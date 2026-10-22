@@ -9,6 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="보드판 카메라">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -202,9 +204,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 <section class="screen" id="s-camera">
   <div class="top">
     <h1>촬영</h1>
-    <div style="display:flex;gap:8px">
-      <button class="pill" id="btn-flip" hidden><svg class="i" viewBox="0 0 24 24"><path d="M4 11a8 8 0 0 1 14-5l2 2"/><path d="M20 4v4h-4"/><path d="M4 13a8 8 0 0 1 14 5l-2-2"/><path d="M4 20v-4h4"/></svg><span id="flip-label">후면</span></button>
-    </div>
+    <div></div>
   </div>
   <div class="install" id="install-banner" hidden>
     <svg class="i" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>
@@ -213,13 +213,11 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
     <button type="button" class="x" id="btn-install-x" aria-label="닫기"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <div class="viewfinder" id="viewfinder">
-    <video id="video" playsinline muted autoplay hidden></video>
     <div class="placeholder" id="vf-placeholder">
       <svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
-      <div id="vf-msg">촬영 버튼을 누르면 폰 카메라가 열려요</div>
+      <div id="vf-msg">아래 주황색 버튼을 누르면 폰 카메라가 열려요</div>
     </div>
     <canvas class="ov" id="vf-board"></canvas>
-    <div class="tip" id="vf-tip" hidden>보드판은 서식 탭에서 위치·크기를 바꿀 수 있어요</div>
   </div>
   <div class="chips">
     <button class="pill on" id="btn-board"><svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>보드판 켜짐</span></button>
@@ -391,9 +389,6 @@ const state = {
   editId: null,
   tab: 'camera',
   showBoard: true,
-  stream: null,
-  facing: 'environment',
-  liveCamera: false,
 };
 function loadAll() {
   const t = LS.get('boardcam.template', null);
@@ -595,29 +590,9 @@ function describeOffer(code, fileName) {
 }
 
 /* ========== 촬영 ========== */
-const video = $('#video');
-async function enterCamera() {
-  renderViewfinderBoard();
-  if (state.stream || state.liveCamera === 'failed') return;
-  await startStream();
-}
-async function startStream() {
-  stopStream();
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { state.liveCamera = 'failed'; return; }
-  try {
-    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: state.facing }, width: { ideal: 4096 }, height: { ideal: 3072 } }, audio: false });
-    state.stream = s; video.srcObject = s; video.hidden = false; $('#vf-placeholder').hidden = true; $('#vf-tip').hidden = false;
-    $('#btn-flip').hidden = false; $('#flip-label').textContent = state.facing === 'environment' ? '후면' : '전면';
-    state.liveCamera = true;
-  } catch (e) {
-    state.liveCamera = 'failed';
-    video.hidden = true; $('#vf-placeholder').hidden = false; $('#btn-flip').hidden = true;
-    $('#vf-msg').textContent = '촬영 버튼을 누르면 폰 카메라 앱이 열려요';
-  }
-}
-function stopStream() { if (state.stream) { state.stream.getTracks().forEach(t => t.stop()); state.stream = null; } video.srcObject = null; }
-function leaveCamera() { stopStream(); if (state.liveCamera === true) state.liveCamera = false; }
-document.addEventListener('visibilitychange', () => { if (document.hidden) leaveCamera(); else if (state.tab === 'camera' && !screens.camera.hidden) enterCamera(); });
+function enterCamera() { renderViewfinderBoard(); }
+function leaveCamera() { /* nothing to stop: the phone camera app is used */ }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !screens.camera.hidden) renderViewfinderBoard(); });
 
 function renderViewfinderBoard() {
   const c = $('#vf-board'); c.hidden = !state.showBoard;
@@ -627,17 +602,7 @@ $('#btn-board').addEventListener('click', e => {
   state.showBoard = !state.showBoard; e.currentTarget.classList.toggle('on', state.showBoard);
   e.currentTarget.querySelector('span').textContent = state.showBoard ? '보드판 켜짐' : '보드판 꺼짐'; renderViewfinderBoard();
 });
-$('#btn-flip').addEventListener('click', () => { state.facing = state.facing === 'environment' ? 'user' : 'environment'; startStream(); });
-$('#btn-shoot').addEventListener('click', async () => {
-  if (state.liveCamera === true && video.videoWidth) {
-    const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight;
-    c.getContext('2d').drawImage(video, 0, 0);
-    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.95));
-    if (blob) startDraft(blob);
-  } else {
-    $('#file-capture').click();
-  }
-});
+$('#btn-shoot').addEventListener('click', () => $('#file-capture').click());
 $('#btn-pick').addEventListener('click', () => $('#file-pick').click());
 for (const id of ['#file-capture', '#file-pick']) {
   $(id).addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) startDraft(f); });
@@ -883,57 +848,57 @@ window.addEventListener('resize', () => {
   redrawOverlays();
 });
 
-/* ========== 홈 화면 설치용 매니페스트 (claude.ai 밖에서 직접 호스팅할 때) ========== */
-const ICON192 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAEVUlEQVR42u3dzXHbMBRFYRKTHrLwQirL7sNlpA+rLGmRhatwVp5JMpNQFEkYwP3OLhnrj7jnvQdSpuepMU7P148Jw3K7nOeW3s8s7EgWYhZ6JMswCz6SZZgFH8kizIKPZBFmwUeyCEX40RN7Z2wWfCR3gyL8SO4GRfiRLEERfiRLUIQfyRIU4UeyBEX4kSxBEX4kS1CEH8kSFOFHsgTFYUIyRfVHchcowo9kCYxAMAKp/kjtAjoAdADVH6ldQAeADqD6I7UL6ADQAVR/pHYBHQA6ABAtgPEHqWOQDgAdACAAQAAgi9kGGDoAQACAAAABAAIABAAIABAAIABAAIAAwBB8cwiWub6dun3v55ebBfwPvgw3aPCJYAQS/oE/DwEAAqiWPhcBAAIABAAIABAAIABAAIAAAAEAAgC/0823QV3G748evoHatABCT4TYEUj4x+H6dmp2PYvwI3ldi4OE5PUtDg6S17k4KEheb9cBEA0BQADtEKnrrgMgGneGw128vz798e/vP34SAHnB//v/exfBCITV4V/7MwQAjEC491uRLZwdWVPZ31+fuh2FCNBA4Jce5zQxASKCv/R8RCBAVPCJQADBJ8KhOAvUWfhrvfaaTW3P1wII0Gn4W3oPOoDwD/le7qnsvV8JtgcYpOqeX26H7Ak+A+67QGh+5DhKgpECbwQafN62JyBAfLBIYARqNlBLI8per3XkOEQA7Br6f/2sSm4E6rr6b70l4NbHE4gAXVT9ms8FAhxeQY8I7KPPqQsQoNvKrxMQQPhJQIAexp+awVz7WsYgAgAEGGksMQoRoJnxx2ciAEAA448xiAAAAQACAAQACAAQACDAcIx6ZzgCAATIZMQLTC6aEWCoUcT4QwCAAK2MDDUrcsu/rEMAo5DRhwAkEH4CxI1BRwa1pVu0EABVJVD5CdBdF/gM7pbwbn286r+Mm+NW7ga17g4NAuzaBfa8bXnrncsIhK4DJfwEiA2W8BMgNmDCT4DYoAk/AWIDJ/wEiA2e8BMgNoDCvx3XAXYMonP8BCDCgSIIPgEiRRB8AgyxP7hXCIEngA0zquAsEAgAEAAgAECA6vgtqExaWHcdADqAaoDU9dYBoAOoCkhd5+LgIHl9i4OE5HUtDhZqrGWr6zmfnq8fPRxEXyRT8aMFAKJGIIAAAAEAAgAEAAgAEAAgALCJ2+U8l9vlPDsU0AEAAgAEALIEsA9A4gZYB4AO4BCAAMYgBI4/OgB0AIcABDAGIXD80QGgAywZAoxa/XUA6AD3mgKMVv11AOgAa40BRqn+ix2ABBg5/EYgRIf/LgF0AUTuAUiA0av/qhGIBBgt/Kv3ACTASOF/aBNMAowS/ocEIAFGCf/DApAAI4R/kwAkQO/hn6Zp2iXA/s4Yegv+rgIQAT2Gf/MIZCRCz+HfvQPoBugl+IcLQAT0MFVUG1mIgBbH6eozOxHQ0h7ySzetZMBXnzhp7qwNKYS9Jr8AgDrpmO3DpowAAAAASUVORK5CYII=';
-const ICON512 = 'data:image/png;base64,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';
+/* ========== 홈 화면에 추가 (PWA 설치) ========== */
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const isTop = window === window.top;
 let deferredInstall = null;
-(async () => {
-  if (window !== window.top) return; // claude.ai 안에서는 뷰어 메뉴의 "홈 화면에 추가"를 쓴다
-  try {
-    let useStatic = false;
-    try { const r = await fetch('manifest.webmanifest', { method: 'HEAD', cache: 'no-store' }); useStatic = r.ok; } catch { /* no static manifest */ }
-    const link = document.createElement('link'); link.rel = 'manifest';
-    if (useStatic) link.href = 'manifest.webmanifest';
-    else {
-      const manifest = { name: '보드판 카메라', short_name: '보드판', start_url: location.href.split('#')[0], scope: location.pathname.replace(/[^/]*$/, ''), display: 'standalone', orientation: 'portrait', background_color: '#121417', theme_color: '#1F58E0', lang: 'ko', icons: [{ src: ICON192, sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: ICON512, sizes: '512x512', type: 'image/png', purpose: 'any' }] };
-      link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
-    }
-    document.head.appendChild(link);
-    const touch = document.createElement('link'); touch.rel = 'apple-touch-icon'; touch.href = useStatic ? 'icon-192.png' : ICON192; document.head.appendChild(touch);
-    if (useStatic && 'serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-  } catch { /* ignore */ }
-  updateInstallUI();
-})();
+if (isTop && 'serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; updateInstallUI(); });
-window.addEventListener('appinstalled', () => { deferredInstall = null; LS.set('boardcam.installed', 1); updateInstallUI(); toast('홈 화면에 추가됐어요'); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; LS.set('boardcam.installed', 1); updateInstallUI(); toast('홈 화면에 아이콘이 추가됐어요'); });
 function updateInstallUI() {
-  const show = window === window.top && !isStandalone();
+  const show = isTop && !isStandalone();
   const dismissedAt = LS.get('boardcam.installDismissed', 0);
   $('#install-banner').hidden = !show || (Date.now() - dismissedAt < 7 * 86400000);
   $('#btn-install2').hidden = !show;
 }
-async function installApp() {
-  if (deferredInstall) {
-    try { deferredInstall.prompt(); await deferredInstall.userChoice; } catch { /* ignore */ }
-    deferredInstall = null; updateInstallUI(); return;
+/** 설치 이벤트가 아직 안 왔으면 잠깐 기다려 본다 (크롬은 페이지 열린 직후 늦게 오기도 함) */
+function waitForInstallEvent(ms) {
+  if (deferredInstall) return Promise.resolve(true);
+  return new Promise(res => {
+    const h = () => { clearTimeout(t); res(true); };
+    const t = setTimeout(() => { window.removeEventListener('beforeinstallprompt', h); res(!!deferredInstall); }, ms);
+    window.addEventListener('beforeinstallprompt', h, { once: true });
+  });
+}
+async function installApp(btn) {
+  const label = btn ? btn.textContent : ''; if (btn) { btn.disabled = true; btn.textContent = '설치 준비 중…'; }
+  const ready = await waitForInstallEvent(2500);
+  if (btn) { btn.disabled = false; btn.textContent = label; }
+  if (ready && deferredInstall) {
+    const ev = deferredInstall; deferredInstall = null;
+    try { ev.prompt(); const r = await ev.userChoice; if (r && r.outcome !== 'accepted') deferredInstall = ev; } catch { /* ignore */ }
+    updateInstallUI(); return;
   }
+  // 자동 설치를 지원하지 않는 브라우저(웨일·삼성 등): 크롬으로 열어 설치하거나 수동 안내
   const ua = navigator.userAgent;
-  const ios = /iPhone|iPad|iPod/.test(ua);
-  const samsung = /SamsungBrowser/.test(ua), whale = /Whale/.test(ua);
-  let html;
-  if (ios) html = '<p>iPhone은 <b>Safari</b>로 열어야 해요.</p><ol><li>아래 <b>공유</b> 버튼(네모에 화살표) 탭</li><li><b>홈 화면에 추가</b> 선택</li><li>오른쪽 위 <b>추가</b></li></ol>';
-  else if (samsung) html = '<ol><li>아래 <b>≡</b> 메뉴 탭</li><li><b>현재 페이지 추가</b> → <b>홈 화면</b></li><li><b>추가</b></li></ol>';
-  else if (whale) html = '<ol><li>아래 <b>≡</b> 메뉴 탭</li><li><b>홈 화면에 추가</b> (또는 <b>앱 설치</b>)</li><li><b>추가</b></li></ol><p>안 보이면 이 주소를 <b>크롬</b>으로 열면 바로 설치 버튼이 떠요.</p>';
-  else html = '<ol><li>오른쪽 위 <b>⋮</b> 메뉴 탭</li><li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b></li><li><b>설치</b></li></ol>';
+  const ios = /iPhone|iPad|iPod/.test(ua), android = /Android/.test(ua);
+  let html = '';
+  if (ios) html = '<p>iPhone은 <b>Safari</b>에서 설치할 수 있어요.</p><ol><li>아래 <b>공유</b> 버튼(네모에 화살표) 탭</li><li><b>홈 화면에 추가</b> 선택</li><li>오른쪽 위 <b>추가</b></li></ol>';
+  else if (android) {
+    const intent = 'intent://' + location.host + location.pathname + location.search + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(location.href) + ';end';
+    html = '<p>이 브라우저는 자동 설치가 안 돼요. <b>크롬</b>으로 열면 버튼 한 번에 설치돼요.</p>'
+      + '<a class="btn" href="' + intent + '" style="margin:8px 0 14px;text-decoration:none">크롬으로 열어서 설치하기</a>'
+      + '<p style="color:var(--muted);font-size:13px">크롬이 없으면: 브라우저 메뉴(⋮ 또는 ≡) → <b>홈 화면에 추가</b> → 추가</p>';
+  } else html = '<ol><li>오른쪽 위 <b>⋮</b> 메뉴</li><li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b></li></ol>';
   $('#install-help').innerHTML = html;
   $('#install-modal').hidden = false;
 }
-$('#btn-install').addEventListener('click', installApp);
-$('#btn-install2').addEventListener('click', installApp);
+$('#btn-install').addEventListener('click', e => installApp(e.currentTarget));
+$('#btn-install2').addEventListener('click', e => installApp(e.currentTarget));
 $('#btn-install-x').addEventListener('click', () => { LS.set('boardcam.installDismissed', Date.now()); updateInstallUI(); });
 $('#btn-install-close').addEventListener('click', () => { $('#install-modal').hidden = true; });
 $('#install-modal').addEventListener('click', e => { if (e.target.id === 'install-modal') e.currentTarget.hidden = true; });
+updateInstallUI();
 
 /* ========== 시작 ========== */
 loadAll();
