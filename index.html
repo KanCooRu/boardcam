@@ -650,8 +650,10 @@ async function readPhoto(blob) {
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   c.getContext('2d').drawImage(bmp, 0, 0, W, H);
   if (bmp.close) bmp.close();
-  return { width: sw, height: sh, base: { canvas: c, W, H } };
+  return { width: sw, height: sh, base: { canvas: c, W, H }, blob };
 }
+/** 베이스 캔버스를 화면 표시용 JPG 로 (원본 형식과 무관하게 항상 보이게) */
+function baseToBlob(base) { return new Promise(res => base.canvas.toBlob(b => res(b), 'image/jpeg', 0.85)); }
 let heicLib = null;
 function loadScript(src) { return new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = () => rej(new Error('변환 모듈을 받지 못했어요 (인터넷 연결 확인)')); document.head.appendChild(el); }); }
 async function heicToJpeg(blob) {
@@ -665,9 +667,9 @@ async function startDraft(blob) {
   $('#btn-shoot').disabled = true; $('#vf-msg').textContent = '사진 읽는 중…';
   try {
     const id = newId();
-    const { width, height, base } = await readPhoto(blob);
+    const { width, height, base, blob: photo } = await readPhoto(blob);
     draftBase = base;
-    await idb.put(id + ':orig', blob);
+    await idb.put(id + ':orig', photo);
     const fields = withDate(state.template.fields);
     const work = fields.find(f => f.key === 'work')?.value || '';
     state.draft = { id, width, height, fields, savedFields: null, style: clone(state.template.style), fileName: buildFileName(work, nextSeq()), createdAt: Date.now(), savedAt: null };
@@ -700,7 +702,8 @@ async function openPreview() {
     const f = d.fields.find(x => x.key === k); if (f) f.value = v;
     $('#pv-ov')._draw && $('#pv-ov')._draw();
   });
-  showPhoto($('#pv-img'), $('#pv-ov'), pvOrig, () => d.fields, () => d.style);
+  const base = await pvBaseP;
+  showPhoto($('#pv-img'), $('#pv-ov'), base ? await baseToBlob(base) : pvOrig, () => d.fields, () => d.style);
 }
 $('#btn-retake').addEventListener('click', async () => { const d = state.draft; state.draft = null; if (d) idb.del(d.id + ':orig'); show('camera'); });
 async function commitSave(record, blob) {
@@ -779,7 +782,8 @@ async function openEdit(id) {
     $('#ed-ov')._draw && $('#ed-ov')._draw();
   });
   updateBanner(r);
-  showPhoto($('#ed-img'), $('#ed-ov'), edOrig, () => r.fields, () => r.style);
+  const base = await edBaseP;
+  showPhoto($('#ed-img'), $('#ed-ov'), base ? await baseToBlob(base) : edOrig, () => r.fields, () => r.style);
 }
 async function edBase() { let b = await edBaseP; if (!b) b = await prepareBase(edOrig, edRecord.width, edRecord.height); return b; }
 /** 변경됨 태그만 갱신 (입력 포커스 유지) */
