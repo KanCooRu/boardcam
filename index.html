@@ -622,19 +622,58 @@ for (const id of ['#file-capture', '#file-pick']) {
   $(id).addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) startDraft(f); });
 }
 
+/** 카메라/갤러리에서 받은 파일을 읽어 크기와 저장용(2048) 베이스 캔버스를 만든다. 실패 원인을 구체적으로 알려준다 */
+async function readPhoto(blob) {
+  if (!blob || !blob.size) throw new Error('카메라에서 사진이 전달되지 않았어요. 다시 찍어주세요.');
+  const t = (blob.type || '').toLowerCase(), n = (blob.name || '').toLowerCase();
+  if (t.includes('heic') || t.includes('heif') || n.endsWith('.heic') || n.endsWith('.heif')) {
+    // 갤럭시 "고효율 사진(HEIF)": 브라우저가 못 읽으므로 JPG로 변환해서 계속 진행
+    toast('HEIC 사진 변환 중… (처음 한 번은 조금 걸려요)');
+    blob = await heicToJpeg(blob);
+  }
+  let bmp = null;
+  if ('createImageBitmap' in window) {
+    try { bmp = await withTimeout(createImageBitmap(blob), 20000, '사진 읽기'); } catch { bmp = null; }
+    if (!bmp) { try { bmp = await withTimeout(createImageBitmap(blob, { resizeWidth: OUTPUT_WIDTH, resizeQuality: 'medium' }), 20000, '사진 읽기'); } catch { bmp = null; } }
+  }
+  if (!bmp) {
+    bmp = await new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onerror = () => rej(new Error('파일을 열 수 없어요'));
+      fr.onload = () => { const img = new Image(); img.onload = () => res(img); img.onerror = () => rej(new Error('이미지 디코딩 실패')); img.src = fr.result; };
+      fr.readAsDataURL(blob);
+    }).catch(e => { throw new Error(`사진을 읽지 못했어요 (${t || '형식 불명'}, ${(blob.size / 1048576).toFixed(1)}MB): ${e.message}`); });
+  }
+  const sw = bmp.width || bmp.naturalWidth, sh = bmp.height || bmp.naturalHeight;
+  if (!sw || !sh) throw new Error('사진 크기를 알 수 없어요');
+  const W = Math.min(OUTPUT_WIDTH, sw), H = Math.round(sh * W / sw);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  c.getContext('2d').drawImage(bmp, 0, 0, W, H);
+  if (bmp.close) bmp.close();
+  return { width: sw, height: sh, base: { canvas: c, W, H } };
+}
+let heicLib = null;
+function loadScript(src) { return new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = () => rej(new Error('변환 모듈을 받지 못했어요 (인터넷 연결 확인)')); document.head.appendChild(el); }); }
+async function heicToJpeg(blob) {
+  if (!heicLib) { await loadScript('https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js'); heicLib = window.heic2any; }
+  if (!heicLib) throw new Error('HEIC 변환 모듈을 불러오지 못했어요');
+  const out = await withTimeout(heicLib({ blob, toType: 'image/jpeg', quality: 0.92 }), 60000, 'HEIC 변환');
+  return Array.isArray(out) ? out[0] : out;
+}
+let draftBase = null;
 async function startDraft(blob) {
-  $('#btn-shoot').disabled = true;
+  $('#btn-shoot').disabled = true; $('#vf-msg').textContent = '사진 읽는 중…';
   try {
     const id = newId();
-    const bmp = await decode(blob);
-    const width = bmp.width || bmp.naturalWidth, height = bmp.height || bmp.naturalHeight; if (bmp.close) bmp.close();
+    const { width, height, base } = await readPhoto(blob);
+    draftBase = base;
     await idb.put(id + ':orig', blob);
     const fields = withDate(state.template.fields);
     const work = fields.find(f => f.key === 'work')?.value || '';
     state.draft = { id, width, height, fields, savedFields: null, style: clone(state.template.style), fileName: buildFileName(work, nextSeq()), createdAt: Date.now(), savedAt: null };
     openPreview();
-  } catch (e) { alert('사진을 읽지 못했어요: ' + (e.message || e)); }
-  finally { $('#btn-shoot').disabled = false; }
+  } catch (e) { alert((e && e.message ? e.message : '사진을 읽지 못했어요') + '\n\n다시 찍어주세요.'); }
+  finally { $('#btn-shoot').disabled = false; $('#vf-msg').textContent = '아래 주황색 버튼을 누르면 폰 카메라가 열려요'; }
 }
 
 /* ========== 공통: 필드 편집 UI ========== */
@@ -655,7 +694,8 @@ async function openPreview() {
   $('#pv-filename').textContent = d.fileName;
   pvOrig = await idb.get(d.id + ':orig');
   if (!pvOrig) { alert('사진을 저장소에서 다시 읽지 못했어요.'); show('camera'); return; }
-  pvBaseP = prepareBase(pvOrig, d.width, d.height).catch(e => { console.warn(e); return null; });
+  pvBaseP = draftBase ? Promise.resolve(draftBase) : prepareBase(pvOrig, d.width, d.height).catch(e => { console.warn(e); return null; });
+  draftBase = null;
   renderFields($('#pv-fields'), d.fields, null, (k, v) => {
     const f = d.fields.find(x => x.key === k); if (f) f.value = v;
     $('#pv-ov')._draw && $('#pv-ov')._draw();
