@@ -229,15 +229,15 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
     <button class="round" data-go="template"><span><svg class="i" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12"/><rect x="3" y="4.5" width="3" height="3" rx=".6"/><rect x="3" y="10.5" width="3" height="3" rx=".6"/><rect x="3" y="16.5" width="3" height="3" rx=".6"/></svg></span>서식 변경</button>
   </div>
   <input type="file" accept="image/*" capture="environment" id="file-capture" class="sr">
-  <input type="file" accept="image/*" id="file-pick" class="sr">
+  <input type="file" accept="image/*" id="file-pick" class="sr" multiple>
   <nav class="tabbar" data-tabbar></nav>
 </section>
 
 <!-- ===== 미리보기 ===== -->
 <section class="screen" id="s-preview" hidden>
   <div class="header">
-    <div class="side"><button class="back" id="btn-retake"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>다시 찍기</button></div>
-    <div class="center">미리보기</div>
+    <div class="side"><button class="back" id="btn-retake"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><span id="btn-retake-label">다시 찍기</span></button></div>
+    <div class="center" id="pv-title">미리보기</div>
     <div class="side right"></div>
   </div>
   <div class="content">
@@ -248,7 +248,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
     <div class="card info"><span class="k">파일명</span><span class="v" id="pv-filename"></span><span class="k">저장 위치</span><span class="v">이 앱 저장함 + 폰 다운로드</span></div>
   </div>
   <div class="footer">
-    <button class="btn" id="btn-save"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>저장하기</button>
+    <button class="btn" id="btn-save"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><span id="btn-save-label">저장하기</span></button>
     <button class="btn outline compact" id="btn-save-share"><svg class="i" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.6M8.2 13.2l7.6 4.6"/></svg>저장하고 바로 공유</button>
   </div>
 </section>
@@ -389,6 +389,7 @@ const state = {
   editId: null,
   tab: 'camera',
   showBoard: true,
+  queue: [], batchTotal: 0, batchIndex: 0, savedCount: 0, carry: null,
 };
 function loadAll() {
   const t = LS.get('boardcam.template', null);
@@ -619,7 +620,21 @@ $('#btn-board').addEventListener('click', e => {
 $('#btn-shoot').addEventListener('click', () => $('#file-capture').click());
 $('#btn-pick').addEventListener('click', () => $('#file-pick').click());
 for (const id of ['#file-capture', '#file-pick']) {
-  $(id).addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) startDraft(f); });
+  $(id).addEventListener('change', e => { const files = Array.from(e.target.files || []); e.target.value = ''; if (files.length) startBatch(files); });
+}
+/** 여러 장 선택 시: 한 장씩 미리보기 → 저장하고 다음 → … → 마지막에 저장함 */
+function startBatch(files) {
+  state.queue = files.slice(1); state.batchTotal = files.length; state.batchIndex = 1; state.savedCount = 0; state.carry = null;
+  startDraft(files[0]);
+}
+function endBatch() {
+  const n = state.savedCount; const batch = state.batchTotal > 1;
+  state.queue = []; state.batchTotal = 0; state.batchIndex = 0; state.savedCount = 0; state.carry = null;
+  if (n) { show('gallery'); toast(batch ? `${n}장 저장 완료` : '저장 완료'); } else show('camera');
+}
+async function nextInBatch() {
+  const next = state.queue.shift(); state.batchIndex++;
+  await startDraft(next);
 }
 
 /** 카메라/갤러리에서 받은 파일을 읽어 크기와 저장용(2048) 베이스 캔버스를 만든다. 실패 원인을 구체적으로 알려준다 */
@@ -671,6 +686,7 @@ async function startDraft(blob) {
     draftBase = base;
     await idb.put(id + ':orig', photo);
     const fields = withDate(state.template.fields);
+    if (state.carry) fields.forEach(f => { if (f.auto !== 'date' && state.carry[f.key] != null) f.value = state.carry[f.key]; });
     const work = fields.find(f => f.key === 'work')?.value || '';
     state.draft = { id, width, height, fields, savedFields: null, style: clone(state.template.style), fileName: buildFileName(work, nextSeq()), createdAt: Date.now(), savedAt: null };
     openPreview();
@@ -693,6 +709,11 @@ let pvOrig = null, pvBaseP = null;
 async function openPreview() {
   const d = state.draft; if (!d) return;
   show('preview');
+  const batch = state.batchTotal > 1, more = state.queue.length > 0;
+  $('#pv-title').textContent = batch ? `미리보기 ${state.batchIndex} / ${state.batchTotal}` : '미리보기';
+  $('#btn-retake-label').textContent = batch ? '이 사진 빼기' : '다시 찍기';
+  $('#btn-save-label').textContent = more ? '저장하고 다음 사진' : '저장하기';
+  $('#btn-save-share').hidden = batch;
   $('#pv-filename').textContent = d.fileName;
   pvOrig = await idb.get(d.id + ':orig');
   if (!pvOrig) { alert('사진을 저장소에서 다시 읽지 못했어요.'); show('camera'); return; }
@@ -705,7 +726,10 @@ async function openPreview() {
   const base = await pvBaseP;
   showPhoto($('#pv-img'), $('#pv-ov'), base ? await baseToBlob(base) : pvOrig, () => d.fields, () => d.style);
 }
-$('#btn-retake').addEventListener('click', async () => { const d = state.draft; state.draft = null; if (d) idb.del(d.id + ':orig'); show('camera'); });
+$('#btn-retake').addEventListener('click', async () => {
+  const d = state.draft; state.draft = null; if (d) idb.del(d.id + ':orig');
+  if (state.queue.length) nextInBatch(); else if (state.batchTotal > 1) endBatch(); else show('camera');
+});
 async function commitSave(record, blob) {
   await idb.put(record.id + ':out', blob);
   record.savedFields = clone(record.fields); record.savedAt = Date.now();
@@ -726,6 +750,13 @@ async function doSavePreview(share) {
     state.draft = null;
     const code = await offerFile(blob, d.fileName, share);
     const [msg, warn] = describeOffer(code, d.fileName);
+    if (state.batchTotal > 1) {
+      state.savedCount++;
+      state.carry = Object.fromEntries(d.fields.map(f => [f.key, f.value]));
+      if (state.queue.length) { toast(msg, warn); await nextInBatch(); }
+      else endBatch();
+      return;
+    }
     show('gallery'); toast(msg, warn);
   } catch (e) { alert('저장 실패: ' + (e.message || e)); }
   finally { btns.forEach(b => b.disabled = false); $('#pv-busy').hidden = true; }
