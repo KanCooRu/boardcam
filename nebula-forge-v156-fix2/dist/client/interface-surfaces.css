@@ -1,0 +1,576 @@
+/* The illustration owns its alpha channel. Counts, locks and rarity rims belong to the surrounding tile. */
+.ui-renewal .game .art.ui-cutout {
+  background-color: transparent; clip-path: none; border-radius: 0; box-shadow: none;
+}
+.ui-renewal .art.book-outline { clip-path: var(--icon-outline); }
+:root:not([data-theme="dark"]) .ui-renewal {
+  --activity-empty: #a49377; --activity-check: #fff;
+  --icon-halo: #69432d30; --figure-shadow: #70522c46; --unavailable-ink: #554a3a;
+  --gauge-empty: #eadfc9; --gauge-fill: #b7a2bd; --gauge-gold: #d4ae76;
+  --gauge-ready: #9dbb9f; --gauge-claimed: #c0b6aa;
+  --unavailable-fill: #e9dfca; --selection-fill: #79491f; --selection-ink: #fff4da;
+}
+:root[data-theme="dark"] .ui-renewal {
+  --activity-empty: #827488; --activity-check: #19251e;
+  --icon-halo: #f4dbc16b; --figure-shadow: #d5b9873b; --unavailable-ink: #d6c9c9;
+  --gauge-empty: #27222f; --gauge-fill: #624c70; --gauge-gold: #705535;
+  --gauge-ready: #405e51; --gauge-claimed: #514956;
+  --unavailable-fill: #3b3344; --selection-fill: #695134; --selection-ink: #fff3d9;
+}
+/* The first-run picker and the in-game previews share the same floor under the feet. */
+.ui-renewal .class-preview-stage > .class-aura,
+.ui-renewal .wardrobe-stage > .wardrobe-pedestal {
+  background: radial-gradient(ellipse closest-side,var(--figure-shadow),transparent);
+  border: 0; box-shadow: none;
+}
+/* Battle shortcuts sit directly on illustrated sky in both themes. */
+.ui-renewal #battle :is(.side-nav,.right-nav) {
+  width: clamp(54px,16%,66px);
+}
+.ui-renewal #battle :is(.side-nav,.right-nav) button {
+  width: 100%;
+}
+.ui-renewal #battle :is(.side-nav,.right-nav) :is(small,time) {
+  color: #fff6df; background: transparent; border: 0; border-radius: 0;
+  box-shadow: none; padding: 0; text-shadow: none; white-space: nowrap;
+  font-size:clamp(10px,2.9cqw,12px); line-height: 1.3; font-weight: 750;
+  -webkit-text-stroke: 2px #242032; paint-order: stroke fill;
+}
+.ui-renewal #battle .offline-shortcut time {
+  color: #ffe2a2; font-size:clamp(10px,2.65cqw,11px);
+  letter-spacing: .02em; font-variant-numeric: tabular-nums;
+}
+@supports not (paint-order: stroke fill) {
+  .ui-renewal #battle :is(.side-nav,.right-nav) :is(small,time) {
+    -webkit-text-stroke: 0;
+    text-shadow: -1px 0 #242032,1px 0 #242032,0 -1px #242032,0 1px #242032;
+  }
+}
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) {
+  & :is(.guild-avatar,.tile-art,.loot-icon,.growth-stat-icon,.package-card .art) {
+    background-color: transparent; background-image: none; box-shadow: none;
+  }
+  & :is(.growth-stat-icon,.guild-banner .art,.discovery-row>.art,.guild-mission-row .art,.tile-art>.art,.raid-coming>.art) {
+    filter: drop-shadow(0 0 1px var(--icon-halo));
+  }
+  & .undiscovered .tile-art>.art, & .relic-vault-card.locked .art {
+    opacity: .88; filter: saturate(.65) drop-shadow(0 0 1px var(--icon-halo));
+  }
+  & .relic-vault-icon>.relic-vault-lock {
+    color: var(--sheet-ink); background: var(--sheet-panel); border: 1px solid var(--sheet-edge);
+    text-shadow: none; font-weight: 700; padding: 0 4px; line-height: 1.4;
+    bottom: -2px; left: 50%; right: auto; transform: translateX(-50%); white-space: nowrap;
+  }
+
+  /* Cards and list rows use the same surface for their title and description. */
+  & :is(.equipped-set-list>div,.pass-row,.costume-stat-link,.class-profile-link,.edit-name,
+    .server-card,.help-item,.honor-card,.costume-detail-hero,
+    .costume-detail-stats>section,.costume-stat-totals>div,.masterwork-costs>div,
+    .masterwork-parts>button,.masterwork-tiers>button,.masterwork-requirements>span,.masterwork-card,
+    .online-score,.payment-notice,.pet-rate-summary>div,.prob-row,.profile-links>button,
+    .region-boss-preview,.royal-pity,.save-status,.set-bonus-list>div,.set-parts>span,
+    .test-explainer>div,.vip-rules,.wheel-rate-list>button,.pet-rate-group,.sound-settings,
+    .equipment-set-card .set-specialty,.vip-rank-selector,.balance-help,.purchase-total) {
+    color: var(--sheet-ink); background: var(--sheet-row); border-color: var(--sheet-edge); text-shadow: none;
+  }
+  & :is(.equipped-set-list>div,.pass-row,.costume-stat-link,.class-profile-link,.server-card,
+    .help-item,.honor-card,.costume-detail-hero,.costume-detail-stats,
+    .costume-stat-totals,.masterwork-costs,.masterwork-card,.online-score,.payment-notice,
+    .pet-rate-group,.pet-rate-summary,.prob-row,.profile-links,.region-boss-preview,.royal-pity,
+    .save-status,.set-bonus-list,.test-explainer,.vip-rules,.wheel-rate-list,.sound-settings,
+    .balance-help,.purchase-total) :is(b,strong,h2,h3,summary,em) {
+    color: var(--sheet-ink); text-shadow: none;
+  }
+  & :is(.equipped-set-list,.pass-row,.costume-stat-link,.class-profile-link,.server-card,.help-item,
+    .honor-card,.bestiary-grid,.costume-detail-stats,.costume-stat-totals,.masterwork-costs,
+    .masterwork-card,.online-score,.payment-notice,.pet-rate-group,.prob-row,.profile-links,
+    .region-boss-preview,.royal-pity,.save-status,.set-bonus-list,.set-parts,.test-explainer,
+    .vip-rules,.wheel-rate-list,.sound-settings,.balance-help,.purchase-total) :is(small,p,span):not(.art) {
+    color: var(--sheet-muted); text-shadow: none;
+  }
+  & :is(.objective-heading,.raid-coming,.identity-heading,.atlas-intro,.newbie-progress,
+    .popup-hero,.masterwork-intro,.gm-hero,.mail-detail,.season-product-heading,.offline-duration,
+    .offline-quick,.prob-head,.vip-gift-heading,.wardrobe-collection,.power-ladder,.danger-zone,
+    .vip-medallion,.costume-rank-details,.guild-foot,.mail-detail-rewards)
+    :is(h2,h3,strong,b,summary) { color: var(--sheet-ink); text-shadow: none; }
+  & :is(.raid-coming,.identity-heading,.newbie-progress,.gm-hero,.season-product-heading,.vip-rank-selector,
+    .vip-gift-heading,.vip-progress-copy,.wardrobe-collection,.power-ladder,.guild-giving,.guild-foot,
+    .local-account-note,.previous-powers,.level-preview,.offline-duration,.offline-quick,.mail-detail-sender,
+    .honor-current,.profile-character,.spec-section h3,.masterwork-effect,.settings-link)
+    :is(p,span,small,summary):not(.art) { color: var(--sheet-muted); text-shadow: none; }
+  & :is(.set-rules,.costume-detail-note,.event-ownership,.empty-state,.offline-hero>small,.equipment-set-card .set-specialty) {
+    color: var(--sheet-muted); text-shadow: none;
+  }
+  & :is(.raid-coming .coming-badge,.wardrobe-event-tag,.event-clock,.pass-step-label,.mail-info-label,.first-charge) {
+    color: var(--sheet-accent); background: var(--sheet-row); border-color: var(--sheet-edge); text-shadow: none;
+  }
+  & :is(.guild-level,.objective-heading,.order-reset,.pass-list-hint,.vip-rank-selector) {
+    background: transparent; box-shadow: none; color: var(--sheet-ink);
+  }
+  & :is(.objective-heading>span,.order-reset,.pass-list-hint) {
+    color: var(--sheet-muted);
+  }
+  & .mission-gauge {
+    background: var(--gauge-empty); box-shadow: inset 0 0 0 1px var(--sheet-edge);
+  }
+  & .mission-gauge i { background: var(--gauge-fill); opacity: 1; }
+  & :is(.mission-total,.guild-bounty,.guild-level) .mission-gauge i { background: var(--gauge-gold); }
+  & :is(.order-row.completed,.objective.is-ready) .mission-gauge i { background: var(--gauge-ready); }
+  & .objective.is-claimed .mission-gauge i { background: var(--gauge-claimed); }
+  & .mission-gauge>b {
+    display: grid; place-items: center; line-height: 1; color: var(--sheet-ink);
+    background: transparent; padding: 0; text-shadow: none;
+  }
+  & .loot-icon {
+    height: 40px; display: grid; grid-template-rows: minmax(0,1fr) auto;
+    justify-items: center; align-items: center; background: transparent; border-color: transparent;
+  }
+  & .loot-icon>.art { width: 25px; height: 25px; max-width: 100%; }
+  & .loot-icon>b {
+    position: static; color: var(--sheet-ink); background: transparent;
+    text-shadow: none; font-size:var(--min-label,13px); line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  & .costume-rank-table :is(th,td) { color: var(--sheet-ink); background:var(--sheet-row); border-color:var(--sheet-edge); }
+  & .costume-rank-table th small { color: var(--sheet-muted); }
+  & .collection-cell :is(.collection-name,.catalog-detail-hint) { color:var(--sheet-ink); text-shadow:none; }
+  & .collection-cell>div[class^="rar"] { color:var(--sheet-muted); border-bottom:2px solid var(--rim,var(--sheet-edge)); width:max-content; margin-inline:auto; }
+  & :is(.day-card.today strong,.campaign-difficulty-tabs>button.active,.masterwork-parts>button.active,.masterwork-tiers>button.active) {
+    background:var(--selection-fill); color:var(--selection-ink); border-color:var(--sheet-edge); text-shadow:none;
+  }
+  & .campaign-difficulty-tabs>button.active small { color:var(--selection-ink); }
+  & :is(.pref-link span,.mail-row-arrow,.mail-row-text small,.profile-links .link-arrow) { color:var(--sheet-muted); }
+  & :is(.gold-button,.muted-button):disabled {
+    background:var(--unavailable-fill); color:var(--unavailable-ink); text-shadow:none; opacity:1;
+  }
+  & :is(.gold-button,.muted-button):disabled :is(span:not(.art),small,b) {
+    color:inherit; background-color:transparent; text-shadow:none;
+  }
+}
+.ui-renewal .game .art[data-icon="portrait"] { clip-path:circle(48%); }
+.ui-renewal .game .art[data-icon="key"] { clip-path: polygon(0% 74%,35% 44%,36% 33%,45% 19%,64% 13%,78% 15%,88% 28%,89% 42%,77% 56%,62% 61%,50% 57%,15% 91%,4% 89%); }
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) {
+  & .tile-art>.tile-level {
+    inset: auto auto 2px 50%; transform: translateX(-50%); padding: 2px 5px;
+    line-height: 1.15; white-space: nowrap; border-radius: 4px; font-size:clamp(var(--min-label,13px),3.4vw,15px);
+    color: var(--sheet-ink); background: var(--sheet-row); border: 1px solid var(--sheet-edge); text-shadow: none;
+  }
+  & :is(.offline-duration,.local-account-note,.event-ownership,.set-rules,
+    .campaign-difficulty-tabs>button:not(.active),.danger-zone>button) {
+    background: var(--sheet-inset); border-color: var(--sheet-edge); color:var(--sheet-ink);
+  }
+  & .vip-rank-selector>button {
+    min-height: 44px; flex-basis: 40px; background: transparent; color: var(--sheet-accent);
+  }
+  & .vip-rank-selector>button:disabled { opacity: 1; color: var(--sheet-muted); }
+  & .vip-medallion {
+    display: grid; grid-template-rows: 22px 1fr; justify-items: center;
+    padding: 3px 0; border-color: var(--sheet-edge); background: transparent;
+  }
+  & .vip-medallion>.art { width: 22px; height: 22px; aspect-ratio: 1; border-radius: 0; opacity: 1; }
+  & .vip-medallion>b {
+    position: static; color: var(--sheet-ink); background: transparent; text-shadow: none;
+    font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  & .costume-detail-stats dl :is(dt,dd), & .costume-detail-hero>div :is(span,a),
+  & .masterwork-tiers>button :is(b,small), & .guild-roster b small { color:var(--sheet-ink); }
+  & .masterwork-tiers>button.active :is(b,small) { color:var(--selection-ink); }
+}
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) {
+  & :is(.gear-detail-hero,.gear-cost-line,.gear-set-details,.pet-result-card,.music-volume-label,.inventory-set-filter select) {
+    background:var(--sheet-row); color:var(--sheet-ink); border-color:var(--sheet-edge);
+  }
+  & .gear-detail-compact :is(h3,b,dt,dd,small,p,summary,span,button:not(.gold-button,.muted-button)):not(.art),
+  & :is(.pet-result-card b,.pet-result-card small,.music-volume-label output,.local-account-note>b,
+    .inventory-set-filter,.roll-member small,.campaign-difficulty-tabs>button:not(.active)>small) {
+    color:var(--sheet-ink); text-shadow:none;
+  }
+  & .gear-detail-compact .positive { color:var(--sheet-positive); }
+  & .gear-detail-compact .negative { color:var(--sheet-accent); }
+}
+.ui-renewal #content .gear-detail-compact .gear-lock-switch {
+  background:var(--sheet-row); border-color:var(--sheet-edge);
+}
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) {
+  & :is(.month-day,.premium-pass-offer,.season-track-selector>button,.monthly-totals) {
+    background:var(--sheet-row); color:var(--sheet-ink); border-color:var(--sheet-edge);
+  }
+  & :is(.monthly-selection-line,.monthly-caption,.monthly-totals>summary,.monthly-selection-line>b,
+    .premium-pass-offer>div>:is(b,small),.season-track-selector>button>*,
+    .month-day>b,.month-day>small,.month-day>.month-day-number) { color:var(--sheet-ink); text-shadow:none; }
+  & :is(.season-track-selector>button.active,.month-day.selected,.month-day.special .month-day-number,.pass-lock-mark) {
+    background:var(--selection-fill); color:var(--selection-ink); border-color:var(--sheet-edge); text-shadow:none;
+  }
+  & :is(.month-day.selected>span,.month-day.selected>b,.month-day.selected>small,.season-track-selector>button.active>*) {
+    background:transparent; color:var(--selection-ink); text-shadow:none;
+  }
+}
+
+/* The item's full illustration sits above the mat. Its level has a separate line. */
+:root:not([data-theme="dark"]) .ui-renewal {
+  --gear-mat: radial-gradient(ellipse at 48% 35%,#efdfbb 0%,#dec69e 55%,#c2a780 100%);
+  --gear-mat-edge: #9f835b;
+  --gear-caption: #765739;
+  --gear-caption-ink: #fff4dd;
+}
+:root[data-theme="dark"] .ui-renewal {
+  --gear-mat: radial-gradient(ellipse at 48% 35%,#a49380 0%,#806e5f 55%,#5e4f46 100%);
+  --gear-mat-edge: #a48b71;
+  --gear-caption: #483a31;
+  --gear-caption-ink: #fff0d7;
+}
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) .equipment-tile {
+  --gear-caption-height: clamp(15px,3.8vw,19px);
+  & .tile-art {
+    background: var(--gear-mat);
+    box-shadow: inset 0 0 0 1px var(--gear-mat-edge);
+  }
+  & .tile-art>.gear-illustration {
+    position: absolute; inset: 2px 0 auto; margin-inline: auto!important;
+    width: calc(100% - var(--gear-caption-height) - 3px)!important;
+    height: calc(100% - var(--gear-caption-height) - 3px)!important;
+    background-color: transparent; filter: none; object-fit:contain;
+  }
+  & .tile-art>.tile-level {
+    position: absolute; inset: auto 0 0; transform: none; display: grid; place-items: center;
+    box-sizing: border-box; height: var(--gear-caption-height); margin: 0; padding: 0;
+    font: inherit; font-size:clamp(var(--min-label,13px),3vw,14px); line-height: 1; font-weight: 750;
+    font-variant-numeric: tabular-nums; border: 0; border-radius: 0;
+    background: var(--gear-caption); color: var(--gear-caption-ink); text-shadow: none;
+  }
+}
+
+/* Discovery records show the selected equipment on its in-game display surface. */
+.ui-renewal :is(#screenContent,#content) .codex-gear-art {
+  display:grid; place-items:center; position:relative; flex:none; box-sizing:border-box;
+  width:var(--codex-art-size,42px); aspect-ratio:1; padding:2px; border-radius:var(--ui-radius-sm,6px);
+  background:var(--gear-mat); box-shadow:inset 0 0 0 1px var(--gear-mat-edge);
+}
+.ui-renewal :is(#screenContent,#content) .codex-gear-art>:is(.art,.weapon-icon) {
+  width:100%; height:100%; max-width:none; object-fit:contain; margin:0;
+  background-color:transparent; box-shadow:none; border:0; filter:none;
+}
+.collection-cell>.codex-gear-art,.relic-vault-card>.codex-gear-art {--codex-art-size:min(64px,100%)}
+.catalog-item-hero>.codex-gear-art,.relic-item-hero>.codex-gear-art {--codex-art-size:min(126px,100%);margin-inline:auto}
+.weapon-codex-intro>.codex-gear-art {--codex-art-size:62px}
+.weapon-milestone>.codex-gear-art {--codex-art-size:32px;justify-self:center}
+
+/* Help, rewards and results share the ink of the surface that actually holds them. */
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) {
+  & :is(.dungeon-guide-title,.content-hero:not(.tower-content-hero) h2,
+    .test-ad h3,.royal-results .loot-card>b,.haven-coin-rewards b,.online-battle-log b) {
+    color: var(--sheet-ink); text-shadow: none;
+  }
+  & :is(.dungeon-guide-copy,.content-hero:not(.tower-content-hero) p,.vip-title-gift>small,
+    .test-ad p,.online-battle-log small,.royal-results .loot-card>small) {
+    color: var(--sheet-muted); text-shadow: none;
+  }
+  & :is(.test-ad,.royal-results .loot-card,
+    .honor-current,.mine-scene,.content-hero:not(.tower-content-hero)) {
+    background: var(--sheet-panel); border-color: var(--sheet-edge); color: var(--sheet-ink);
+  }
+  & :is(.reward-chips,.haven-coin-rewards,.mine-scene) :is(b,h2,small) { color: var(--sheet-ink); }
+  & :is(.mine-scene>p,.honor-current>small,.honor-current>p) { color: var(--sheet-muted); }
+  & .mine-scene #mineClock { color: var(--sheet-accent); }
+  & .realm-enter>span { color: inherit; opacity: 1; }
+  & :is(.realm-enter,.gear-secondary-actions>button):disabled {
+    color: var(--unavailable-ink); background: var(--unavailable-fill); opacity: 1;
+  }
+  & .server-card.unavailable { opacity: 1; background: var(--unavailable-fill); }
+  & .server-card.unavailable :is(b,small,strong) { color: var(--unavailable-ink); }
+  & :is(.wardrobe-prev,.wardrobe-next) { color: var(--sheet-ink); background: transparent; opacity: 1; }
+  & .online-battle-log>div { background: var(--sheet-row); color: var(--sheet-ink); }
+}
+.ui-renewal :is(#screenContent,#content) .setting-row .switch-face.is-on { background: #356a47; }
+.ui-renewal :is(#screenContent,#content) .setting-row .switch-face.is-off { background: #8e4344; }
+.ui-renewal :is(#screenContent,#content) .setting-row .switch-face .switch-word { color: #fff; text-shadow: none; }
+.ui-renewal .class-onboarding .class-choice-note,
+.ui-renewal .class-onboarding .class-pick-header>span,
+.ui-renewal :is(.class-onboarding,#screenContent) .class-skill-preview small { color: var(--sheet-muted); text-shadow: none; }
+.ui-renewal .class-onboarding .class-choose:disabled,
+.ui-renewal #screenContent[data-surface="skills"] .gold-button:disabled {
+  color: var(--unavailable-ink); background: var(--unavailable-fill); opacity: 1;
+}
+/* An outline follows the letters over changing artwork without concealing the illustration. */
+.ui-renewal :is(#content,#screenContent) :is(.world-card,.region-preview,.tower-content-hero,.vip-center-banner)
+  :is(h2,h3,p,b,em,small,span:not(.art)),
+.ui-renewal #screenContent .realm-banner :is(.realm-heading>div,.realm-rewards)
+  :is(h3,p,b,small,span:not(.art)) {
+  color: #fff4df; -webkit-text-stroke: 2px #26202c; paint-order: stroke fill;
+  text-shadow: 0 1px 1px #26202c;
+}
+.ui-renewal :is(#content,#screenContent) .honor-ornate .honor-name {
+  color: #fff4dc; -webkit-text-stroke: 2px #302135; paint-order: stroke fill; text-shadow: 0 1px 1px #302135;
+}
+.ui-renewal #content .dungeon-guide-copy {
+  font-size: 14px; line-height: 1.65; word-break: keep-all; overflow-wrap: anywhere;
+}
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) {
+  & :is(.gm-tools h4,.gm-tools legend,.import-columns h3,.gm-session-label) { color: var(--sheet-accent); }
+  & :is(.gm-stage-input label,.import-summary dt) { color: var(--sheet-muted); }
+  & :is(.gm-action-grid,.gm-region-grid) button {
+    background: var(--sheet-row); color: var(--sheet-ink); border-color: var(--sheet-edge);
+  }
+  & .gm-action-grid button b { color: var(--sheet-ink); }
+  & .gm-action-grid button small { color: var(--sheet-muted); }
+  & :is(.gm-action-grid,.gm-region-grid) button:disabled {
+    background: var(--unavailable-fill); color: var(--unavailable-ink); opacity: 1;
+  }
+  & .mail-reward .received-check {
+    color: var(--sheet-positive); background: var(--sheet-row); border-radius: 50%;
+  }
+  & .day-card.claimed, & .equipment-tile.picking:disabled { opacity: 1; }
+  & .day-card.claimed { background: var(--sheet-inset); }
+  & .day-card.claimed>strong { background: transparent; color: var(--sheet-muted); }
+  & .equipment-tile.picking:disabled .gear-illustration { filter: saturate(.45); }
+}
+
+/* Captions on illustrated banners share the artwork's shade in either theme. */
+.ui-renewal :is(#screenContent,#content):not([data-surface="skills"]) {
+  & .pass-banner .pass-banner-footer,
+  & :is(.pass-list-icon,.pass-point-icon,.mail-mini-reward,.class-preview-tag,
+    .reward-chips>span,.haven-coin-rewards>span,.bestiary-grid>div),
+  & .realm-banner .realm-ribbon {
+    background: transparent; border: 0; box-shadow: none;
+  }
+  & :is(.reward-chips>span,.haven-coin-rewards>span,.bestiary-grid>div,.bestiary-grid>div>b) { color: var(--sheet-ink); }
+  & .pass-banner .pass-banner-footer { min-height: 36px; }
+  & .pass-banner .pass-banner-footer>span {
+    color: #fff1d8; background: transparent; text-shadow: 0 1px 2px #201627;
+  }
+  & .pass-banner .pass-claim-status { font-size: .85em; font-weight: 600; }
+  & .pass-banner-shade {
+    background: linear-gradient(90deg,#171123eb 4%,#21172b91 55%,transparent),
+      linear-gradient(0deg,#171123f2 0%,#171123a6 27%,transparent 70%);
+  }
+  & .pass-point-icon { display: grid; justify-items: center; }
+  & .pass-point-icon>b {
+    position: static; width: auto; padding: 0; font-weight: 750; line-height: 1.25;
+    color: var(--sheet-accent); background: transparent; border: 0; text-shadow: none;
+  }
+  & :is(.pass-point-icon,.pass-list-icon)>i, & .pass-track-reward>.pass-check {
+    inset: 2px 1px auto auto; font-size: 14px; line-height: 1; color: var(--sheet-positive);
+    background: var(--sheet-row); border-radius: 50%; padding: 1px; text-shadow: none;
+  }
+  & .pass-track-step.is-claimed .pass-track-reward>b,
+  & .pass-row-claimed .pass-list-copy { opacity: 1; }
+  & .pass-row-claimed :is(.pass-point-icon,.pass-list-icon)>.art,
+  & .pass-track-step.is-claimed .pass-track-reward>.art { opacity: .8; }
+
+  & .class-preview-tag { color: var(--sheet-muted); text-shadow: none; }
+  & .realm-banner .realm-ribbon { clip-path: none; }
+
+}
+.ui-renewal .game .haven-heading {
+  color: #fff1cd; background: transparent; box-shadow: none; border: 0;
+  paint-order: stroke fill; -webkit-text-stroke: 2.5px #251b2d; text-shadow: 0 1px 2px #21172b;
+}
+.ui-renewal .class-onboarding .class-preview-stage .class-preview-tag {
+  color: #fff4dd; background: transparent; border: 0; box-shadow: none;
+  paint-order: stroke fill; -webkit-text-stroke: 2px #261c2d; text-shadow: 0 1px 1px #211a29;
+}
+
+/* The brass rim and the shared divider delimit only the facts above the entry button. */
+.ui-renewal #screenContent .realm-briefing {
+  --briefing-edge:var(--ui-line); --briefing-rule:var(--ui-line);
+  background:var(--ui-panel); color:var(--ui-text);
+  border:1px solid var(--briefing-edge); border-radius:var(--ui-radius-card);
+  box-shadow:0 2px 5px #101c2533; overflow:hidden;
+}
+.ui-renewal #screenContent .realm-briefing {
+  & .recommended-power {
+    display:grid; grid-template-columns:minmax(0,1fr) auto; gap:3px 5px;
+    margin:0; padding:7px 9px; border:0; border-radius:0; background:transparent;
+  }
+  & .recommended-power>:is(span,small,em), & .realm-entry-hint {
+    color:var(--ui-muted); text-shadow:none; line-height:1.35;
+  }
+  & .recommended-power>strong { color:var(--ui-gold); font-variant-numeric:tabular-nums; }
+  & .recommended-power.power-low>strong { color:var(--ui-danger); }
+  & .realm-difficulty {
+    margin:0 6px 5px; border:1px solid var(--briefing-rule);
+    background:var(--ui-raised); border-radius:var(--ui-radius-control);
+  }
+  & .realm-difficulty b, & .realm-difficulty button { color:var(--ui-text); }
+  & .realm-difficulty button:disabled { color:var(--ui-muted); opacity:1; }
+  & .realm-admission { display:grid; justify-items:center; gap:3px; padding:7px 6px; text-align:center; }
+  & .realm-admission:not(:first-child) { border-top:1px solid var(--briefing-rule); }
+  & .realm-entry-count {
+    padding:0; min-height:0; background:transparent; border:0; box-shadow:none;
+  }
+  & .realm-entry-count>b { color:var(--ui-text); text-shadow:none; }
+  & .realm-entry-hint { display:block; }
+}
+
+/* Give each displayed title the ink that belongs to its own nameplate. */
+.ui-renewal #content :is(.honor-current,.honor-card) .honor-badge:not(.honor-ornate) {
+  color:var(--sheet-ink); background:var(--sheet-inset); text-shadow:none;
+  font-size:14px; font-weight:750;
+  & >span { color:inherit; }
+}
+:root:not([data-theme="dark"]) .ui-renewal #content :is(.honor-current,.honor-card) .honor-badge:not(.honor-ornate) {
+  --honor-ink:#514323; --honor-paper:#efdfb9; --honor-edge:#aa8950;
+  &.honor-silver { --honor-ink:#34434c; --honor-paper:#e9e6db; --honor-edge:#949997; }
+  &.honor-blue { --honor-ink:#214e50; --honor-paper:#dce7db; --honor-edge:#839e90; }
+  &.honor-astral, &.honor-violet { --honor-ink:#58365e; --honor-paper:#ebe0e8; --honor-edge:#ad92ac; }
+  color:var(--honor-ink); background:var(--honor-paper); border-color:var(--honor-edge);
+}
+.ui-renewal #content :is(.honor-current,.honor-card) .honor-badge.honor-ornate>.honor-name {
+  color:#fff5df; font-size:clamp(12px,6.7cqw,19px);
+  -webkit-text-stroke:2px #2b182d; paint-order:stroke fill; text-shadow:0 1px 2px #231329;
+}
+
+.ui-renewal #content .newbie-rewards {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  min-width: 0;
+  color: var(--sheet-ink);
+  font-size:var(--min-label,13px);
+  line-height: 1.45;
+}
+.ui-renewal #content .newbie-rewards > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.ui-renewal #content .newbie-rewards .art {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.ui-renewal #content .newbie-mission footer button { flex: none; }
+
+/* Keep both tracks and their shared missions in the same compact pass sheet. */
+.ui-renewal #content .pass-mode-tabs,.ui-renewal #content .pass-mission-tabs,
+.ui-renewal #content .season-track-selector {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.ui-renewal #content .season-track-selector>button {display:block;min-height:38px;text-align:center;padding:7px 5px;font-size:14px;font-weight:650}
+.ui-renewal #content .pass-track-scroll {padding:4px 1px 5px;margin:10px 0 3px;scrollbar-width:none}
+.ui-renewal #content .pass-track-scroll::-webkit-scrollbar {display:none}
+.ui-renewal #content .pass-track-scroll:focus:not(:focus-visible) {outline:none}
+.ui-renewal #content .pass-track-scroll:focus-visible {outline:2px solid var(--sheet-accent);outline-offset:2px;border-radius:8px}
+.ui-renewal #content .pass-track {gap:7px;align-items:stretch}
+.ui-renewal #content .pass-track-step {width:112px;flex:0 0 112px;display:flex;flex-direction:column;align-items:center}
+.ui-renewal #content .pass-track-reward {flex:1;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:7px 5px;min-height:56px}
+.pass-loot-item {width:100%;display:grid;grid-template-columns:23px minmax(0,1fr);grid-template-rows:auto auto;column-gap:4px;align-items:center;text-align:left;line-height:1.15}
+.ui-renewal #content .pass-track-reward .pass-loot-item>.art {grid-row:span 2;width:23px;height:23px;margin:0;border:0}
+.pass-loot-item>span:nth-child(2) {font-size:12px;word-break:keep-all}
+.pass-loot-item>b {font-size:15px;font-variant-numeric:tabular-nums}
+.ui-renewal #content .pass-track-extra {font-size:13px;min-height:22px;height:auto;line-height:1.45;white-space:nowrap}
+.ui-renewal #content .pass-track-extra:empty {min-height:0}
+.ui-renewal #content .pass-track-step.is-ready .pass-track-extra {color:var(--sheet-positive);font-weight:700}
+.ui-renewal #content .pass-meter {appearance:none;-webkit-appearance:none;width:100%;display:block;height:8px;border:0;border-radius:5px;overflow:hidden;background:#171222;color:#ddba75}
+.pass-meter::-webkit-progress-bar {background:#171222;border-radius:5px}
+.pass-meter::-webkit-progress-value {background:linear-gradient(90deg,#ab824c,#f1d194);border-radius:5px}
+.pass-meter::-moz-progress-bar {background:linear-gradient(90deg,#ab824c,#f1d194);border-radius:5px}
+.season-banner .pass-meter::-webkit-progress-value {background:linear-gradient(90deg,#9b6fc8,#e3c6ff)}
+.season-banner .pass-meter::-moz-progress-bar {background:linear-gradient(90deg,#9b6fc8,#e3c6ff)}
+.ui-renewal #content .pass-level-line {margin:14px 0 3px}
+.ui-renewal #content .pass-level-line>b {white-space:nowrap;min-width:52px}
+.ui-renewal #content .pass-banner-footer {justify-content:flex-end;min-height:0}
+.ui-renewal #content .pass-progress-copy {flex-wrap:wrap;align-items:center}
+.ui-renewal #content .pass-period-clock {display:flex;justify-content:flex-end;gap:6px;margin:0 2px 8px;color:var(--sheet-muted);font-size:13px;font-variant-numeric:tabular-nums}
+.ui-renewal #content .pass-list-row>button {white-space:nowrap;font-size:13px;padding:6px 4px;min-height:36px}
+.ui-renewal #content .premium-pass-offer {justify-content:space-between}
+.ui-renewal #content .premium-pass-offer>b {color:var(--sheet-ink)}
+.ui-renewal #content .pass-progress-copy>span>b {color:inherit;font-weight:700}
+
+/* The season sheet has its own cover and level ledger in both palettes. */
+.ui-renewal :is(#content,#screenContent) {
+  & .season-cover {
+    --cover-art:url('./assets/c2b795353d0c3e64b7f1.webp');
+    --cover-accent:#d4c4ff;
+    position:relative; isolation:isolate; overflow:hidden;
+    padding:12px 15px 13px; border-radius:12px; border:1px solid #817292;
+    color:#fff6e5; background:#241b38;
+  }
+  & .season-cover::before {
+    content:""; position:absolute; inset:0; z-index:-1;
+    background:linear-gradient(90deg,#171126eb,transparent 91%),linear-gradient(0deg,#191423ed,transparent 68%),
+      var(--cover-art) 70% 28% / cover no-repeat;
+  }
+  & .season-cover.premium {--cover-art:url('./assets/7904181fc5ec2dbee9ee.webp');--cover-accent:#f6d49a;border-color:#ac8956}
+  & .season-cover-top, & .season-cover-progress>div {display:flex;align-items:center;justify-content:space-between;gap:6px}
+  & .season-cover-top {min-height:24px;color:var(--cover-accent);font-size:13px;font-weight:700}
+  & .season-cover h3 {margin:2px 0 3px;color:#fff2d8;font-size:clamp(21px,5.2vw,25px);line-height:1.26;text-shadow:0 1px 5px #211626}
+  & .season-details {display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px}
+  & .season-time {display:block;color:#f1e7ed;font-size:13px;line-height:1.5}
+  & .season-cover-progress {margin-top:12px;max-width:100%}
+  & .season-cover-progress b {color:#fff1d7;font-size:18px;line-height:1.2}
+  & .season-cover-progress span {color:#f6e8db;font-size:13px;font-weight:600}
+  & .season-cover .pass-meter {height:5px;margin-top:5px;background:#241b30}
+  & .season-cover .pass-meter::-webkit-progress-value {background:var(--cover-accent)}
+  & .season-cover .pass-meter::-moz-progress-bar {background:var(--cover-accent)}
+  & .season-price, & .season-collect-all {min-height:32px;border:1px solid #e1bf8e82;border-radius:7px;background:#211926d9;color:#ffebcc;font-size:13px;font-weight:700;padding:4px 9px}
+  & .season-price {display:inline-flex;gap:6px;align-items:center}
+  & .season-price span {display:inline-grid;place-items:center;width:16px;height:16px;border:1px solid currentColor;border-radius:50%;font:700 12px/1 sans-serif}
+  & .season-collect-all {display:block;margin:8px 0 0 auto}
+
+  & .season-cover.growth {
+    --cover-art:url('./assets/80ac6fd91712e0acdda0.webp'); --cover-accent:#f9ce87; border-color:#ad8a55;
+  }
+  & .season-cover.growth::before {
+    background:linear-gradient(90deg,#231b13e3,#3025234d 66%,#1a151932),linear-gradient(0deg,#201924d9,transparent 72%),var(--cover-art) 54% 45% / cover;
+  }
+  & .season-cover.growth .season-cover-progress {margin-top:19px}
+  & .reward-rail {
+    position:relative; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none;
+    margin:12px 0 15px; padding:3px 1px; --rail-color:var(--sheet-accent);
+  }
+  & .reward-rail::-webkit-scrollbar {display:none}
+  & .reward-rail:focus-visible {outline:2px solid var(--rail-color);outline-offset:2px;border-radius:8px}
+  & .rail-stages {display:flex;align-items:stretch;list-style:none;margin:0;padding:0;width:max-content;min-width:100%}
+  & .rail-stage {width:113px;flex:none;position:relative;display:flex;flex-direction:column;padding:0 5px 0 2px}
+  & .rail-stage::before {content:"";position:absolute;top:7px;left:0;right:0;height:2px;background:var(--sheet-edge)}
+  & .rail-stage:first-child::before {left:13px}
+  & .rail-stage:last-child::before {right:calc(100% - 16px)}
+  & .rail-stage:is(.earned,.ready,.claimed)::before {background:var(--rail-color)}
+  & .rail-stop {display:flex;align-items:center;gap:5px;z-index:1;align-self:flex-start;height:16px;margin:0 0 5px 7px;padding:0 4px 0 0;background:var(--sheet-panel);color:var(--sheet-ink);font-weight:750;font-size:12px;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
+  & .rail-stop i {display:block;width:8px;height:8px;margin:0 2px;transform:rotate(45deg);border:1px solid var(--sheet-edge);background:var(--sheet-row);box-shadow:0 0 0 2px var(--sheet-panel)}
+  & .rail-stage:is(.ready,.earned,.claimed) .rail-stop i {border-color:var(--rail-color);background:var(--rail-color)}
+  & .rail-gift, & .rail-gift:disabled {
+    display:flex;flex-direction:column;align-items:stretch;gap:5px;flex:1;min-height:65px;min-width:0;padding:8px;
+    border:1px solid var(--sheet-edge);border-radius:8px;opacity:1;filter:none;
+    background:linear-gradient(150deg,var(--sheet-row),var(--sheet-inset));color:var(--sheet-ink);box-shadow:none;text-align:left;
+  }
+  & .rail-stage.ready .rail-gift {border-color:var(--rail-color);background:linear-gradient(145deg,color-mix(in srgb,var(--rail-color) 13%,var(--sheet-row)),var(--sheet-row))}
+  & .rail-loot {display:flex;align-items:center;min-height:28px;gap:7px;color:var(--sheet-ink)}
+  & .rail-loot>.art {width:29px;height:29px;flex:0 0 29px}
+  & .rail-loot>span:last-child {display:grid;gap:2px;min-width:0}
+  & .rail-loot b {color:var(--sheet-ink);font-variant-numeric:tabular-nums;font-size:16px;line-height:1.03}
+  & .rail-loot small {color:var(--sheet-muted);font-size:12px;line-height:1.2;word-break:keep-all}
+  & .rail-status {display:block;margin-top:auto;text-align:center;padding:4px 0 0;border-top:1px solid var(--sheet-edge);color:var(--sheet-muted);font-weight:650;font-size:12px;line-height:1.1}
+  & .rail-stage.ready .rail-status {color:var(--rail-color)}
+}
+:root[data-theme="dark"] .reward-rail.free {--rail-color:#c7b4e5}
+:root:not([data-theme="dark"]) .reward-rail.free {--rail-color:#75588e}
+
+/* On compact phones, shortcuts share a strip above the field instead of the actors' space. */
+#battleShortcuts{display:contents}
+.ui-renewal #homeScreen>#battleShortcuts{
+ display:flex;flex:none;align-items:stretch;overflow-x:auto;overscroll-behavior-x:contain;
+ padding:0 4px;border-block:1px solid #63536766;background:#211c2b;scrollbar-width:thin;
+}
+.ui-renewal #homeScreen>#battleShortcuts nav{
+ display:flex;position:static;flex:1 0 auto;flex-direction:row;gap:0;width:auto;
+}
+.ui-renewal #homeScreen>#battleShortcuts button{
+ flex:1 0 auto;min-width:44px;min-height:52px;width:auto;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:1px;padding:2px 0;
+}
+/* The caption sets each shortcut's width, with the same space at both text edges. */
+.ui-renewal #homeScreen>#battleShortcuts button>small{margin-inline:12px}
+.ui-renewal #homeScreen>#battleShortcuts .art{width:23px;height:22px}
+.ui-renewal #homeScreen>#battleShortcuts .roulette-medallion{--roulette-diameter:22px}
+.ui-renewal #homeScreen>#battleShortcuts :is(small,time){
+ display:block;white-space:nowrap;line-height:1.1;color:#f2e9d9;background:none;
+ padding:0;text-shadow:none;font-size:12px;font-weight:650;
+}
+.ui-renewal #homeScreen>#battleShortcuts time{font-size:12px;color:#edc680;font-variant-numeric:tabular-nums}
+.ui-renewal #homeScreen>#battleShortcuts .reward-indicator,.ui-renewal #homeScreen>#battleShortcuts .dot{right:15%;top:2px}
+.ui-renewal.dungeon-combat #homeScreen>#battleShortcuts{display:none}
+@media(max-width:380px),(max-width:540px) and (max-height:700px){
+ .ui-renewal .home .battle{min-height:clamp(190px,38dvh,270px)}
+}
+#saveRecovery{box-sizing:border-box;width:min(92vw,26rem);max-height:90dvh;overflow:auto;background:#211c2f;color:#f7efdf;border:1px solid #9b825c;border-radius:16px;padding:1.3rem;z-index:2000}#saveRecovery::backdrop{background:#100c18cf}#saveRecovery h2{font-size:1.25rem;margin:0}#saveRecovery p{font-size:1rem;line-height:1.6}#saveRecovery button{display:block;width:100%;min-height:44px;border-radius:8px;margin:.45rem 0;background:#42374f;color:inherit;border:1px solid #83738d;font:inherit}.policy-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:1rem}.policy-links a{color:#d9c59e;font-size:.875rem}

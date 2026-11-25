@@ -1,0 +1,191 @@
+/* A dedicated scenery window keeps moving detail away from the entry controls. */
+.ui-renewal #screenContent .realm-banner {
+  display: grid;
+  grid-template-columns: clamp(80px, 25%, 106px) minmax(0, 1fr);
+  min-height: 0;
+  background: var(--ui-panel, var(--sheet-panel, #282131));
+}
+.realm-showcase {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  overflow: hidden;
+  background: var(--realm-preview) center / cover no-repeat;
+}
+.realm-showcase > :is(.art, .realm-portrait) {
+  align-self: center;
+  width: 94%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  filter: drop-shadow(0 2px 2px #17122099);
+}
+.realm-overview { min-width: 0; padding: 10px; }
+.ui-renewal #screenContent .realm-overview .realm-heading { align-items: center; gap: 6px; padding: 0; }
+.ui-renewal #screenContent .realm-overview .realm-heading h3 { font-size: var(--ui-type-section, 18px); line-height: 1.25; }
+.ui-renewal #screenContent .realm-overview .realm-heading > div { text-shadow: none; }
+.ui-renewal #screenContent .realm-overview .realm-rewards {
+  position: static; width: auto; margin-top: 6px; text-shadow: none;
+}
+.ui-renewal #screenContent .realm-banner .realm-overview :is(.realm-heading > div, .realm-rewards) :is(h3, b, small, span) {
+  color: var(--ui-text, var(--sheet-ink)); -webkit-text-stroke: 0; text-shadow: none;
+}
+.ui-renewal #screenContent .realm-banner .realm-overview :is(.realm-heading > div > span, .realm-rewards > small) {
+  color: var(--ui-muted, var(--sheet-muted)); line-height: 1.35; letter-spacing: 0;
+}
+.ui-renewal :is(#screenContent .realm-banner .realm-info, #featureScreen .screen-head > .screen-help) {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  margin: -5px; border: 0; border-radius: 50%; color: var(--ui-gold);
+  background: transparent; box-shadow: none; text-shadow: none;
+}
+.ui-renewal :is(#screenContent .realm-banner .realm-info, #featureScreen .screen-head > .screen-help)::before,
+.ui-renewal :is(#screenContent .realm-banner .realm-info, #featureScreen .screen-head > .screen-help) > ui-mark {
+  grid-area: 1 / 1; pointer-events: none;
+}
+.ui-renewal :is(#screenContent .realm-banner .realm-info, #featureScreen .screen-head > .screen-help)::before {
+  content: ""; box-sizing: border-box; width: 22px; height: 22px;
+  border: 1px solid currentColor; opacity: .75; border-radius: 50%;
+}
+.ui-renewal :is(#screenContent .realm-banner .realm-info, #featureScreen .screen-head > .screen-help) > ui-mark {
+  width: 14px; height: 14px;
+}
+.ui-renewal #screenContent .realm-banner .realm-controls {
+  grid-column: 1 / -1; width: auto; margin: 0; padding: 8px; gap: 6px;
+  border-top: 1px solid var(--ui-line, var(--sheet-edge));
+}
+.ui-renewal #screenContent .realm-banner .realm-briefing {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center;
+}
+.ui-renewal #screenContent .realm-banner .realm-briefing > .recommended-power { align-self: center; }
+.ui-renewal #screenContent .realm-banner .realm-briefing > .realm-admission {
+  grid-column: 2; grid-row: 1 / span 2; align-self: stretch; align-content: center;
+  border: 0; border-left: 1px solid var(--ui-line, var(--sheet-edge)); min-width: 0;
+}
+.ui-renewal #screenContent .realm-banner .realm-briefing > .realm-admission:only-child {
+  grid-column: 1 / -1; grid-row: 1; border: 0;
+}
+.ui-renewal #screenContent .realm-banner .realm-briefing > .realm-difficulty { grid-column: 1; }
+.ui-renewal #screenContent .realm-banner .realm-difficulty button { min-height: 32px; }
+.ui-renewal #screenContent .realm-banner .realm-enter { min-height: 42px; }
+.dungeon-guide-art { align-items: center; }
+.dungeon-guide-art > .realm-portrait { width: min(100%, 106px); height: auto; object-fit: contain; }
+
+.ui-renewal :is(#screenContent, #content) .package-section .offer-grid {
+  grid-template-columns: minmax(0, 1fr); gap: 7px;
+}
+.ui-renewal :is(#screenContent, #content) .package-section .package-card {
+  display: grid; grid-template-columns: clamp(52px, 17%, 66px) minmax(0, 1fr);
+  align-items: center; padding: 8px 10px; gap: 10px; text-align: start;
+}
+.package-loot-art { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
+.package-description { min-width: 0; }
+.package-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; }
+.package-heading strong { font-size: var(--ui-type-body, 15px); }
+.package-heading b { font-size: var(--ui-type-caption, 13px); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.package-description :is(p, small) { font-size: var(--ui-type-caption, 13px); line-height: 1.5; }
+.package-description p { margin: 4px 0 0; word-break: keep-all; overflow-wrap: anywhere; }
+.package-description small { display: block; margin-top: 2px; }
+
+.trial-guide, .trial-result, .trial-choices { display: grid; gap: 12px; }
+.trial-element, .trial-result-heading { display: flex; align-items: center; gap: 10px; }
+.trial-element > img, .trial-result-heading > .art { width: 44px; height: 44px; object-fit: contain; flex: 0 0 44px; }
+.trial-element strong, .trial-element small, .trial-result-heading small { display: block; }
+.trial-element > b { margin-left: auto; }
+#overlay[data-trial-choice="true"] {
+ padding: 10px clamp(8px, 2.5vw, 16px);
+ background: linear-gradient(180deg, #0d081969, #100a1cd9 52%, #0c091970);
+ backdrop-filter: none;
+}
+#overlay[data-trial-choice="true"] .dialog {
+ width: 100%; max-width: 480px; max-height: 100%; padding: 0; gap: 8px;
+ border: 0; border-radius: 0; background: none; box-shadow: none; animation: none;
+}
+#overlay[data-trial-choice="true"] .dialoghead {
+ min-height: 0; display: flex; align-items: center; justify-content: center; gap: 10px;
+ padding: 0; border: 0; background: none; box-shadow: none;
+}
+#overlay[data-trial-choice="true"] .dialoghead::before,
+#overlay[data-trial-choice="true"] .dialoghead::after {
+ content: ""; width: clamp(28px, 15%, 54px); height: 1px;
+ background: linear-gradient(90deg, transparent, #e6bb76); transform: none; position: static;
+}
+#overlay[data-trial-choice="true"] .dialoghead::after { transform: rotate(180deg); }
+#overlay[data-trial-choice="true"] .dialoghead h2 {
+ flex: 0 0 auto; margin: 0; padding: 0; text-align: center;
+ color: #ffdf9b; font-size: clamp(22px, 6vw, 28px); line-height: 1.25;
+ text-shadow: 0 2px 5px #07030f;
+}
+#overlay[data-trial-choice="true"] .dialoghead button,
+#overlay[data-trial-choice="true"] .popup-close { display: none; }
+#overlay[data-trial-choice="true"] #content {
+ margin: 0; padding: 3px; overflow: visible; background: none; box-shadow: none;
+}
+.trial-choices { justify-items: center; gap: 12px; }
+.trial-choice-status {
+ display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 3px 8px;
+ margin: 0; color: #eee3f3; font-size: 13px; line-height: 1.4; text-shadow: 0 1px 4px #08050c;
+}
+.trial-choice-status strong { color: #ffdeb0; }
+.trial-options { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(5px, 1.7vw, 9px); }
+#overlay .trial-options .trial-option {
+ display: grid; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; overflow: hidden;
+ margin: 0; padding: 3px; gap: 0; border: 1px solid #d8ae70; border-radius: 9px;
+ background: linear-gradient(145deg, #7c592d, #302035 38%, #4d324e 70%, #a57b45);
+ box-shadow: inset 0 0 0 1px #503751, 0 4px 12px #08050eaa;
+ font: inherit; text-align: center; text-shadow: none; touch-action: manipulation;
+}
+.trial-card-art {
+ position: relative; isolation: isolate; width: 100%; aspect-ratio: 1 / 1.12; display: grid; place-items: center;
+ border-radius: 5px 5px 0 0; overflow: hidden;
+ background: radial-gradient(ellipse at 50% 42%, #80519d 0%, #4a2e67 49%, #231b36 90%);
+}
+.trial-card-art::before {
+ content: ""; position: absolute; z-index: -1; width: 84%; aspect-ratio: 1; border-radius: 50%;
+ border: 1px solid #e4bb873f; box-shadow: inset 0 0 0 3px #b186b71c, 0 0 0 4px #cba4b312;
+}
+.trial-card-art > .art {
+ width: 78%; height: auto; aspect-ratio: 1; object-fit: contain; display: block;
+ filter: drop-shadow(0 3px 3px #1a0c32aa);
+}
+.trial-option[data-buff="time"] .trial-card-art > .art { mix-blend-mode: screen; }
+.trial-card-effect {
+ display: grid; grid-template-rows: 1fr auto; align-items: center; justify-items: center; gap: 4px;
+ min-height: 75px; padding: 7px 3px 8px; border-top: 1px solid #e6bf83; border-radius: 0 0 5px 5px;
+ background: linear-gradient(155deg, #f6e8ce, #e3cfad); color: #35243a;
+}
+.trial-card-effect > span { font-size: clamp(13px, 3.7vw, 16px); font-weight: 700; line-height: 1.25; word-break: keep-all; }
+.trial-card-effect > strong { color: #57326a; font-size: clamp(19px, 5.2vw, 24px); line-height: 1.1; font-variant-numeric: tabular-nums; }
+#overlay .trial-option:focus-visible { outline: 3px solid #ffe4a3; outline-offset: 2px; }
+#overlay .trial-option:active { border-color: #fff0c2; }
+#overlay .trial-choices .trial-forfeit {
+ justify-self: center; min-width: 86px; padding-inline: 14px;
+ border-color: #b698b366; color: #e6d8e9; background: #291f34e8;
+}
+@media (max-height: 440px) {
+ .trial-choices { gap: 6px; }
+ .trial-card-art { max-height: 86px; }
+ .trial-card-art > .art { width: min(74%, 66px); }
+ .trial-card-effect { min-height: 56px; padding-block: 4px; gap: 1px; }
+}
+.trial-forfeit, .trial-exit-actions button, .trial-guide button, .trial-result button { min-height: 44px; }
+.trial-picked { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 0; list-style: none; }
+.trial-result h3, .trial-result h4, .trial-picked, .trial-element small { margin: 0; }
+
+.realm-banner[data-dungeon=trial] .realm-enter { min-height: 44px; }
+.ui-renewal #screenContent [data-dungeon=trial] .trial-rank-link { grid-column: 1 / -1; }
+.trial-rank-link, .trial-rank-tabs button, .trial-rank-status button, .trial-week-prize button { min-height: 44px; }
+.trial-week-prize { display: grid; gap: 12px; }
+.trial-week-prize :is(h3,p) { margin: 0; }
+.trial-rank-status { margin: 8px 0; }
+.trial-title-prize b { color: var(--ui-gold); }
+#content .trial-rank-tabs button, #content .trial-week-prize button, #content .trial-rank-link { min-height: 44px; }
+.trial-floors { display: grid; gap: 6px; }
+.trial-floors h4 { margin: 0; display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; color: #f4dba5; }
+.trial-floors h4 small { font-size: 12px; color: #bbaac5; font-weight: 600; }
+.trial-floor-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid #4a3f5c; border-radius: 10px; background: #171520; }
+.trial-floor-row.ready { border-color: #d9b36a; }
+.trial-floor-row > b { color: #ffdeb0; font-size: 14px; }
+.trial-floor-row > span { font-size: 13px; line-height: 1.4; }
+.trial-floor-row > button { min-height: 44px; min-width: 68px; font-size: 13px; }

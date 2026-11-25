@@ -1,0 +1,95 @@
+/* Let the battlefield use the space previously occupied by quick upgrades. */
+.home-bottom{padding-bottom:7px}
+.home .battle{flex:1 1 auto}
+.forge-dock>div{min-width:0}
+.forge-dock>div>strong{white-space:nowrap;font-size:clamp(11px,3.1cqw,16px)}
+
+.pass-mode-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:12px}
+.pass-mode-tabs button{padding:9px 3px;font-size:var(--min-label,13px);min-height:36px}
+.pass-banner{position:relative;isolation:isolate;overflow:hidden;border:1px solid #cca766;border-radius:13px;padding:17px 14px 12px;background:linear-gradient(120deg,#36263e,#171523);box-shadow:inset 0 0 0 3px #d4a75512,0 7px 18px #08051255}
+.pass-banner-art{position:absolute;inset:0;z-index:-2;background:url('./assets/c2b795353d0c3e64b7f1.webp') right 27%/cover no-repeat;opacity:.9}
+.pass-banner-shade{position:absolute;inset:0;background:linear-gradient(90deg,#171123e8 5%,#21172b99 52%,#24172b05),linear-gradient(0deg,#171123d9,transparent 65%);z-index:-1}
+.pass-banner-title>span{display:block;font-size:var(--min-label,13px);letter-spacing:2px;color:#c9a878}
+.pass-banner-title h3{font-size:22px;color:#ffe6b5;margin:4px 0 5px;text-shadow:0 2px 3px #130b1c}
+.pass-banner-title>small{font-size:var(--min-label,13px);color:#d2c0d3}
+.pass-level-line{display:flex;align-items:center;gap:10px;margin-top:18px}
+.pass-level-line>b{border:2px solid #c9a361;border-radius:17px;min-width:53px;height:49px;display:flex;align-items:center;justify-content:center;color:#ffe6b1;font-size:19px;background:#211728de}
+.pass-level-line>div{flex:1;min-width:0}
+.pass-progress-copy{display:flex;justify-content:space-between;gap:5px;font-size:var(--min-label,13px);color:#d5c2dd;margin-bottom:7px}
+.pass-progress-copy strong{color:#ffdf9f;font-size:var(--min-label,13px)}
+.pass-progress-bar{height:14px;background:#100d1d;border:1px solid #95724f;border-radius:12px;overflow:hidden;box-shadow:inset 0 2px 4px #0007}
+.pass-progress-bar>i{height:100%;display:block;background:linear-gradient(#ffeab5,#efb34b 56%,#bd7727);border-radius:inherit;box-shadow:0 0 10px #efb34b55}
+.season-banner .pass-progress-bar>i{background:linear-gradient(#ead5ff,#bb84e4 56%,#7851a5)}
+.pass-banner-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.pass-banner-footer>span{font-size:var(--min-label,13px);color:#d8c4d9}
+.pass-banner-footer>button{font-size:var(--min-label,13px);color:#432b1e;font-weight:bold;border:1px solid #e9cb90;border-radius:8px;padding:7px 13px;background:linear-gradient(#ffe7a7,#d9a04d);min-height:32px}
+.pass-banner-footer>button:disabled{opacity:.5}
+.pass-track-caption{display:flex;align-items:center;justify-content:space-between;margin:16px 1px 8px;font-size:var(--min-label,13px);color:#e7d2b4}
+.pass-track-caption small{font-size:var(--min-label,13px);color:#bca5c8}
+.pass-track-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:thin;scrollbar-color:#997548 #1e1728;padding:2px 1px 8px;position:relative}
+.pass-track{display:flex;width:max-content;gap:9px;position:relative}
+.pass-track:before{content:'';position:absolute;top:12px;left:25px;right:25px;height:2px;background:#856640;z-index:0}
+.pass-track-step{width:85px;flex:0 0 85px;position:relative;text-align:center}
+.pass-step-label{position:relative;display:inline-block;min-width:46px;padding:3px 7px;border:1px solid #b79a6e;border-radius:13px;background:linear-gradient(#836340,#463449);font-size:var(--min-label,13px);color:#ffe6b0;font-weight:bold;margin-bottom:7px}
+.pass-track-reward{position:relative;display:flex;align-items:center;flex-direction:column;width:100%;border:1px solid #8f719c;border-radius:10px;background:radial-gradient(ellipse at 50% 35%,#57406b,#22182f 80%);padding:8px 4px 7px;color:#ffdf9e;min-height:103px;opacity:1!important}
+.pass-track-reward .art{height:43px;width:43px;border-radius:7px;flex:none}
+.pass-track-reward>b{font-size:17px;margin-top:3px}
+.pass-track-reward>small{font-size:var(--min-label,13px);color:#bea9c8;margin-top:3px}
+.pass-track-step.is-ready .pass-track-reward{border-color:#f1d28d;box-shadow:inset 0 0 0 2px #daa94c33,0 0 12px #d8a34e22}
+.pass-track-step.is-ready .pass-track-reward>small{color:#ffdd8c;font-weight:bold}
+.pass-track-step.is-claimed .pass-track-reward .art,.pass-track-step.is-claimed .pass-track-reward>b{opacity:.45}
+.pass-check{position:absolute;left:calc(50% - 15px);top:20px;font-style:normal;color:#b4e3a8;font-size:32px;line-height:1;text-shadow:0 2px 3px #172c1a}
+.pass-track-extra{height:26px;display:flex;align-items:center;justify-content:center;font-size:var(--min-label,13px);line-height:1.3;color:#c7b1ce;white-space:normal}
+.premium-track-lock{border:1px solid #8f734955;background:linear-gradient(#382d34,#231c28);border-radius:8px;height:48px;display:flex;align-items:center;justify-content:center;gap:3px;opacity:.65}
+.premium-track-lock .art{width:24px;height:24px;border-radius:5px}
+.premium-track-lock small{font-size:var(--min-label,13px);color:#d6b987}
+.pass-vip-note{display:flex;align-items:center;gap:7px;padding:9px 8px;margin-top:4px;border:1px solid #a07a4344;border-radius:8px;background:#46303b55}
+.pass-vip-note>span{color:#f4d18e;font-size:var(--min-label,13px);font-weight:bold;white-space:nowrap}
+.pass-vip-note>small{flex:1;font-size:var(--min-label,13px);color:#c6adc9;line-height:1.4}
+.pass-vip-note>button{font-size:var(--min-label,13px);color:#edcb91;white-space:nowrap;min-height:28px}
+.pass-mission-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:20px 0 12px}
+.pass-mission-tabs>button{min-height:34px;font-size:var(--min-label,13px);padding:7px 3px}
+.pass-mission-heading{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:17px 1px 7px;color:#ecd6b6}
+.pass-mission-heading>b{font-size:14px}
+.pass-mission-heading>span{font-size:var(--min-label,13px);color:#a992b4}
+.pass-mission-heading strong{color:#d9bdea;font-size:var(--min-label,13px);font-variant-numeric:tabular-nums}
+.pass-list-hint{font-size:var(--min-label,13px);color:#a88fb5;margin:7px 1px 10px}
+.pass-compact-list{display:flex;flex-direction:column;gap:8px}
+.pass-list-row{display:grid;grid-template-columns:43px minmax(0,1fr) 71px;gap:9px;align-items:center;padding:11px 9px;min-height:82px;border:1px solid #715878;border-radius:10px;background:linear-gradient(110deg,#382940,#221b2d);position:relative}
+.pass-row-ready{border-color:#d4ad69;background:linear-gradient(110deg,#4e3443,#2d2234);box-shadow:inset 3px 0 #e1b866}
+.pass-row-claimed{background:#231c2e;border-color:#514458}
+.pass-row-claimed .pass-list-copy,.pass-row-claimed .pass-list-icon>.art,.pass-row-claimed .pass-point-icon>.art{opacity:.55}
+.pass-list-icon,.pass-point-icon{position:relative;align-self:center;text-align:center;min-width:0}
+.pass-list-icon>.art,.pass-point-icon>.art{display:block;width:43px;height:43px;border-radius:8px}
+.pass-point-icon>b{position:absolute;bottom:-4px;left:0;right:0;font-size:var(--min-label,13px);color:#ffe3a9;border:1px solid #8f6e4b;border-radius:7px;background:#352332;padding:2px 0;text-shadow:0 1px #000}
+.pass-list-icon>i,.pass-point-icon>i{position:absolute;inset:4px 0 auto;text-align:center;font-style:normal;font-size:29px;color:#b4e3a8;text-shadow:0 2px 3px #152c1d}
+.pass-list-copy{min-width:0}
+.pass-list-copy>strong{display:block;font-size:var(--min-label,13px);color:#f2dbb8;line-height:1.35;overflow-wrap:anywhere}
+.pass-list-copy>small{display:block;margin:4px 0;font-size:var(--min-label,13px);color:#bca6c7;line-height:1.4}
+.pass-list-copy>span{display:block;font-size:var(--min-label,13px);color:#c7b4d0;margin-top:5px}
+.pass-mission-progress{display:flex;align-items:center;gap:5px;margin-top:5px}
+.pass-mission-progress>.bar{flex:1;min-width:15px;height:7px;margin:0;border-color:#9d759e}
+.pass-mission-progress>.bar>i{background:linear-gradient(90deg,#9870c2,#dfb8ef)}
+.pass-mission-progress>span{font-size:var(--min-label,13px);color:#e4d1e9;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pass-row-ready .pass-mission-progress>.bar>i{background:linear-gradient(90deg,#d49843,#ffe6a5)}
+.pass-list-row>.gold-button{font-size:var(--min-label,13px);padding:10px 3px;min-height:37px;width:100%;border-radius:8px;white-space:nowrap}
+.pass-row-claimed>.gold-button{color:#abb8a9;background:#364137;border-color:#66765f;opacity:.8}
+.pass-shared-note{font-size:var(--min-label,13px);text-align:center;color:#a790b2;margin:13px 0 0}
+@media(max-width:360px){.pass-list-row{grid-template-columns:36px minmax(0,1fr) 62px;gap:7px;padding:10px 7px}.pass-list-icon>.art,.pass-point-icon>.art{width:36px;height:36px}.pass-list-copy>strong{font-size:var(--min-label,13px)}.pass-list-copy>small{font-size:var(--min-label,13px)}.pass-list-row>.gold-button{font-size:var(--min-label,13px)}.pass-track-step{width:78px;flex-basis:78px}.pass-banner{padding:14px 11px 11px}}
+@media(max-height:740px){.home-bottom{padding-bottom:3px}}
+/* Season membership is separate from the reward ledger. */
+.season-track-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
+.season-track-selector>button{display:flex;flex-direction:column;gap:5px;align-items:flex-start;padding:12px 10px;border-radius:11px;background:#241b30;border:1px solid #725b7e;text-align:left}
+.season-track-selector>button>span{font-size:var(--min-label,13px);letter-spacing:1.5px;color:#b7a2c8}
+.season-track-selector>button>b{font-size:var(--min-label,13px);color:#e5d3e7}
+.season-track-selector>button>small{font-size:var(--min-label,13px);color:#a58eb1}
+.season-track-selector>button.active{border-color:#d9bb87;background:linear-gradient(115deg,#61423d,#382637);box-shadow:inset 0 0 0 2px #c8a25b33}
+.season-track-selector>button.active>b{color:#ffe3ad}
+.season-track-selector>button.active.premium{background:linear-gradient(115deg,#795327,#453044)}
+.premium-pass-offer{display:flex;gap:8px;align-items:center;padding:12px 10px;margin:12px 0;border:1px solid #a88752;border-radius:10px;background:linear-gradient(100deg,#543a32,#292033)}
+.premium-pass-offer>div{flex:1;min-width:0}.premium-pass-offer b{font-size:var(--min-label,13px);color:#f0d1a0;display:block}.premium-pass-offer small{font-size:var(--min-label,13px);color:#bda4bb;display:block;margin-top:5px}.premium-pass-offer>.gold-button{padding:9px 8px;font-size:var(--min-label,13px)}
+.season-product-heading{text-align:center;margin:10px 0 18px}.season-product-heading>span{font-size:var(--min-label,13px);letter-spacing:1.6px;color:#d7ac68}.season-product-heading h3{font-size:21px;color:#ffe1ac;margin:8px 0}.season-product-heading p{font-size:var(--min-label,13px);color:#c6b2d0}
+.pass-lock-mark{position:absolute;right:4px;top:1px;color:#edcc8a;font-size:22px;font-style:normal}
+.stage{height:69px;top:8px}.stage-map-button .difficulty-badge{display:block;font-size:12px!important;line-height:1.2;letter-spacing:1px;margin:0 0 3px;font-weight:700}.stage-map-button #stage{font-size:clamp(17px,5cqw,26px);line-height:1.2}.stage-map-button #region{font-size:10px;margin-top:4px}.stage-route{top:86px}
+.campaign-difficulty-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:0 0 13px}.campaign-difficulty-tabs button{font-size:var(--min-label,13px);padding:9px 2px;background:#2b2137;border:1px solid #6f5379;border-radius:8px;color:#c9b0d3}.campaign-difficulty-tabs button.active{background:linear-gradient(#805434,#483044);border-color:#d4ab6c;color:#ffdfaa}.campaign-difficulty-tabs small{font-size:var(--min-label,13px);display:block;margin-top:5px;color:#a88eb7}
+@media(max-height:740px){.stage{height:60px;top:6px}.stage-route{top:72px}.stage-map-button #stage{font-size:18px}.stage-map-button .difficulty-badge{font-size:12px!important}.stage-map-button #region{font-size:9px}}

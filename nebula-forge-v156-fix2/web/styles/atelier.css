@@ -1,0 +1,297 @@
+/* Moonlit Atelier — one quiet, readable visual system for the entire game. */
+.ui-renewal{--ui-ease:cubic-bezier(.22,1,.36,1);--copy-color:#d7d0e2;--caption-color:#b9afc8;color:var(--ui-ink);background:#0b0b15}
+.ui-renewal .game{--hud-top:94px;--nav-height:68px;background:#14121f;box-shadow:0 0 0 1px #d2b68824;min-height:540px}
+.ui-renewal button,.ui-renewal a,.ui-renewal input,.ui-renewal select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.ui-renewal button{transition:background-color .18s,border-color .18s,color .18s,translate .16s var(--ui-ease)}
+.ui-renewal button:not(:disabled):active{translate:0 1px}
+.ui-renewal :focus-visible{outline:2px solid #edcf9b;outline-offset:3px}
+.ui-renewal .top{height:var(--hud-top);grid-template-rows:45px 28px;grid-template-columns:minmax(0,1fr) auto 44px 44px;gap:5px 6px;padding:8px 12px;background:linear-gradient(110deg,#201a2d,#151320);border:0;box-shadow:0 1px #d9c19030;z-index:22}
+.ui-renewal .portrait{width:42px;height:42px;flex:0 0 42px}
+.ui-renewal .profile{gap:8px;min-width:0}
+.ui-renewal .profile-copy strong{font-size:13px;font-weight:650;letter-spacing:-.2px}
+.ui-renewal .profile-copy{gap:2px}.ui-renewal .profile-copy b{font-size:var(--menu-label-size,12px);color:var(--ui-gold)}
+.ui-renewal .xp-track{height:3px;margin:5px 0;border:0;background:#ffffff14}
+.ui-renewal .xp-track>i{background:linear-gradient(90deg,#9b7c53,#e8d3a1);transition:width .3s var(--ui-ease)}
+.ui-renewal .vip{font-size:var(--menu-label-size,12px);padding:6px 10px;min-height:30px;border:1px solid #e8c98b55;border-radius:8px;background:#d4b57515;color:#edd29f;box-shadow:none}
+.ui-renewal .header-button{height:44px;width:44px;display:grid;place-items:center}
+.ui-renewal .header-button>.art{width:28px;height:28px}
+.ui-renewal .menu-lines{font-size:24px;color:#d1bfd6}
+.ui-renewal .wallet{gap:6px}
+.ui-renewal .wallet button{border-radius:7px;background:#0c0b1680;border:1px solid #b9a0d522;box-shadow:none;padding:1px 7px 1px 3px;gap:5px}
+.ui-renewal .wallet .art{width:22px;height:22px}
+.ui-renewal .wallet b{font-size:var(--menu-label-size,12px);font-weight:650;color:#eee6f4}
+.ui-renewal .wallet small{font-size:15px;color:#c9b58b}
+
+/* The landscape is the main stage; compact HUD elements leave its centre open. */
+.ui-renewal .battle{min-height:270px}
+.ui-renewal .stage{clip-path:none;min-width:0;width:59%;height:61px;top:12px;border-radius:3px 3px 15px 15px;border:0;border-bottom:1px solid #dbbd8055;background:linear-gradient(#181629f5,#1c1b2cd9);box-shadow:0 7px 20px #07051130}
+.ui-renewal .stage strong{font-size:18px;letter-spacing:.7px;color:#f6e7c8;font-weight:750}
+.ui-renewal .stage span{font-size:10px;color:#d6cbdc}
+.ui-renewal .stage .difficulty-badge{font-size:9px;letter-spacing:1px;color:#b8b4dc}
+.ui-renewal .stage>button:not(.stage-map-button){width:28px;min-height:44px;font-size:25px;color:#d8bd8c}
+.ui-renewal .stage-route{top:83px;width:145px;gap:4px;opacity:.9}
+.ui-renewal .stage-route span{width:6px;height:6px}
+.ui-renewal .stage-route .boss-dot{width:14px;height:14px;font-size:10px;line-height:12px}
+.ui-renewal .stage-route:before{height:1px;top:6px;background:#d6b57e80}
+.ui-renewal .side-nav,.ui-renewal .right-nav{top:14px;gap:7px;width:49px}
+.ui-renewal .side-nav{left:5px}.ui-renewal .right-nav{right:5px}
+.ui-renewal :is(.side-nav,.right-nav) button{min-height:45px;padding:0;background:none;gap:2px}
+.ui-renewal :is(.side-nav,.right-nav) button>.art{width:30px;height:30px;border-radius:8px;box-shadow:0 3px 8px #06031060}
+.ui-renewal :is(.side-nav,.right-nav) small{font-size:9px;color:#f4e9d6;background:#171220bf;border-radius:4px;padding:2px 3px}
+.ui-renewal .offline-shortcut time{font-size:8px;border:0;border-radius:3px;min-width:45px}
+.ui-renewal .enemy-status{left:53%;width:31%;top:32%;padding:4px 0}
+.ui-renewal .enemy-status>b{font-size:10px;font-weight:600}
+.ui-renewal .enemy-status>small{font-size:8px;color:#eee2f0}
+.ui-renewal .enemy-track{height:4px;background:#1b111ce0;border:0;box-shadow:0 0 0 1px #f1c2bb20}
+.ui-renewal .enemy-track>i{transition:width .22s var(--ui-ease);background:linear-gradient(90deg,#9f5464,#ed9f9a)}
+.ui-renewal .hero-health{left:27.5%;bottom:calc(24% + var(--hero-health-height,34.3cqw) + 8px);width:21%;max-width:110px;height:4px;transform:translateX(-50%);border:0;background:#091c20dc;box-shadow:0 0 0 1px #bce7d33d,0 2px 5px #0008;z-index:6}
+.ui-renewal .hero-health>i{background:linear-gradient(90deg,#529a91,#bae3c5);transition:width .28s var(--ui-ease)}
+.ui-renewal .hero-health small{left:50%;bottom:7px;top:auto;transform:translateX(-50%);font-size:9px;line-height:13px;font-weight:600;font-variant-numeric:tabular-nums;color:#f0f8ec;background:#111724d9;border:1px solid #c3e6d51f;border-radius:4px;padding:1px 5px;text-shadow:none}
+.ui-renewal .actor.hero .hero-title{bottom:calc(100% + 38px);left:-5%;width:110%}
+.ui-renewal .battle.off .manual-hit{z-index:23;touch-action:manipulation;left:50%;top:auto;bottom:98px;transform:translateX(-50%);padding:7px 17px;min-height:34px;font-size:11px;background:#1b172ae6;border:1px solid #bfa77870}
+.ui-renewal .battle-controls{z-index:22;bottom:83px;left:12px;right:12px;gap:14px;pointer-events:none}
+.ui-renewal .battle-controls>button{pointer-events:auto}
+.ui-renewal .battle-controls .orb-label{font-size:12px;top:38px;color:#eee3d2}
+.ui-renewal #skillbuttons{z-index:22;pointer-events:none;gap:14px;bottom:12px;padding-bottom:14px}
+.ui-renewal #skillbuttons button{pointer-events:auto;width:45px;height:45px;border:1px solid #e7c68c99;box-shadow:0 3px 9px #0007;background:#181326}
+.ui-renewal #skillbuttons .battle-skill-name{font-size:9px;bottom:-17px;color:#dfd3e7}
+.ui-renewal .home-bottom{padding:0 10px 5px;border:0;background:#171422;box-shadow:0 -1px #d4bc8d25}
+.ui-renewal .home-quest{margin:8px 0 0;min-height:41px;padding:6px 8px;border:1px solid #bba4d025;border-radius:9px;background:#242032;gap:8px}
+.ui-renewal .home-quest .quest-medal{width:24px;height:24px}
+.ui-renewal .quest-label>span{font-size:10px;color:#e1d6e6}
+.ui-renewal .quest-line{height:2px;margin-top:5px;background:#ffffff14}
+.ui-renewal .home-quest .gold-button{min-height:44px;font-size:12px;padding:5px 9px}
+.ui-renewal .forge-dock{height:66px;padding:5px 1px 0;gap:10px}
+.ui-renewal .forge-mini-art{--forge-art-size:57px;width:73px;height:var(--forge-art-size);flex:0 0 73px;display:grid;place-items:center}
+.ui-renewal .forge-mini-art .art{width:var(--forge-art-size);height:var(--forge-art-size);aspect-ratio:1;object-fit:contain}
+.ui-renewal .forge-dock>div>small{font-size:12px;color:var(--ui-muted)}
+.ui-renewal .forge-dock>div>strong{font-size:13px;font-weight:650}
+.ui-renewal .mini-meter{height:3px;border:0;background:#ffffff14}
+.ui-renewal .forge-dock>.gold-button{min-width:88px;min-height:43px;border-radius:9px;padding:6px 10px}
+.ui-renewal .forge-dock>.gold-button strong{font-size:12px}
+
+/* Main destinations stay within thumb reach, with one restrained active state. */
+.ui-renewal .bottom-nav{height:var(--nav-height);padding:5px 6px max(5px,env(safe-area-inset-bottom));gap:2px;background:#151220;border-top:1px solid #bca47932;box-shadow:0 -5px 20px #0a081140}
+.ui-renewal .bottom-nav button{gap:3px;border-radius:10px;padding:3px 0;border:0}
+.ui-renewal .bottom-nav button .art{width:28px;height:28px;opacity:.65;filter:none}
+.ui-renewal .bottom-nav button>strong{font-size:var(--menu-label-size,10px);font-weight:600;color:#aaa0b7}
+.ui-renewal .bottom-nav button.active{background:linear-gradient(#a2896033,#594c3510);box-shadow:inset 0 1px #e4c88c40}
+.ui-renewal .bottom-nav button.active>.art{opacity:1}
+.ui-renewal .bottom-nav button.active>strong{color:#f1d9a7}
+.ui-renewal .bottom-nav button.active:before{width:14px;left:calc(50% - 7px);top:-5px;height:2px;border-radius:4px;background:#dfc18c;box-shadow:0 0 8px #dfc18c50}
+
+/* Feature pages use their full available height; tabs belong with the heading. */
+.ui-renewal .feature-screen{top:var(--hud-top);bottom:var(--nav-height);left:0;right:0;border:0;border-radius:0;background:radial-gradient(ellipse at 95% 0,#5e467b1f,transparent 45%),#171421;box-shadow:none;animation:ui-page-in .26s var(--ui-ease)}
+.ui-renewal .screen-head{height:59px;padding:7px 12px;gap:8px;background:transparent;border-bottom:1px solid var(--ui-edge)}
+.ui-renewal .screen-head:after{content:none}
+.ui-renewal .screen-head>button:first-child{width:34px;min-height:40px;font-size:28px}
+.ui-renewal .screen-head>div{text-align:left;margin:0}
+.ui-renewal .screen-head small{font-size:var(--min-label,13px);letter-spacing:1.9px;color:#a596b5;margin-bottom:3px}
+.ui-renewal .screen-head h1{font-size:21px;letter-spacing:0;color:#f3e6cb;text-shadow:none;font-weight:700}
+.ui-renewal .screen-help{width:34px;height:34px;font-size:16px;border:1px solid #bd9dd230;color:#d2bfdc;background:#b99cda08}
+.ui-renewal #screenTabs{height:auto;min-height:47px;padding:6px 10px;gap:4px;border:0;border-bottom:1px solid #9b83b21c;background:#1b1726;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth;align-items:stretch}
+.ui-renewal #screenTabs>button{flex:1 0 auto;min-width:42px;min-height:35px;padding:6px 8px;font-size:var(--min-label,13px);font-weight:600;border:0;border-radius:7px;background:none;color:#b5a9c4;box-shadow:none}
+.ui-renewal #screenTabs>button.active{background:#b096cb1e;color:#f0dcad;box-shadow:inset 0 -2px #d1b47a}
+.ui-renewal .screen-content{padding:16px 14px 22px;scrollbar-color:#927eaa60 transparent}
+.ui-renewal .screen-content>:first-child{margin-top:0}
+.ui-renewal .game:has(#testRibbon:not([hidden])) .feature-screen{bottom:calc(var(--nav-height) + 34px)}
+.ui-renewal .test-ribbon{bottom:var(--nav-height);height:32px;left:8px;right:8px;border-radius:7px;font-size:var(--menu-label-size,10px)}
+
+/* Dialogs share a clear title bar and close control, without a second oversized X. */
+.ui-renewal .overlay{padding:12px;align-items:center;background:#090711bd;backdrop-filter:none}
+.ui-renewal .dialog{max-height:calc(100% - 32px);border:1px solid #c1a67d66;border-radius:17px;background:radial-gradient(ellipse at 100% 0,#65457726,transparent 35%),#1c1829;box-shadow:0 24px 80px #0009;animation:ui-modal-in .24s var(--ui-ease)}
+.ui-renewal .dialoghead{min-height:58px;padding:8px 10px;border-radius:17px 17px 0 0;border-bottom:1px solid var(--ui-edge);background:#26203380}
+.ui-renewal .dialoghead>button:first-child{width:34px;min-height:40px;font-size:26px}
+.ui-renewal .dialoghead h2{text-align:left;font-size:18px;font-weight:700;color:#f1e1c2;text-shadow:none;padding-left:3px}
+.ui-renewal .dialoghead .close-button{width:38px;height:38px;font-size:24px;border:1px solid #b99ad430;border-radius:9px;background:#b3a0cb10;color:#e7d9eb}
+.ui-renewal .popup-close{display:none}
+.ui-renewal .content{padding:15px 14px 18px;scrollbar-color:#927eaa60 transparent}
+
+/* Buttons, cards, captions, selection and stat tables use a single hierarchy. */
+.ui-renewal :is(.gold-button,.action){color:#322a25;border:1px solid #eed5a07a;border-radius:9px;background:linear-gradient(120deg,#eddbb3,#d9b67c);box-shadow:inset 0 1px #fff4d533,0 2px 5px #07051133;text-shadow:none;font-weight:700}
+.ui-renewal :is(.gold-button.purple,.action.alt){color:#eee6f8;border-color:#b09ac74d;background:linear-gradient(115deg,#5a476e,#433550);box-shadow:inset 0 1px #d4b6ee20;text-shadow:none}
+.ui-renewal :is(.content,.screen-content) :is(.gold-button,.action,.muted-button){min-height:40px;padding:9px 12px;font-size:13px;line-height:1.35;border-radius:9px}
+.ui-renewal .muted-button{border:1px solid #b197c638;color:#d6cae1;background:#2a2238}
+.ui-renewal :is(.gold-button,.action,.muted-button):disabled{color:#9e94aa;background:#2b2535;border-color:#7f6f901f;box-shadow:none;text-shadow:none;opacity:1}
+.ui-renewal :is(.card,.growth-comparison,.growth-row,.equipment-set-card,.newbie-mission,.effect-table,.setting-row,.town-directory-card,.class-skill-card,.online-opening,.guild-panel){border:1px solid var(--ui-edge);border-radius:12px;background:linear-gradient(120deg,#292235,#211c2e);box-shadow:none}
+.ui-renewal :is(.card,.equipment-set-card,.guild-panel){padding:14px;margin-bottom:12px}
+.ui-renewal :is(.card,.guild-panel,.equipment-set-card)>h3{font-size:17px;line-height:1.4;color:#e8d5ad;margin:0 0 12px}
+.ui-renewal .section-label{margin:20px 0 10px;color:#e3d1ab;font-size:13px;font-weight:650}
+.ui-renewal .section-label>small{font-size:var(--min-label,13px);font-weight:400;color:var(--ui-muted)}
+.ui-renewal .summary-strip{padding:11px 10px;margin:12px 0;border-color:var(--ui-edge);background:#b7a0d00a;font-size:var(--min-label,13px);color:#cfc4db;gap:8px}
+.ui-renewal .summary-strip b{color:#e5cc99}
+.ui-renewal .stat-chips{gap:7px;margin-bottom:12px}
+.ui-renewal .stat-chips>div{border:1px solid var(--ui-edge);border-radius:9px;padding:10px 4px;background:#262032}
+.ui-renewal .stat-chips small{color:var(--ui-muted);font-size:var(--min-label,13px)}
+.ui-renewal .stat-chips b{font-size:16px;font-weight:700;color:#eee0bd}
+.ui-renewal :is(.item-card,.pet-card,.collection-cell,.wardrobe-card,.relic-vault-card,.offer-card,.package-card){border-width:1px;border-radius:11px;background:linear-gradient(145deg,#2b2439,#201b2d);box-shadow:none;padding:9px 6px}
+.ui-renewal :is(.item-card,.pet-card,.wardrobe-card).selected{border-color:#d7bb82;background:linear-gradient(#55433e,#2a2232);box-shadow:inset 0 0 0 1px #e8c67a22}
+.ui-renewal :is(.item-card,.pet-card,.wardrobe-card)>:is(b,strong){font-size:var(--min-label,13px);line-height:1.4;color:#e5d9eb;word-break:keep-all;overflow-wrap:break-word}
+.ui-renewal :is(.item-card,.pet-card,.wardrobe-card)>small{font-size:var(--min-label,13px);line-height:1.45}
+.ui-renewal .item-card>.art{width:58px;height:58px;max-width:100%;margin:auto auto 7px;aspect-ratio:1}
+.ui-renewal :is(.tabs,.profile-tabs,.mailbox-tabs,.guild-tabs){gap:5px;background:#171320;border-color:var(--ui-edge);border-radius:10px;padding:4px}
+.ui-renewal :is(.tabs,.profile-tabs,.mailbox-tabs,.guild-tabs)>button{border:0;border-radius:7px;background:none;color:#bcb0cc;font-size:var(--min-label,13px);min-height:36px;box-shadow:none}
+.ui-renewal :is(.tabs,.profile-tabs,.mailbox-tabs,.guild-tabs)>button.active{color:#efdcaf;background:#65507444;box-shadow:inset 0 -2px #c3a574}
+.ui-renewal :is(.filter-chips,.batch-controls,.class-ranks)>button{border-color:#ad91c636;border-radius:7px;background:#251e31;color:#c4b6d2;min-height:35px}
+.ui-renewal :is(.filter-chips,.batch-controls,.class-ranks)>button:is(.active,.selected){border-color:#bfa57977;background:#6c577338;color:#f1dcb0}
+.ui-renewal :is(.bar,.progress-bar){height:5px;border:0;border-radius:5px;background:#ffffff0b;overflow:hidden}
+.ui-renewal :is(.bar,.progress-bar)>i{background:linear-gradient(90deg,#8873a7,#dfc18a);transition:width .28s var(--ui-ease)}
+.ui-renewal :is(.content,.screen-content) select{min-height:38px;border:1px solid #ad91c640;border-radius:8px;background:#201a2b;color:#e7dbee;padding:7px 10px;font-size:var(--min-label,13px)}
+.ui-renewal :is(.content,.screen-content) input:not([type=range]){border:1px solid #ad91c640;border-radius:8px;background:#171320;color:#eee3f2}
+.ui-renewal .effect-table>div{min-height:39px;border-color:#c4a9da15;padding:10px 12px;font-size:var(--min-label,13px)}
+.ui-renewal .effect-table b{font-size:13px;color:#e3d0a5}
+.ui-renewal .spec-section{background:#262032;color:#e4d9ec;border:1px solid #ad91c632;box-shadow:none;border-radius:12px;padding:14px}
+.ui-renewal .spec-section h3{color:#e8d1a5;border-color:#b79acc26;font-size:15px}
+.ui-renewal .spec-section dt{font-size:var(--min-label,13px);color:#d0c3db}
+.ui-renewal .spec-section dt small{font-size:var(--min-label,13px);color:#aaa0b8}
+.ui-renewal .spec-section dd{color:#f0dfbb;font-size:14px}
+.ui-renewal .spec-section dl>div{border-color:#bfa4d514}
+.ui-renewal .gear-main-stat{background:linear-gradient(100deg,#57443d66,#32263f);border-color:#d4b78a50;padding:13px}
+.ui-renewal .gear-detail-hero{border-color:var(--ui-edge)}
+.ui-renewal .gear-detail-hero h3{font-size:19px;color:#efdbb3}
+.ui-renewal .gear-detail-hero>.art{border-color:#bc9c6e80}
+.ui-renewal .gear-compare>div{border-color:#b99bd41c;padding-block:10px}
+.ui-renewal .class-pick-header{padding:3px 0 16px}
+.ui-renewal .class-pick-header h2{font-size:23px;color:#f2e1bb;letter-spacing:-.4px}
+.ui-renewal .class-selector>button{border:1px solid var(--ui-edge);border-radius:9px;background:#262032}
+.ui-renewal .class-selector>button.selected{border-color:#d0b37b;background:linear-gradient(#59473c88,#33263e);box-shadow:none}
+.ui-renewal .class-description>span{border-radius:6px;padding:7px 10px}
+.ui-renewal .wardrobe-title h2{font-size:23px;color:#f0ddb3}
+.ui-renewal .wardrobe-collection{border-color:var(--ui-edge)}
+.ui-renewal .relic-vault-hero{border-color:var(--ui-edge);background:radial-gradient(ellipse at 15% 50%,#74539933,transparent 65%),#211a30;border-radius:12px}
+.ui-renewal .relic-vault-hero>.art{width:82px;height:82px;flex-basis:82px}
+.ui-renewal .relic-vault-hero h2{font-size:22px}
+.ui-renewal .forge-showcase{border:1px solid var(--ui-edge);border-radius:13px;background:radial-gradient(ellipse,#9c684b20,transparent 75%),#211b2d}
+.ui-renewal .forge-showcase>.forge-hd{width:155px;height:155px}
+@media(max-width:420px){.ui-renewal .forge-showcase>.forge-hd{position:relative;top:9px;pointer-events:none}}
+.ui-renewal .forge-showcase h2{font-size:21px}
+.ui-renewal .dungeon-reset-banner{border:1px solid var(--ui-edge);background:#292233;box-shadow:none;border-radius:10px;padding:11px;gap:8px}
+.ui-renewal .dungeon-reset-banner b{font-size:var(--min-label,13px)}.ui-renewal .dungeon-reset-banner small,.ui-renewal .dungeon-reset-banner>span>small{font-size:var(--min-label,13px)}
+.ui-renewal .dungeon-reset-banner strong{font-size:13px;color:#c8dbb9;text-shadow:none}
+.ui-renewal .realm-banner{border:1px solid #c3a87970;border-radius:13px;box-shadow:0 7px 18px #08051030}
+.ui-renewal .realm-corner{display:none}
+.ui-renewal .realm-enter{min-height:40px;border:1px solid #ddc18b88;border-radius:9px;background:linear-gradient(110deg,#e4d0a8,#c3a36e);color:#352a23;font-size:14px;font-weight:700;box-shadow:inset 0 1px #fff4db33;text-shadow:none;letter-spacing:0}
+.ui-renewal .realm-enter:disabled{background:#302837;color:#a79aad;border:1px solid #8f7b9b30;box-shadow:none}
+.ui-renewal .realm-controls .recommended-power{background:#1b1528d9;border:1px solid #bda0d339;border-radius:9px}
+.ui-renewal .town-nameplate,.ui-renewal .town-building.online .town-nameplate{background:linear-gradient(#30263eea,#20192de8);border:1px solid #d0b18288;border-radius:9px;box-shadow:0 5px 15px #0c08115e;text-shadow:none;padding:9px 10px}
+.ui-renewal .town-nameplate:before,.ui-renewal .town-nameplate:after{content:none}
+.ui-renewal .town-nameplate b{font-size:14px;font-weight:700;color:#f0dfba}
+.ui-renewal .town-nameplate small{font-size:var(--min-label,13px);color:#c9bbd6}
+.ui-renewal .shop-banner,.ui-renewal .newbie-intro{border-color:var(--ui-edge);background:linear-gradient(110deg,#3b2c4144,#272033);box-shadow:none}
+.ui-renewal .vip-center-banner{border:0;border-radius:12px 12px 0 0;min-height:125px;padding:19px 15px}
+.ui-renewal .vip-center-banner h3{font-size:24px}
+.ui-renewal .vip-ribbon{border:0;background:#4f394c;color:#f0d5a4;font-size:13px;padding:10px;box-shadow:none}
+.ui-renewal .vip-parchment{background:linear-gradient(135deg,#2e2638,#211a2c);color:#ddd0e6;border:1px solid var(--ui-edge);box-shadow:none;padding:16px 12px}
+.ui-renewal .vip-rank-selector h3{color:#f0dfba;font-size:23px}
+.ui-renewal .vip-rank-selector :is(span,small),.ui-renewal .vip-parchment :is(h4,.small),.ui-renewal .vip-gift-heading,.ui-renewal .vip-gift-heading small,.ui-renewal .vip-progress-copy{color:#cfc0d8}
+.ui-renewal .vip-rank-selector>button{color:#dfbd87;min-height:44px}
+.ui-renewal .vip-progress{background:#15111d;border:1px solid #a58d6233;height:6px}
+.ui-renewal .vip-progress-copy b{color:#b8dbc7}
+.ui-renewal .vip-reward-track{scrollbar-color:#a48b664f transparent;gap:8px}
+.ui-renewal .vip-reward-track>div{background:#34283e;border:1px solid #c0a16e55;border-radius:10px;box-shadow:none}
+.ui-renewal .vip-title-gift{border-color:var(--ui-edge);background:#c4a2df09;color:#dfd1e7}
+.ui-renewal .monthly-rewards>.month-day{border-color:#b69acc33;background:#2b2239;border-radius:8px}
+.ui-renewal .monthly-rewards>.month-day.special{border-color:#d6b67d6b;background:#54403366}
+.ui-renewal .monthly-rewards>.month-day.selected{box-shadow:inset 0 0 0 1px #e4c48b;border-color:#e4c48b}
+.ui-renewal .guild-hero{border-color:#c7ab7e55;box-shadow:none}
+.ui-renewal .guild-tabs{background:#1d1829}
+.ui-renewal .guild-member-row{border-color:var(--ui-edge);background:#2a2236;border-radius:10px}
+.ui-renewal .guild-member-row.guild-self{background:#4c3c4d55;border-color:#d1b27e55}
+
+/* Motion stays on transform/opacity. No animated blur or full-screen filters. */
+/* Artwork owns its space: combat magnification must not leak into menu cards. */
+.ui-renewal .class-sprite:not(.actor){scale:1}
+.ui-renewal .class-selector{gap:6px}
+.ui-renewal .class-selector>button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:5px 2px 8px}
+.ui-renewal .class-selector .class-sprite{width:100%;max-width:70px;margin:0 auto 3px}
+.ui-renewal .class-preview-stage{height:244px;margin:12px 0 0;overflow:hidden}
+.ui-renewal .class-preview-stage>.class-sprite{width:216px;height:216px;max-width:100%;top:25px;left:50%;transform:translateX(-50%)}
+.ui-renewal .class-preview-tag{top:3px;right:5px;z-index:3;font-size:var(--min-label,13px)}
+.ui-renewal .class-aura{bottom:8px;height:25px;left:21%;width:58%}
+.ui-renewal .class-preview-title{position:static;text-align:center;margin:5px 0 13px;text-shadow:none}
+.ui-renewal .class-preview-title h3{font-size:25px;line-height:1.2;margin:4px 0 0}
+.ui-renewal .class-preview-title small{font-size:var(--min-label,13px);color:var(--ui-muted)}
+.ui-renewal .wardrobe-stage>.class-sprite{max-width:calc(100% - 58px);scale:1}
+.ui-renewal .class-wardrobe .class-sprite{scale:1;position:relative;overflow:hidden}
+.ui-renewal .hero-showcase{height:264px;margin:0 0 12px;isolation:isolate}
+.ui-renewal .hero-showcase>.paperdoll{width:calc(100% - 112px);max-width:222px;height:auto;aspect-ratio:1;left:50%;top:18px;right:auto;transform:translateX(-50%);scale:1}
+.ui-renewal .hero-showcase:before{bottom:42px;left:21%;right:21%;height:25px}
+.ui-renewal .hero-showcase>strong{bottom:5px;font-size:16px;line-height:24px}
+.ui-renewal .equipment-slot{width:48px;height:51px}
+.ui-renewal .equipment-slot[data-pos="0"]{left:5px;top:5px}
+.ui-renewal .equipment-slot[data-pos="1"]{right:5px;top:5px}
+.ui-renewal .equipment-slot[data-pos="2"]{left:5px;top:64px}
+.ui-renewal .equipment-slot[data-pos="3"]{right:5px;top:64px}
+.ui-renewal .equipment-slot[data-pos="4"]{left:5px;top:123px}
+.ui-renewal .equipment-slot[data-pos="5"]{right:5px;top:123px}
+.ui-renewal .equipment-slot[data-pos="6"]{left:auto;right:5px;top:182px}
+.ui-renewal .screen-content:has(.hero-showcase) .item-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ui-renewal .art.atlas-fit{position:relative;display:inline-block;background-image:none!important;overflow:hidden;isolation:isolate}
+.ui-renewal .art.atlas-fit>.atlas-cell{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:block;background-repeat:no-repeat;pointer-events:none;border-radius:0}
+.ui-renewal .collection-cell .equipment-art{width:100%;max-width:90px;height:auto;aspect-ratio:1;flex:0 0 auto;margin:auto}
+.ui-renewal .equipment-slot .equipment-art{width:44px;height:44px;display:block;margin:auto}
+.ui-renewal .collection-grid{align-items:stretch}
+.ui-renewal .collection-cell{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:10px 6px}
+.ui-renewal .collection-cell .collection-name{margin:0;min-height:2.8em;line-height:1.4;font-size:var(--min-label,13px);word-break:keep-all;overflow-wrap:anywhere}
+.ui-renewal .collection-cell :is(small,.catalog-detail-hint){margin:0;font-size:var(--min-label,13px)}
+.ui-renewal .collection-claim-dock{position:static;margin-top:12px;padding:0;background:none}
+.ui-renewal .relic-vault-hero{display:grid;grid-template-columns:64px minmax(0,1fr);gap:13px;align-items:center;padding:14px}
+.ui-renewal .relic-vault-hero>.art{width:64px;height:64px;min-width:0;flex:none}
+.ui-renewal .relic-vault-hero h2{font-size:20px;line-height:1.35}
+.ui-renewal .relic-vault-hero p{font-size:var(--min-label,13px);line-height:1.5}
+.ui-renewal .relic-vault-hero small{font-size:var(--min-label,13px);line-height:1.5;display:block}
+.ui-renewal .skill-equipped{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px 8px}
+.ui-renewal .skill-equipped>button{display:flex;flex-direction:column;align-items:center;min-width:0;gap:5px}
+.ui-renewal .skill-equipped :is(.skill-lock,.skill-sigil){position:relative;inset:auto;width:42px;height:42px;flex:0 0 42px;margin:0}
+.ui-renewal .skill-equipped .skill-lock svg{width:19px;height:19px;display:block}
+.ui-renewal .skill-equipped small{position:static;display:block;width:100%;font-size:var(--min-label,13px);line-height:1.4;min-height:2.8em;margin:0;white-space:normal;overflow-wrap:anywhere}
+.ui-renewal .skill-equipped .slot-number{top:-5px;left:0;z-index:2}
+.ui-renewal .screen-content,.ui-renewal .content{min-height:0;padding-bottom:28px;scroll-padding-block:12px 28px}
+.ui-renewal .class-onboarding-inner{display:block}
+@media(max-width:350px){.ui-renewal .class-preview-stage{height:222px}.ui-renewal .class-preview-stage>.class-sprite{width:194px;height:194px}.ui-renewal .class-selector b{font-size:var(--min-label,13px)}}
+@keyframes ui-page-in{from{opacity:0;transform:translate3d(0,9px,0)}to{opacity:1;transform:none}}
+@keyframes ui-modal-in{from{opacity:0;transform:translate3d(0,12px,0) scale(.985)}to{opacity:1;transform:none}}
+@keyframes class-breathe{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-2px,0)}}
+@keyframes warrior-strike{0%{transform:none}18%{transform:translate3d(-3%,0,0) rotate(-4deg)}42%{transform:translate3d(29%,0,0) rotate(3deg)}62%{transform:translate3d(25%,0,0) rotate(1deg)}100%{transform:none}}
+@keyframes shadow-strike{0%{transform:none;opacity:1}18%{transform:translate3d(-5%,0,0);opacity:.86}42%{transform:translate3d(59%,0,0);opacity:1}62%{transform:translate3d(51%,0,0)}100%{transform:none}}
+@keyframes paladin-strike{0%{transform:none}18%{transform:translate3d(-2%,0,0) rotate(-2deg)}42%{transform:translate3d(23%,0,0) rotate(2deg)}64%{transform:translate3d(19%,0,0)}100%{transform:none}}
+@keyframes mage-strike{0%{transform:none}25%{transform:translate3d(0,-5px,0) rotate(-2deg)}42%{transform:translate3d(0,-7px,0)}65%{transform:translate3d(0,-4px,0) rotate(1deg)}100%{transform:none}}
+@keyframes archer-strike{0%{transform:none}25%{transform:translate3d(-4%,0,0) rotate(-2deg)}42%{transform:translate3d(-1%,0,0)}58%{transform:translate3d(-6%,0,0) rotate(-1deg)}100%{transform:none}}
+@keyframes creature-hit{0%{transform:none}22%{transform:translate3d(5px,-1px,0) rotate(1deg)}55%{transform:translate3d(2px,0,0)}100%{transform:none}}
+.ui-renewal .actor.world-creature.damaged{animation-duration:.23s;animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+.ui-renewal .result-surface:not(.result-settled) .loot-card{animation-duration:320ms!important;animation-timing-function:var(--ui-ease)!important}
+.ui-renewal .actor.hero.class-hero[data-motion]:not([data-motion=idle]){animation-timing-function:cubic-bezier(.3,0,.25,1)}
+.ui-renewal :is(.painted-impact,.painted-vfx-frame){will-change:transform,opacity}
+.ui-renewal .notice{border:1px solid #cbb38666;border-radius:11px;background:#30243ef5;box-shadow:0 8px 24px #08041166;transition:opacity .22s,transform .26s var(--ui-ease)}
+.ui-renewal .notice-confirm{width:23px;flex-basis:23px;height:23px;font-size:var(--menu-label-size,12px);background:#d9bb84;box-shadow:none}
+.ui-renewal .screen-content,.ui-renewal .content{overflow-anchor:none}
+.ui-renewal .game:has(.feature-screen:not([hidden])) :is(.actor,.battle-pet,.weather-spark),.ui-renewal .game:has(.overlay.show) :is(.actor,.battle-pet,.weather-spark){animation-play-state:paused}
+@media(max-width:360px){
+ .ui-renewal .top{padding-inline:8px;gap:5px 4px;grid-template-columns:minmax(0,1fr) auto 44px 44px}
+ .ui-renewal .portrait{width:36px;height:36px;flex-basis:36px}.ui-renewal .profile{gap:6px}.ui-renewal .profile-copy strong{font-size:var(--menu-label-size,12px)}.ui-renewal .vip{padding-inline:7px}
+ .ui-renewal .wallet b{font-size:var(--menu-label-size,11px)}.ui-renewal .wallet button{gap:3px}.ui-renewal .stage strong{font-size:16px}.ui-renewal .stage span{font-size:9px}
+ .ui-renewal .screen-content,.ui-renewal .content{padding-inline:11px}.ui-renewal #screenTabs{padding-inline:7px}.ui-renewal #screenTabs>button{min-width:37px;padding-inline:6px;font-size:var(--min-label,13px)}
+ .ui-renewal #skillbuttons{gap:12px}.ui-renewal #skillbuttons button{width:42px;height:42px}.ui-renewal .dialoghead h2{font-size:17px}
+ .ui-renewal .hero-health small{font-size:8px}.ui-renewal .forge-mini-art{width:63px;flex-basis:63px}.ui-renewal .forge-dock{gap:7px}
+}
+@media(max-height:700px){
+ .ui-renewal .game{--hud-top:84px;--nav-height:61px}.ui-renewal .top{grid-template-rows:40px 25px;padding-top:5px;padding-bottom:5px;gap:4px 6px}
+ .ui-renewal .portrait{width:36px;height:36px;flex-basis:36px}.ui-renewal .wallet .art{width:20px;height:20px}.ui-renewal .bottom-nav button .art{width:25px;height:25px}
+ .ui-renewal .screen-head{height:52px}.ui-renewal .screen-head h1{font-size:20px}.ui-renewal #screenTabs{min-height:44px;padding-block:4px}
+ .ui-renewal .stage{top:8px;height:54px}.ui-renewal .stage-route{top:70px}.ui-renewal :is(.side-nav,.right-nav){top:9px;gap:4px}.ui-renewal :is(.side-nav,.right-nav) button>.art{width:26px;height:26px}.ui-renewal :is(.side-nav,.right-nav) button{min-height:39px}
+ .ui-renewal .forge-dock{height:57px}.ui-renewal .home-quest{margin-top:6px;min-height:38px}.ui-renewal .forge-mini-art{--forge-art-size:48px}.ui-renewal .battle-controls{bottom:78px}
+ .ui-renewal .battle.off .manual-hit{bottom:94px}.ui-renewal .dialog{max-height:calc(100% - 16px)}.ui-renewal .overlay{padding:8px}
+}
+@media(prefers-reduced-motion:reduce){.ui-renewal *,.ui-renewal *::before,.ui-renewal *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+.ui-renewal.low-motion *,.ui-renewal.low-motion *::before,.ui-renewal.low-motion *::after,.ui-renewal.power-saving *,.ui-renewal.power-saving *::before,.ui-renewal.power-saving *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+
+/* Keep turn markers readable in narrow battle reports. */
+.ui-renewal .online-battle-log>div>small{flex:0 0 auto;min-width:24px;white-space:nowrap}
+.ui-renewal .online-battle-log>div>span{min-width:0}
+@media(max-width:420px){.ui-renewal .online-battle-log{grid-template-columns:minmax(0,1fr)}}
+
+.ui-renewal .vip-parchment .vip-title-gift>small{color:#cfc0d8}
+
+.ui-renewal #content .spec-section dt{color:#d6cbdc}
+.ui-renewal #content .spec-section dd{color:#f0dfba}
+.ui-renewal #content .spec-section dt small{color:#b9abc5}

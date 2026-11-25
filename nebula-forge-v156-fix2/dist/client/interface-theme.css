@@ -1,0 +1,172 @@
+/* Keep the HUD geometry stable when the palette changes. */
+.ui-renewal .game { --hud-top: 104px; }
+.ui-renewal .top { grid-template-rows: minmax(0,1fr) 44px; padding-block: 5px; }
+.ui-renewal .stage .stage-map-button {
+  height: 100%; min-width: 0; flex: 1; gap: 0; padding: 2px 0;
+}
+.ui-renewal .stage-map-button #stage { font-size: clamp(16px,4.8cqw,23px); line-height: 1.08; }
+.ui-renewal .stage-map-button #region { margin: 1px 0 0; line-height: 1.15; }
+.ui-renewal .stage-map-button .difficulty-badge[hidden] { display: none; }
+@media (max-height: 700px) {
+  /* Short screens keep the battlefield: the wallet row and the chat bar stay compact. */
+  .ui-renewal .game { --hud-top: 90px; --chat-strip: 32px; }
+  .ui-renewal .top { padding-block: 3px; grid-template-rows: minmax(0,1fr) 40px; }
+  .ui-renewal :is(.wallet,.wallet button) { min-height: 40px; }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  background: #0b0b15;
+}
+.ui-renewal {
+  --sheet-ink: var(--ui-text);
+  --sheet-muted: var(--ui-muted);
+  --sheet-edge: var(--ui-line);
+  --sheet-panel: var(--ui-panel);
+  --sheet-row: var(--ui-raised);
+  --sheet-inset: var(--ui-canvas);
+  --sheet-accent: var(--ui-gold);
+  --sheet-positive: var(--ui-good);
+}
+/* Apply ink and paper as a pair, including content below the scroll fold. */
+.ui-renewal :is(.mailbox-actions,.summon-stage,.wheel-selected,.wheel-event-link,
+  .wheel-guarantees>div,.wheel-rate-list,.wheel-rate-row,.mailbox-empty) {
+  color: var(--sheet-ink); background: var(--sheet-panel); border-color: var(--sheet-edge);
+  text-shadow: none;
+}
+.ui-renewal .mailbox-actions {
+  background: var(--sheet-panel); box-shadow: none;
+}
+.ui-renewal .wheel-guarantees>div,.ui-renewal .wheel-selected,.ui-renewal .wheel-event-link {
+  background: var(--sheet-row);
+}
+.ui-renewal :is(.summon-stage h2,.wheel-selected b,.wheel-wallet b,.wheel-guarantees b,
+  .wheel-event-link>span,.mail-mini-reward>b) { color: var(--sheet-ink); text-shadow: none; }
+.ui-renewal :is(.summon-stage p,.wheel-selected span,.wheel-guarantees span,.wheel-event-link small,
+  .wheel-wallet,.wheel-wallet>span,.wheel-caption,.mailbox-empty small) {
+  color: var(--sheet-muted); text-shadow: none;
+}
+.ui-renewal .wheel-selected strong { color: var(--sheet-positive); }
+.ui-renewal .wheel-event-link>b { color: var(--sheet-accent); }
+.ui-renewal :is(.haven-heading,.town-nameplate,.town-nameplate b,.town-nameplate small,
+  .system-tiles button,.package-card,.mail-row-text,.mail-row-arrow) { text-shadow: none; }
+.ui-renewal .town-building { filter: none; }
+.ui-renewal .town-nameplate { box-shadow: 0 2px 4px #261a2038; }
+/* Separate the claimed mark from the count, even for three-digit rewards. */
+.ui-renewal .mail-mini-reward {
+  display: grid; grid-template-rows: 22px auto; justify-items: center;
+  width: auto; min-width: 24px; height: auto; border: 0; box-shadow: none; background: transparent;
+}
+.ui-renewal .mail-mini-reward>b { position: static; font-size:var(--min-label,13px); line-height: 1.25; }
+.ui-renewal .mail-mini-reward>.received-check {
+  inset: 0 0 auto auto; width: 12px; height: 12px; border-radius: 50%; background: #335d42;
+  color: #fff; font-size: 9px; line-height: 1; text-shadow: none; -webkit-text-stroke: 0;
+}
+.ui-renewal .mail-mini-reward.claimed>.art { opacity: .75; }
+.ui-renewal .grade-odds span {
+  border: 1px solid var(--sheet-edge);
+  border-top: 3px solid var(--rim);
+  border-radius: 5px; padding: 4px 2px; background: var(--sheet-row); color: var(--sheet-ink);
+  text-shadow: none;
+}
+:root[data-theme="dark"] .dialog:has(.pref-sheet) {
+  color: var(--sheet-ink); background: var(--sheet-panel); border-color: #927a5b;
+  box-shadow: inset 0 0 0 1px #594858, 0 12px 36px #0b09136b;
+}
+:root[data-theme="dark"] .dialog:has(.pref-sheet) .dialoghead :is(h2,button) { color: var(--sheet-ink); }
+:root[data-theme="dark"] .pref-sheet { color-scheme: dark; color: var(--sheet-ink); }
+:root[data-theme="dark"] .pref-frame {
+  background: var(--sheet-inset); border-color: var(--sheet-edge); box-shadow: none;
+}
+:root[data-theme="dark"] .pref-sheet :is(.pref-switch,.pref-link) {
+  color: var(--sheet-ink); background: var(--sheet-row); border-color: var(--sheet-edge);
+}
+:root[data-theme="dark"] :is(.pref-switch svg,.pref-link span,.pref-version) { color: var(--sheet-muted); }
+:root[data-theme="dark"] .pref-tabs { background: var(--sheet-inset); }
+:root[data-theme="dark"] .pref-tabs button { color: var(--sheet-muted); }
+:root[data-theme="dark"] .pref-tabs button[aria-pressed="true"] {
+  color: #fff1ce; background: #58463b; border-color: #9a815d; box-shadow: none;
+}
+:root[data-theme="dark"] .pref-sheet button:focus-visible { outline-color: var(--sheet-accent); }
+
+/* Original atlas coordinates remain intact. Clip only the painted icons on UI surfaces. */
+.ui-renewal :is(.system-tiles,.package-card,.summon-stage,.wheel-wallet,.wheel-actions,.wheel-event-link,.wallet,.mailbox-list,.action-row,.ability-metrics,.bottom-nav,.header-button,.grade-odds) .art[data-icon]:where(:not(.catalog-icon)) { clip-path: var(--icon-outline, none); }
+:is(.art[data-icon="settings"]) { --icon-outline: polygon(
+  44% 2.5%, 54.5% 2%, 57% 4.5%, 58% 9.5%, 61.5% 12%, 63.5% 12%, 68.5% 7%, 72.5% 8%, 79% 13.5%, 77% 21.5%, 79.5% 24%, 86.5% 23%, 89% 25.5%, 93% 33.5%, 93% 35.5%, 87% 40.5%, 87% 43.5%, 94% 48.5%, 94% 53.5%, 92% 60.5%, 90.5% 62%, 84.5% 62%, 83.5% 61%, 80% 65.5%, 83% 69.5%, 84% 73.5%, 74.5% 82%, 72.5% 82%, 67.5% 78%, 62.5% 80%, 61% 81.5%, 60% 87.5%, 55.5% 90%, 40.5% 89%, 39% 87.5%, 38% 81.5%, 32.5% 78%, 26.5% 82%, 21.5% 80%, 15% 73.5%, 15% 71.5%, 19% 65.5%, 18% 63.5%, 16.5% 62%, 8.5% 62%, 7% 60.5%, 5% 53.5%, 5% 49.5%, 13% 42.5%, 6% 35.5%, 10% 25.5%, 12.5% 23%, 20.5% 24%, 22% 22.5%, 20% 13.5%, 23.5% 10%, 28.5% 7%, 31.5% 7%, 36.5% 12%, 38.5% 12%, 41% 9.5%, 42% 4.5%
+); }
+:is(.art[data-icon="ticket"]) { --icon-outline: polygon(
+  76% 10.5%, 79.5% 10%, 82% 15.5%, 84.5% 18%, 89.5% 18%, 91% 19.5%, 92% 27.5%, 88% 31.5%, 88% 36.5%, 95% 40.5%, 97% 48.5%, 92% 52.5%, 91% 55.5%, 92% 56.5%, 92% 60.5%, 90.5% 62%, 19.5% 83%, 17% 81.5%, 16% 76.5%, 13.5% 74%, 8.5% 74%, 6% 71.5%, 5% 62.5%, 10% 58.5%, 10% 53.5%, 7.5% 51%, 4.5% 51%, 2% 48.5%, 1% 41.5%, 6% 37.5%, 6% 29.5%, 8.5% 27%
+); }
+:is(.art[data-icon="ranking"], .art[data-icon="guild"]) { --icon-outline: polygon(
+  42% 3.5%, 62.5% 4%, 69.5% 6%, 73.5% 9%, 77.5% 5%, 84.5% 5%, 88.5% 8%, 90.5% 7%, 93% 9.5%, 96% 21.5%, 96% 24.5%, 92% 29.5%, 93% 31.5%, 83.5% 41%, 79.5% 40%, 73.5% 42%, 71% 44.5%, 75% 49.5%, 71.5% 53%, 66.5% 52%, 62.5% 47%, 57% 50.5%, 59% 53.5%, 56% 56.5%, 57% 58.5%, 71% 70.5%, 72% 79.5%, 78% 86.5%, 78% 89.5%, 76.5% 91%, 66.5% 92%, 65.5% 93%, 35.5% 93%, 34.5% 92%, 26.5% 92%, 22% 89.5%, 23% 84.5%, 28% 79.5%, 29% 75.5%, 28% 71.5%, 29% 69.5%, 30.5% 68%, 32.5% 68%, 35.5% 64%, 43% 58.5%, 43% 55.5%, 41% 53.5%, 43% 50.5%, 37.5% 47%, 31.5% 53%, 28.5% 53%, 25% 48.5%, 29% 44.5%, 24.5% 41%, 20.5% 40%, 16.5% 41%, 7% 31.5%, 3% 21.5%, 5% 19.5%, 5% 14.5%, 7% 9.5%, 9.5% 7%, 10.5% 8%, 15.5% 5%, 22.5% 5%, 26.5% 9%, 30.5% 6%
+); }
+:is(.art[data-icon="quests"]) { --icon-outline: polygon(
+  69% 2.5%, 76.5% 2%, 84.5% 6%, 92% 13.5%, 95% 19.5%, 95% 24.5%, 96% 25.5%, 96% 27.5%, 92.5% 31%, 85.5% 35%, 76% 43.5%, 77% 44.5%, 76% 47.5%, 67% 57.5%, 76% 70.5%, 80% 78.5%, 78.5% 80%, 73.5% 79%, 71% 81.5%, 71% 84.5%, 68.5% 89%, 65% 86.5%, 63% 81.5%, 58.5% 77%, 53% 85.5%, 49.5% 88%, 48% 86.5%, 48% 76.5%, 46.5% 75%, 42% 82.5%, 34.5% 91%, 30.5% 92%, 26.5% 90%, 25.5% 91%, 21.5% 91%, 17.5% 88%, 15.5% 88%, 10% 83.5%, 4% 74.5%, 5% 73.5%, 3% 71.5%, 3% 65.5%, 5% 61.5%, 29.5% 44%, 31% 42.5%, 31% 38.5%, 39% 29.5%, 42.5% 26%, 47.5% 26%, 57% 14.5%, 60% 9.5%, 60% 7.5%, 62.5% 5%, 66.5% 3%, 67.5% 4%
+); }
+:is(.art[data-icon="skills"], .art[data-icon="summonBook"]) { --icon-outline: polygon(
+  8.0% 16.9%, 8.9% 14.0%, 11.1% 11.7%, 14.3% 10.0%, 28.9% 8.3%, 30.9% 8.3%, 31.4% 9.4%, 57.4% 6.0%, 58.0% 5.1%, 71.1% 2.9%, 75.1% 15.4%, 74.6% 17.1%, 73.4% 16.6%, 82.6% 47.1%, 84.3% 46.9%, 91.1% 60.9%, 91.1% 62.6%, 88.9% 63.4%, 87.1% 66.3%, 86.0% 69.7%, 86.9% 72.0%, 88.0% 73.1%, 88.3% 74.9%, 77.1% 77.1%, 40.3% 82.9%, 40.3% 90.9%, 38.6% 94.6%, 32.9% 91.1%, 32.9% 82.9%, 27.7% 83.7%, 25.4% 84.3%, 23.1% 82.9%, 21.7% 80.6%, 20.9% 77.1%, 20.9% 74.9%, 20.0% 72.6%, 19.1% 70.9%, 18.9% 67.1%, 19.7% 65.4%, 18.6% 60.9%, 17.1% 59.1%, 16.6% 56.9%, 16.9% 54.9%, 16.0% 51.1%, 14.9% 49.7%, 14.0% 46.3%, 14.3% 44.3%, 12.9% 41.4%, 12.9% 39.1%, 13.7% 36.6%, 12.0% 32.3%, 11.4% 31.1%, 10.9% 28.9%, 11.1% 26.9%, 10.3% 23.7%, 8.9% 22.6%, 8.0% 20.6%, 7.7% 18.6%
+); }
+:is(.art[data-icon="dungeon"]) { --icon-outline: polygon(
+  48% 1.5%, 51.5% 1%, 53.5% 3%, 56.5% 3%, 58.5% 5%, 67.5% 9%, 69.5% 8%, 73.5% 9%, 75% 10.5%, 74% 14.5%, 76.5% 17%, 80.5% 15%, 85% 21.5%, 81% 25.5%, 83.5% 28%, 86.5% 28%, 91% 31.5%, 91% 35.5%, 88% 40.5%, 87% 51.5%, 88% 52.5%, 88% 63.5%, 91% 66.5%, 91% 71.5%, 94% 74.5%, 95% 82.5%, 97% 84.5%, 97% 87.5%, 95.5% 89%, 91.5% 89%, 90.5% 88%, 87.5% 91%, 80.5% 91%, 79.5% 92%, 74.5% 89%, 70.5% 89%, 68.5% 91%, 67.5% 90%, 63.5% 92%, 62.5% 91%, 59.5% 92%, 57.5% 90%, 55.5% 92%, 44.5% 92%, 43.5% 91%, 39.5% 92%, 37.5% 90%, 34.5% 91%, 32.5% 89%, 29.5% 91%, 26.5% 89%, 23.5% 91%, 13.5% 91%, 8.5% 88%, 5.5% 89%, 3% 86.5%, 3% 84.5%, 5% 82.5%, 6% 74.5%, 9% 71.5%, 9% 66.5%, 12% 63.5%, 12% 56.5%, 13% 55.5%, 12% 40.5%, 8% 35.5%, 8% 32.5%, 14.5% 27%, 16.5% 28%, 19% 25.5%, 15% 21.5%, 19.5% 16%, 23.5% 17%, 26% 14.5%, 25% 10.5%, 26.5% 9%, 28.5% 8%, 33.5% 9%
+); }
+:is(.art[data-icon="mail"]) { --icon-outline: polygon(
+  82% 13.5%, 89.5% 13%, 92% 15.5%, 92% 29.5%, 93% 30.5%, 95% 66.5%, 96% 67.5%, 96% 74.5%, 94.5% 76%, 65.5% 77%, 64.5% 78%, 42.5% 78%, 41.5% 79%, 22.5% 79%, 21.5% 80%, 8.5% 80%, 7% 78.5%, 6% 19.5%, 8.5% 17%
+); }
+:is(.art[data-icon="coin"]) { --icon-outline: polygon(
+  44% 7.5%, 60.5% 7%, 69.5% 10%, 75.5% 14%, 83% 20.5%, 88% 27.5%, 93% 44.5%, 92% 57.5%, 90% 61.5%, 90% 64.5%, 84% 75.5%, 74.5% 85%, 68.5% 89%, 53.5% 94%, 38.5% 93%, 32.5% 91%, 24.5% 86%, 14% 74.5%, 8% 59.5%, 8% 43.5%, 11% 34.5%, 15% 27.5%, 31.5% 10%, 36.5% 10%
+); }
+:is(.art[data-icon="gem"]) { --icon-outline: polygon(
+  45% 13.5%, 54.5% 13%, 55.5% 14%, 63.5% 14%, 76.5% 17%, 96% 37.5%, 82% 53.5%, 79% 58.5%, 66% 70.5%, 50.5% 88%, 25% 62.5%, 22% 57.5%, 4% 38.5%, 5% 34.5%, 7.5% 32%, 8.5% 33%, 16% 23.5%, 23.5% 17%, 31.5% 16%, 36.5% 14%
+); }
+:is(.art[data-icon="rouletteCoin"]) { --icon-outline: polygon(
+  49% 4.5%, 50.5% 4%, 54.5% 8%, 59.5% 8%, 65.5% 10%, 74.5% 15%, 86% 27.5%, 90% 35.5%, 91% 42.5%, 94% 46.5%, 91% 53.5%, 91% 58.5%, 89% 65.5%, 84% 74.5%, 70.5% 87%, 60.5% 91%, 51.5% 92%, 50.5% 93%, 33.5% 89%, 23.5% 83%, 17% 76.5%, 10% 63.5%, 8% 50.5%, 6% 47.5%, 8% 44.5%, 8% 41.5%, 12% 30.5%, 21% 18.5%, 32.5% 11%, 41.5% 8%, 45.5% 8%
+); }
+:is(.art[data-icon="shop"]) { --icon-outline: polygon(
+  70% 4.5%, 74.5% 4%, 82.5% 7%, 87% 11.5%, 85% 14.5%, 89% 18.5%, 84% 25.5%, 87% 29.5%, 85% 37.5%, 92% 53.5%, 92% 56.5%, 89% 59.5%, 91% 64.5%, 89% 69.5%, 90% 71.5%, 89% 80.5%, 84.5% 84%, 80.5% 85%, 75.5% 84%, 66.5% 89%, 50.5% 89%, 44.5% 87%, 41.5% 89%, 36.5% 89%, 32.5% 88%, 30.5% 86%, 26.5% 86%, 23.5% 83%, 20.5% 82%, 18% 83.5%, 20% 85.5%, 18.5% 87%, 9.5% 85%, 2% 75.5%, 2% 66.5%, 8% 53.5%, 7% 50.5%, 9% 45.5%, 6% 38.5%, 10% 25.5%, 16.5% 20%, 23.5% 19%, 32.5% 9%, 36.5% 7%, 40.5% 6%, 51.5% 7%, 56.5% 9%, 60.5% 13%, 64.5% 14%, 67% 11.5%, 67% 8.5%
+); }
+:is(.art[data-icon="event"]) { --icon-outline: polygon(
+  29% 3.5%, 32.5% 3%, 37.5% 5%, 45% 12.5%, 46% 15.5%, 49.5% 18%, 52.5% 18%, 56% 11.5%, 65.5% 3%, 70.5% 3%, 77.5% 8%, 82.5% 10%, 86% 13.5%, 87% 18.5%, 83% 25.5%, 84.5% 27%, 92.5% 29%, 95% 31.5%, 94% 45.5%, 91% 48.5%, 92% 49.5%, 92% 71.5%, 91% 72.5%, 92% 73.5%, 89.5% 76%, 85.5% 77%, 78.5% 82%, 76.5% 82%, 69.5% 86%, 67.5% 85%, 51.5% 93%, 48.5% 93%, 34.5% 86%, 30.5% 86%, 25.5% 84%, 8% 74.5%, 8% 48.5%, 6% 46.5%, 5% 31.5%, 7.5% 29%, 13.5% 28%, 16% 25.5%, 14% 22.5%, 15% 15.5%, 25.5% 5%
+); }
+:is(.art[data-icon="pass"]) { --icon-outline: polygon(
+  24% 3.5%, 41.5% 4%, 43.5% 6%, 44.5% 5%, 53.5% 5%, 54.5% 6%, 56.5% 4%, 75.5% 4%, 77% 5.5%, 77% 9.5%, 72% 22.5%, 64.5% 29%, 59.5% 27%, 57% 28.5%, 69.5% 35%, 78% 44.5%, 82% 53.5%, 83% 64.5%, 80% 75.5%, 77% 80.5%, 68.5% 89%, 60.5% 93%, 53.5% 95%, 45.5% 95%, 34.5% 92%, 28.5% 88%, 22% 81.5%, 17% 73.5%, 15% 66.5%, 15% 56.5%, 20% 44.5%, 25.5% 37%, 36.5% 31%, 38.5% 31%, 41% 28.5%, 38.5% 27%, 33.5% 29%, 25% 20.5%, 21% 9.5%, 21% 5.5%
+); }
+:is(.art[data-icon="summonTicket"]) { --icon-outline: polygon(
+  87% 9.5%, 89.5% 10%, 95% 16.5%, 95% 27.5%, 94% 30.5%, 90.5% 34%, 88.5% 35%, 86.5% 34%, 83% 36.5%, 89% 55.5%, 84% 59.5%, 84% 65.5%, 82.5% 67%, 70.5% 69%, 61.5% 73%, 48.5% 76%, 27.5% 77%, 26% 78.5%, 27% 79.5%, 27% 84.5%, 23.5% 88%, 17.5% 91%, 10.5% 91%, 5% 87.5%, 4% 85.5%, 4% 74.5%, 8% 68.5%, 8% 66.5%, 5% 63.5%, 6% 57.5%, 12% 53.5%, 12% 50.5%, 8% 47.5%, 9% 40.5%, 16% 36.5%, 17% 28.5%, 19.5% 26%, 21.5% 27%, 36.5% 27%, 37.5% 26%, 47.5% 25%, 61.5% 21%, 69.5% 14%
+); }
+:is(.art[data-icon="attendance"]) { --icon-outline: polygon(
+  27% 7.5%, 30.5% 7%, 34.5% 12%, 39.5% 7%, 41.5% 7%, 46.5% 12%, 50.5% 8%, 53.5% 8%, 57.5% 12%, 61.5% 8%, 64.5% 8%, 68.5% 12%, 75.5% 8%, 86% 18.5%, 86% 22.5%, 87% 23.5%, 86% 35.5%, 87% 36.5%, 90% 55.5%, 97% 79.5%, 97% 83.5%, 95.5% 85%, 86.5% 84%, 85.5% 85%, 67.5% 86%, 66.5% 87%, 58.5% 87%, 57.5% 88%, 49.5% 88%, 48.5% 89%, 37.5% 89%, 34.5% 92%, 28.5% 92%, 23.5% 87%, 15.5% 85%, 10.5% 85%, 8.5% 87%, 5.5% 87%, 3% 84.5%, 3% 80.5%, 8% 63.5%, 8% 59.5%, 12% 43.5%, 12% 38.5%, 13% 37.5%, 13% 32.5%, 12% 31.5%, 13% 19.5%, 17.5% 14%, 21.5% 15%, 24% 9.5%
+); }
+:is(.art[data-icon="vip"]) { --icon-outline: polygon(
+  49% 3.5%, 50.5% 3%, 55% 9.5%, 65% 19.5%, 65% 22.5%, 63.5% 24%, 59.5% 23%, 56% 25.5%, 56% 28.5%, 57.5% 30%, 63.5% 28%, 68.5% 28%, 73.5% 32%, 76.5% 32%, 78% 30.5%, 77% 27.5%, 83.5% 22%, 86% 24.5%, 88% 29.5%, 86% 32.5%, 95% 40.5%, 97% 44.5%, 96% 58.5%, 88% 68.5%, 88% 72.5%, 87% 73.5%, 88% 74.5%, 87% 78.5%, 88% 80.5%, 83.5% 85%, 70.5% 88%, 42.5% 89%, 41.5% 88%, 23.5% 87%, 16.5% 85%, 13% 82.5%, 12% 68.5%, 5% 60.5%, 4% 57.5%, 4% 53.5%, 3% 52.5%, 4% 42.5%, 14% 32.5%, 12% 29.5%, 16.5% 22%, 24% 27.5%, 22% 30.5%, 23.5% 32%, 26.5% 32%, 31.5% 28%, 37.5% 28%, 43.5% 30%, 45% 28.5%, 44% 25.5%, 41.5% 23%, 37.5% 24%, 35% 21.5%, 35% 19.5%, 41% 14.5%
+); }
+:is(.art[data-icon="costume"]) { --icon-outline: polygon(
+  44% 1.5%, 57.5% 1%, 60.5% 2%, 63.5% 5%, 69.5% 7%, 76% 15.5%, 79% 20.5%, 77% 24.5%, 83% 37.5%, 79% 42.5%, 84% 58.5%, 96% 74.5%, 86% 84.5%, 86% 86.5%, 83.5% 89%, 78.5% 89%, 72.5% 94%, 70% 92.5%, 67.5% 88%, 63.5% 89%, 60.5% 86%, 51.5% 92%, 45.5% 85%, 44% 86.5%, 44% 91.5%, 41.5% 94%, 31.5% 93%, 27% 89.5%, 28% 88.5%, 26.5% 87%, 17.5% 88%, 11.5% 85%, 6% 79.5%, 3% 74.5%, 3% 71.5%, 6% 65.5%, 17% 52.5%, 22% 44.5%, 22% 42.5%, 18% 37.5%, 25% 24.5%, 23% 19.5%, 31% 10.5%, 33.5% 6%, 40.5% 4%
+); }
+
+/* Text and arrows float over the battlefield in both interface themes. */
+.ui-renewal #battle .stage {
+  width:calc(100% - 2 * clamp(56px,16%,68px)); max-width:330px;
+  background:transparent; border:0; border-radius:0; box-shadow:none; clip-path:none;
+}
+.ui-renewal #battle .stage>button { background:transparent; border:0; box-shadow:none; }
+.ui-renewal #battle .stage :is(#stage,#region,.difficulty-badge,.stage-chevron) {
+  color:#fff4dc; text-shadow:0 1px 2px #211b27;
+  paint-order:stroke fill; -webkit-text-stroke:2.5px #211b27;
+}
+.ui-renewal #battle .stage .stage-map-button { padding:0; }
+.ui-renewal #battle .stage #stage { white-space:nowrap; font-size:clamp(14px,4.35cqw,21px); letter-spacing:.2px; }
+.ui-renewal #battle .stage #region { color:#fff; font-weight:650; font-size:clamp(12px,2.9cqw,14px); }
+.ui-renewal #battle .stage .difficulty-badge { color:color-mix(in srgb,var(--difficulty-accent,#ffe1ad) 40%,#fff4e0); }
+.ui-renewal #battle .stage>button:not(.stage-map-button) {
+  display:grid; place-items:center; flex:0 0 44px; width:44px; min-height:48px; padding:0;
+}
+.ui-renewal #battle .stage-chevron {
+  display:block; color:#ffe6aa; font:700 clamp(30px,8.5cqw,40px)/1 sans-serif;
+}
+.ui-renewal #battle .stage>button:focus-visible {
+  outline:2px solid #fff4dc; outline-offset:-2px; border-radius:5px;
+}
+@supports not (paint-order:stroke fill) {
+  .ui-renewal #battle .stage :is(#stage,#region,.difficulty-badge,.stage-chevron) {
+    -webkit-text-stroke:0; text-shadow:-1px -1px #211b27,1px -1px #211b27,-1px 1px #211b27,1px 1px #211b27;
+  }
+}
