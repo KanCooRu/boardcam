@@ -1,0 +1,55 @@
+/* player-experience.css */
+.player-stat-overview{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:7px;margin:0 0 10px}.player-stat-overview>div{padding:12px 8px;text-align:center;background:#292234;border:1px solid #51445d;border-radius:12px;min-width:0}.player-stat-overview small{display:block;font-size:var(--min-label,13px);color:#d2c8dc;line-height:1.5}.player-stat-overview b{display:block;font-size:18px;color:#f9e4ab;margin-top:6px;overflow-wrap:anywhere}.growth-final{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #ffffff14;padding-top:10px;font-size:var(--min-label,13px);color:#c9bfd3}.growth-final b{font-size:13px;color:#e5f1e5;font-variant-numeric:tabular-nums}.growth-comparison{row-gap:10px}
+.backup-times,.journey-card{border:1px solid #5c4b68;border-radius:14px;background:#292234;padding:15px;margin:12px 0}.backup-times p{display:flex;justify-content:space-between;gap:14px;font-size:var(--min-label,13px)}.backup-times small,.journey-card p{font-size:var(--min-label,13px);color:#d3c9de;line-height:1.7}.backup-times b{color:#ffe8b8}.import-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}.import-columns section{background:#292234;border:1px solid #57475e;border-radius:12px;padding:12px;min-width:0}.import-columns h3{font-size:15px;color:#f3d89c}.import-summary div{margin-bottom:15px}.import-summary dt{font-size:var(--min-label,13px);color:#c3b8cf}.import-summary dd{margin:5px 0 0;font-size:13px;overflow-wrap:anywhere;line-height:1.7}
+@media(max-width:360px){.import-columns{grid-template-columns:1fr}.backup-times p{display:block}.backup-times b{display:block;margin-top:6px}}
+.journey-card>b{display:block;margin-top:8px;font-size:15px;color:#f6ddb0}.journey-card>small{font-size:var(--min-label,13px);color:#c4b0db}.journey-card .action-row{margin:10px 0 0}.journey-card .muted-button{margin:10px 6px 0 0}.journey-card h3{margin:8px 0}.backup-reminder .muted-button{min-height:36px}
+.player-mission-title{display:flex;justify-content:space-between;gap:12px}.player-mission-title b{font-size:13px;line-height:1.6}.player-mission-title strong{white-space:nowrap;color:#f1d698}.player-missions .journey-card{margin:8px 0}.player-missions .bar{height:5px;margin-top:10px}
+.player-reset{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#211c2e;border:1px solid #52415c;border-radius:12px;padding:12px;margin:12px 0;line-height:1.6}.player-reset b{font-size:var(--min-label,13px);color:#dfc6ed}.player-reset small{display:block;font-size:var(--min-label,13px);color:#c4bad0}.player-reset>strong{font-size:13px;color:#f4db9f;white-space:nowrap;font-variant-numeric:tabular-nums}.coin-shortage{font-size:var(--min-label,13px);color:#eabca8;margin:8px 0 0}
+/* 05. Comfortable touch targets and readable compact layouts. */
+.ui-renewal :is(.screen-tabs,.tabs,.pass-mission-tabs){overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin;scrollbar-color:#9e8054 transparent;overscroll-behavior-x:contain;scroll-padding:12px}
+.ui-renewal :is(.screen-tabs,.tabs)>button{flex:1 0 auto;min-height:44px;min-width:58px;padding-inline:12px;white-space:nowrap;font-size:13px}
+.ui-renewal :is(.gold-button,.muted-button,.settings-link,.haven-return,.nebula-shop-tabs button){min-height:44px}
+.ui-renewal :is(.wallet button,.header-button,.vip){min-height:44px}
+.ui-renewal .wallet b{font-size:13px}.ui-renewal .wallet{min-height:44px}
+.ui-renewal .home-quest .quest-label span{white-space:normal;font-size:12px;line-height:1.5}
+.ui-renewal .home-quest .gold-button{font-size:12px}.ui-renewal .bottom-nav button>strong{font-size:var(--menu-label-size,12px)}
+.ui-renewal :is(.growth-help,.pass-list-hint,.nebula-shop-note,.online-note){font-size:var(--min-label,13px);line-height:1.7}
+.ui-renewal :is(.pass-mission-tabs,.nebula-shop-tabs){gap:4px}
+.ui-renewal .pass-list-row{gap:9px}.ui-renewal .pass-list-copy{min-width:0}.ui-renewal .pass-list-copy strong{overflow-wrap:anywhere}
+@container(max-width:360px){.player-stat-overview{gap:5px}.player-stat-overview b{font-size:15px}.player-stat-overview small{font-size:var(--min-label,13px)}.growth-final{align-items:flex-start;flex-direction:column;gap:4px}.player-reset{flex-wrap:wrap}.ui-renewal .pass-list-row{grid-template-columns:42px minmax(0,1fr) auto}.ui-renewal .pass-list-row .gold-button{padding:7px;font-size:var(--min-label,13px)}.ui-renewal .wallet button{gap:3px;padding-inline:3px}.ui-renewal .wallet b{font-size:var(--menu-label-size,12px)}}
+/* Foreground scale varies by actual silhouette; the foot pivot stays on the floor. */
+.ui-renewal :is(.class-preview-stage,.wardrobe-stage)>.class-sprite,
+.ui-renewal .wardrobe-stage>.costume-0.class-sprite{width:min(calc(var(--display-body,200px) / var(--display-height,.9)),calc((100% - 40px) / var(--display-span,1)));background-size:var(--atlas-size);background-position:0 var(--rank-y)}
+.ui-renewal .hero-showcase>.class-sprite{width:min(calc(185px / var(--display-height,.9)),calc((100% - 66px) / var(--display-span,1)));background-size:var(--atlas-size);background-position:0 var(--rank-y)}
+
+/* boss-and-art.css */
+.boss-retry{top:104px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0;width:152px;padding:0 6px 8px;border:0;background:radial-gradient(ellipse at 50% 35%,#960f3955,transparent 69%);box-shadow:none;color:#fff1e2;line-height:1.15;text-shadow:0 2px 4px #180b1d,1px 0 #280c14,-1px 0 #280c14;touch-action:manipulation}
+.boss-retry[hidden],.stage-boss-clock[hidden]{display:none!important}
+.boss-retry img{width:66px;height:66px;object-fit:contain;filter:drop-shadow(0 0 10px #d8244966);pointer-events:none}
+.boss-retry span{font-size:10px;letter-spacing:2px;color:#ffd0a6;margin:1px 0 3px}
+.boss-retry strong{font-size:22px;font-weight:900;letter-spacing:-.7px}
+.boss-retry small{font-size:9px;color:#edd4c6;margin-top:5px}
+.boss-retry:active{transform:translateX(-50%) scale(.96)}
+.boss-retry:focus-visible{outline:2px solid #ffe3b0;outline-offset:3px;border-radius:18px}
+.stage-boss-clock{position:absolute;top:104px;left:50%;transform:translateX(-50%);z-index:14;width:min(180px,42%);height:18px;padding:0;border:1px solid #d7a27699;border-radius:9px;background:#170e23e8;overflow:hidden;pointer-events:none}
+.stage-boss-clock>i{display:block;width:100%;height:100%;background:linear-gradient(90deg,#a86f36,#e6b977);transition:width .2s linear}
+.stage-boss-clock>em{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;font-style:normal;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #000,0 0 3px #000}
+.stage-boss-clock.urgent{border-color:#ff6470}.stage-boss-clock.urgent>i{background:#c94759}
+img.art.companion-art.pet-image{object-fit:contain;object-position:center;background:none!important;border-radius:0;overflow:visible;max-width:100%;aspect-ratio:1}
+.pet-hero>img.pet-image{width:190px;height:190px;display:block;margin:0 auto 7px}
+.pet-card>img.pet-image{display:block;margin:0 auto;width:100%;height:auto}
+.battle-pet>img.pet-image{display:block;width:100%;height:100%;filter:drop-shadow(0 4px 4px #17102266)}
+@media(max-width:360px){.boss-retry{top:102px;width:132px}.boss-retry img{width:58px;height:58px}.boss-retry strong{font-size:20px}}
+
+/* Compact challenge prompt leaves the monster health line clear. */
+.boss-retry{top:100px}.boss-retry img{width:60px;height:60px}.boss-retry span{display:none}.boss-retry strong{margin-top:2px}.boss-retry small{font-size:8px;margin-top:4px}
+@media(max-width:360px){.boss-retry{top:100px}.boss-retry img{width:52px;height:52px}}
+
+/* page */
+
+.skin-upgrade-box{margin:10px 0;padding:10px;border:1px solid var(--sheet-border,#66546d);border-radius:10px;display:grid;grid-template-columns:46px minmax(55px,1fr) minmax(70px,100px);align-items:center;gap:10px}
+.skin-stars{display:inline-flex;align-items:center;justify-content:center;gap:1px;line-height:1;vertical-align:middle}.skin-stars>img{display:block;width:17px;height:17px;object-fit:contain}.skin-stars>img.empty{filter:grayscale(1) brightness(.56);opacity:.76}.wardrobe-card .skin-stars{position:relative;display:flex;margin:2px auto 0}.wardrobe-card .skin-stars>img{width:12px;height:12px}.costume-detail-hero .skin-stars{display:flex;justify-content:flex-start;margin:0 0 6px}.skin-copy-tile{position:relative;overflow:hidden;height:46px;border-radius:7px;border:1px solid #b99764;background:radial-gradient(ellipse at 50% 70%,#6e5868,#211c2c)}.skin-copy-tile .class-sprite{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;transform:none!important}.skin-copy-count{display:grid;gap:2px}.skin-copy-count span{font-size:13px;color:#ded1ca}.skin-copy-count b{color:#ffe2ac;font-size:17px;font-variant-numeric:tabular-nums}
+.skin-upgrade-box .gold-button{width:100%}
+.costume-detail-stats dd .skin-next{display:block;color:var(--sheet-accent,#d4aa72);font-size:12px}
+.art.growth-emblem{background:none;object-fit:contain}
+
