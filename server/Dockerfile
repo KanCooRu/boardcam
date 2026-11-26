@@ -15,7 +15,7 @@ RUN mkdir /src \
  && unzip -q /tmp/base.zip "${BASE_NAME}/dist/*" "${BASE_NAME}/drizzle/*" -d /src \
  && mv "/src/${BASE_NAME}" /game && rm /tmp/base.zip
 COPY ${OVERLAY}/ /overlay/
-RUN cp -a /overlay/dist/. /game/dist/ \
+RUN if [ -d /overlay/dist ]; then cp -a /overlay/dist/. /game/dist/; fi \
  && if [ -d /overlay/drizzle ]; then cp -a /overlay/drizzle/. /game/drizzle/; fi \
  && for path in ${DELETE}; do rm -f "/game/${path}"; done \
  && echo '{"type":"module"}' > /game/dist/server/package.json \

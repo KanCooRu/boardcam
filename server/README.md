@@ -15,7 +15,7 @@
 | `loadtest/` | 부하 시험(k6용, Node만으로 도는 것) |
 | `test/` | Postgres 계층과 로그인 검증 시험 |
 
-어떤 게임 버전을 올릴지는 `docker-compose.yml`의 `api` → `args` 한 곳에서 정합니다(지금: v162 + `nebula-forge-v162-fix1`).
+어떤 게임 버전을 올릴지는 `docker-compose.yml`의 `api` → `args` 한 곳에서 정합니다(지금: **v166**, 릴리스 `test1`의 압축을 그대로 씁니다).
 
 ## 여기서 확인한 것
 

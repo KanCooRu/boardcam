@@ -68,7 +68,12 @@
    firebase.initializeApp(info.firebase);auth=firebase.auth();
    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
    try{await auth.getRedirectResult()}catch{}
+   // Inside the Android app the page runs in an embedded browser, where Google's sign-in window is refused.
+   // There the player is signed in without a prompt, as a guest of this installation.
+   const inApp=typeof window.ForgeApp==='object'||/; wv\)/.test(navigator.userAgent);
+   let guestTried=false;
    auth.onAuthStateChanged(user=>{
+    if(!user&&inApp&&!guestTried){guestTried=true;auth.signInAnonymously().catch(()=>{waited=true;panel('로그인 서버에 연결하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.')});return}
     if(user){
      const box=document.getElementById('hostSignIn');
      // The game started while the sign-in window was open and may have given up on its first requests;
