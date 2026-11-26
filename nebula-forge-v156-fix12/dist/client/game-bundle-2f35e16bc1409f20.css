@@ -2855,6 +2855,12 @@ body:is(.low-motion,.power-saving) #game .guide-target{animation:none}
 .ui-painted .board-turn span{min-width:108px;padding:7px 12px;border-radius:0;background:center/100% 100% no-repeat}
 .ui-painted .board-turn span.ally{background-image:url('./assets/minigames/turn-ally.webp')}
 .ui-painted .board-turn span.foe{background-image:url('./assets/minigames/turn-foe.webp')}
+/* Painted gauge frame, ore buttons and small icons for the furnace (switch FURNACE_UI_ART). */
+.furnace-icon{width:18px;height:18px;object-fit:contain;vertical-align:-4px;margin-right:3px}
+.furnace-gauge b{z-index:1;display:flex;align-items:center;justify-content:center}
+.furnace-panel.ui-painted .furnace-gauge{height:38px;border:0;border-radius:8px}
+.furnace-panel.ui-painted .furnace-gauge::after{content:'';position:absolute;inset:0;border-style:solid;border-width:12px 18px;border-image:url('./assets/minigames/gauge-frame.webp') 32 48 stretch;pointer-events:none}
+.furnace-panel.ui-painted .furnace-piece{border:8px solid transparent;border-image:url('./assets/minigames/piece-frame.webp') 24 fill/8px stretch;background:none;padding:2px}
 
 /* page */
 /* Common mobile surfaces. Portraits, meters and illustrated frames keep their own geometry. */

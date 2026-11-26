@@ -4673,7 +4673,7 @@ function exchangeHavenItem(id){return onlineAct('townExchange',{id})}
 function raidComingPopup(){return partyRaid.lobby()}
 EXTRA_POPUPS.havenShop=['성운의 상점',havenShopPopup];
 EXTRA_POPUPS.raidComing=['레이드',raidComingPopup];
-</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-b4e8f83cee3a3037.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
+</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-2f35e16bc1409f20.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
 
 const ADVENTURE_TERMS={
  '공격력':'평타와 공격 스킬의 피해를 계산할 때 사용하는 기본 수치입니다.',
@@ -5621,6 +5621,10 @@ const FURNACE_ART=false,BOARD_ART=false;
 // badges (work order A11). BOARD_SOUND: its own sound effects and music in assets/minigames/sfx/ (work order S5).
 const BOARD_UI_ART=false;
 const BOARD_SOUND=false;
+// The furnace has the same two extra switches. FURNACE_UI_ART: the gauge frame, the ore button frame and three
+// small icons (work order A12). FURNACE_SOUND: its own sound effects and music (work order S6).
+const FURNACE_UI_ART=false;
+const FURNACE_SOUND=false;
 function minigameArt(on,name,cls,width,height){return on?'<img class="'+cls+'" src="./assets/minigames/'+name+'.webp" width="'+width+'" height="'+height+'" alt="">':''}
 function minigameOpen(key,state=s){return state.maxStage>MINIGAME_GATES[key]}
 function minigameLockText(key){return stageText(MINIGAME_GATES[key])+'을 클리어하면 열립니다.'}
@@ -6014,9 +6018,9 @@ function furnaceGrade(purity){return 3-FURNACE_GRADES.findIndex(([need])=>purity
 const boardDraft={day:'',n:-1,draft:null,place:new Map(),pick:-1,note:'',battle:null,banner:''};
 function openMinigame(key){
  if(!minigameOpen(key)){openMenu('starLocked',minigameLockText(key));return false}
- miniView=key;miniRefresh();if(key==='petBoard')boardMusic();return true;
+ miniView=key;miniRefresh();miniMusic();return true;
 }
-function closeMinigame(){stopBoardBattle();miniView='hub';miniRefresh();boardMusic()}
+function closeMinigame(){stopBoardBattle();miniView='hub';miniRefresh();miniMusic()}
 // A minigame takes the whole screen: its own title, the play area, and a bar with the guide and the exit.
 let miniStageEl=null;
 const MINI_STAGES={
@@ -6075,13 +6079,14 @@ function furnaceScreen(){
  const heat=run?.heat||0,percent=Math.min(100,heat/FURNACE.limit*100),zone=heat>=85?'danger':heat>=65?'warm':'';
  const piece=key=>{const p=FURNACE.pieces[key];return `<button class="furnace-piece" onclick="furnaceAct('${key}')" ${furnaceBusy?'disabled':''}>${minigameArt(FURNACE_ART,'ore-'+key,'furnace-ore',48,48)}<b>${p.name}</b><small>온도 +${p.heat[0]}~${p.heat[1]}</small><small>순도 +${p.purity}</small></button>`};
  const preview=furnaceRewards(run?.purity||0,false);
- return `<section class="furnace-panel">
+ const mark=name=>minigameArt(FURNACE_UI_ART,name,'furnace-icon',18,18);
+ return `<section class="furnace-panel${FURNACE_UI_ART?' ui-painted':''}">
  ${furnaceScene(run,heat,zone)}
- <div class="furnace-gauge ${zone}" role="img" aria-label="온도 ${heat} / ${FURNACE.limit}"><i style="width:${percent}%"></i><b>${heat} / ${FURNACE.limit}</b></div>
- <div class="effect-table"><div><span>순도</span><b>${run?.purity||0}</b></div><div><span>지금 꺼내면</span><b>${run?passRewardText(preview)||'보상 없음':'-'}</b></div></div>
+ <div class="furnace-gauge ${zone}" role="img" aria-label="온도 ${heat} / ${FURNACE.limit}"><i style="width:${percent}%"></i><b>${mark('icon-heat')}${heat} / ${FURNACE.limit}</b></div>
+ <div class="effect-table"><div><span>${mark('icon-purity')}순도</span><b>${run?.purity||0}</b></div><div><span>지금 꺼내면</span><b>${run?passRewardText(preview)||'보상 없음':'-'}</b></div></div>
  <p class="furnace-note" aria-live="polite">${furnaceNote||'온도가 100을 넘으면 과열되어 순도의 절반만 남습니다.'}</p>
  ${run?`<div class="furnace-pieces">${piece('small')}${piece('large')}</div>
- <div class="action-row">${button(run.cooled?'냉각수 사용함':'냉각수 · 온도 -'+FURNACE.coolant,"furnaceAct('cool')",run.cooled||furnaceBusy,true)}${button('꺼내기',"furnaceAct('take')",!run.count||furnaceBusy)}</div>`
+ <div class="action-row">${button(mark('icon-coolant')+(run.cooled?'냉각수 사용함':'냉각수 · 온도 -'+FURNACE.coolant),"furnaceAct('cool')",run.cooled||furnaceBusy,true)}${button('꺼내기',"furnaceAct('take')",!run.count||furnaceBusy)}</div>`
  :`<div class="action-row">${button(left>0?'제련 시작':'오늘의 제련 완료',"furnaceAct('start')",left<=0||furnaceBusy)}</div>`}
  <p class="small masterwork-rules">입장은 무료이고 다이아를 쓰지 않습니다. 보상: 순도 3마다 별철 1개, 순도 1마다 강화석 10개.</p></section>`;
 }
@@ -6110,9 +6115,15 @@ function furnaceShow(result){
  else if(f.op==='cool')furnaceNote='냉각수로 온도를 '+FURNACE.coolant+' 낮췄습니다.';
  else if(f.op==='start')furnaceNote='불을 지폈습니다. 덩이를 넣으세요.';
  else furnaceNote=rolled+'현재 온도 '+f.heat+'.';
- if(f.ended&&Object.keys(result.rewards||{}).length){rewardNotice(result.rewards,f.burst?'과열 · 절반 보상':'제련 완료');playSound('reward')}
+ const paid=Object.keys(result.rewards||{}).length>0;
+ if(f.ended&&paid)rewardNotice(result.rewards,f.burst?'과열 · 절반 보상':'제련 완료');
  else if(f.ended)notice('보상을 받기에는 순도가 부족했습니다');
- else playSound(f.op==='cool'?'ice':'forge');
+ // One sound for each thing that can happen; a warning follows a piece that leaves the furnace close to overheating.
+ if(f.ended){if(paid||FURNACE_SOUND)furnaceSound(f.burst?'burst':furnaceGrade(f.purity)===3?'master':'take')}
+ else{
+  furnaceSound(f.op);
+  if(FURNACE.pieces[f.op]&&f.heat>=85)setTimeout(()=>furnaceSound('warn'),260);
+ }
 }
 function furnaceAct(op){
  if(furnaceBusy)return false;
@@ -6124,43 +6135,63 @@ function furnaceAct(op){
  try{const result=economyClaimRule(s,{source:'furnace',id:op},Math.random,Date.now());save();return done(result)}
  catch(error){notice(error.message);return done(null)}
 }
-// The battle's sounds. Each name is one file, assets/minigames/sfx/board-<file>.mp3, used once BOARD_SOUND is on.
-// Until then the value after the file name, a cue the game already has, is played instead ('' plays nothing).
+// The minigames' own sounds. Each name is one file, assets/minigames/sfx/<game>-<file>.mp3, used once that game's
+// sound switch is on. Until then the value after the file name, a cue the game already has, is played instead
+// ('' plays nothing).
 const BOARD_SOUNDS={buy:['buy','forge'],merge:['merge','reward'],reroll:['reroll',''],place:['place',''],start:['start',''],
  move:['move',''],melee:['melee','heavy'],ranged:['ranged','heavy'],blast:['blast','heavy'],heal:['heal','heal'],down:['down',''],
  turnAlly:['turn-ally',''],turnFoe:['turn-foe',''],win:['win','victory'],lose:['lose','']};
-const BOARD_SOUND_GAIN={move:.45,place:.6,reroll:.7,turnAlly:.7,turnFoe:.7,down:.8};
-const boardSfx={buffers:new Map(),pending:new Set(),last:new Map()};
-function boardSoundLoad(name){
- if(boardSfx.buffers.has(name)||boardSfx.pending.has(name)||!soundContext)return;
- const context=soundContext;boardSfx.pending.add(name);
- fetch('./assets/minigames/sfx/board-'+BOARD_SOUNDS[name][0]+'.mp3').then(response=>{if(!response.ok)throw Error('sound unavailable');return response.arrayBuffer()})
+const FURNACE_SOUNDS={start:['start','forge'],small:['small','forge'],large:['large','forge'],cool:['cool','ice'],
+ take:['take','reward'],master:['master','reward'],burst:['burst','reward'],warn:['warn','']};
+const MINI_SOUNDS={
+ board:{on:()=>BOARD_SOUND,cues:BOARD_SOUNDS,gain:{move:.45,place:.6,reroll:.7,turnAlly:.7,turnFoe:.7,down:.8}},
+ furnace:{on:()=>FURNACE_SOUND,cues:FURNACE_SOUNDS,gain:{small:.75,warn:.6}}
+};
+const miniSfx={buffers:new Map(),pending:new Set(),last:new Map()};
+function miniSoundLoad(game,name){
+ const file=game+'-'+MINI_SOUNDS[game].cues[name][0];
+ if(miniSfx.buffers.has(file)||miniSfx.pending.has(file)||!soundContext)return;
+ const context=soundContext;miniSfx.pending.add(file);
+ fetch('./assets/minigames/sfx/'+file+'.mp3').then(response=>{if(!response.ok)throw Error('sound unavailable');return response.arrayBuffer()})
   .then(bytes=>new Promise((resolve,reject)=>context.decodeAudioData(bytes,resolve,reject)))
-  .then(buffer=>boardSfx.buffers.set(name,buffer)).catch(()=>{}).finally(()=>boardSfx.pending.delete(name));
+  .then(buffer=>miniSfx.buffers.set(file,buffer)).catch(()=>{}).finally(()=>miniSfx.pending.delete(file));
 }
-function boardSoundWarm(){if(BOARD_SOUND&&s?.sound&&soundContext)for(const name of Object.keys(BOARD_SOUNDS))boardSoundLoad(name)}
-function boardSound(name){
- if(!BOARD_SOUND){const cue=BOARD_SOUNDS[name][1];return cue?playSound(cue):false}
+function miniSoundWarm(game){if(MINI_SOUNDS[game].on()&&s?.sound&&soundContext)for(const name of Object.keys(MINI_SOUNDS[game].cues))miniSoundLoad(game,name)}
+function miniSound(game,name){
+ const set=MINI_SOUNDS[game],cue=set.cues[name];
+ if(!set.on())return cue[1]?playSound(cue[1]):false;
  if(!s?.sound||document.hidden||!soundContext||soundContext.state!=='running')return false;
- const buffer=boardSfx.buffers.get(name),now=Date.now();
- if(!buffer){boardSoundLoad(name);return false}
- if(now-(boardSfx.last.get(name)||0)<60)return false;
- boardSfx.last.set(name,now);
+ const file=game+'-'+cue[0],buffer=miniSfx.buffers.get(file),now=Date.now();
+ if(!buffer){miniSoundLoad(game,name);return false}
+ if(now-(miniSfx.last.get(file)||0)<60)return false;
+ miniSfx.last.set(file,now);
  const bus=soundBus();bus.gain.setValueAtTime(soundVolume()*.65,soundContext.currentTime);
- playSoundClip(buffer,[0,buffer.duration],soundContext.currentTime,BOARD_SOUND_GAIN[name]||.85,1,bus);
+ playSoundClip(buffer,[0,buffer.duration],soundContext.currentTime,set.gain[name]||.85,1,bus);
  return true;
 }
+function boardSound(name){return miniSound('board',name)}
+function furnaceSound(name){return miniSound('furnace',name)}
 // The sound of one action: by the role of the unit acting, then a fall if someone went down.
 function boardHitSound(state,unit,hit){
  const role=BOARD_ROLES[unit.role];
  boardSound(hit.heal?'heal':role.shape==='burst'?'blast':role.reach>1?'ranged':'melee');
  if(!hit.heal&&hit.cells.some(struck=>!boardAt(state,struck.cell)))setTimeout(()=>boardSound('down'),160);
 }
-// With its own sounds on, the battle also has its own music while its screen is open.
+// With its own sounds on, a minigame also has its own music while its screen is open.
 if(BOARD_SOUND)BGM_TRACKS['mini-board']={title:'별빛 연무장',scene:'동료 배치전',src:'./assets/minigames/sfx/board-bgm.mp3',duration:9999,encounter:true};
+if(FURNACE_SOUND)BGM_TRACKS['mini-furnace']={title:'불꽃의 숨결',scene:'용광로 제련',src:'./assets/minigames/sfx/furnace-bgm.mp3',duration:9999,encounter:true};
 const bgmSceneBeforeMinigames=bgmScene;
-bgmScene=function(){return BOARD_SOUND&&miniView==='petBoard'?'mini-board':bgmSceneBeforeMinigames()};
-function boardMusic(){if(BOARD_SOUND){boardSoundWarm();syncMusic()}}
+bgmScene=function(){
+ if(BOARD_SOUND&&miniView==='petBoard')return 'mini-board';
+ if(FURNACE_SOUND&&miniView==='furnace')return 'mini-furnace';
+ return bgmSceneBeforeMinigames();
+};
+function miniMusic(){
+ if(!BOARD_SOUND&&!FURNACE_SOUND)return;
+ if(miniView==='petBoard')miniSoundWarm('board');
+ if(miniView==='furnace')miniSoundWarm('furnace');
+ syncMusic();
+}
 // The battle on screen. The device plays it out with the same rules, records each companion's move,
 // and hands the record to the server when the last enemy falls.
 function boardSync(){
@@ -6461,7 +6492,7 @@ const dungeonScreenBeforeMinigames=dungeonScreen;
 dungeonScreen=function(){return screenTab==='minigames'?minigameHub():dungeonScreenBeforeMinigames()};
 // Moving to another screen leaves the minigame first.
 const navigateBeforeMinigames=navigate;
-navigate=function(...args){if(miniStageOpen()){stopBoardBattle();miniView='hub';miniRefresh();boardMusic()}return navigateBeforeMinigames(...args)};
+navigate=function(...args){if(miniStageOpen()){stopBoardBattle();miniView='hub';miniRefresh();miniMusic()}return navigateBeforeMinigames(...args)};
 </script><script>
 /* A second tab must not overwrite a newer game with its stale autosave. */
 function startNebulaGame(){return saveGuard.boot(()=>{init();initExpansion();initDiversity();initProfile();initRewardsDungeons();initTownWardrobe();initClassesCombat();initGameChat();syncAccountNickname().then(restoreChatGuild).catch(()=>{}).finally(scheduleEarnedClaims)})}
