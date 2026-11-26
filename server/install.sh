@@ -51,6 +51,12 @@ fi
 FREE_MB=$(df -Pm / | awk 'NR==2{print $4}')
 [ "$FREE_MB" -ge 2500 ] || fail "디스크 여유 공간이 부족합니다(${FREE_MB}MB). 2.5GB 이상 필요합니다."
 
+# Another program already answering on the web port would be knocked out by nothing here, but the game
+# could not start beside it. Stop before changing anything else.
+if command -v ss >/dev/null && ss -ltn 2>/dev/null | grep -qE "[:.]$PORT[[:space:]]" && ! systemctl is-active --quiet nebula-game.service; then
+  fail "이 서버에서 다른 프로그램이 이미 ${PORT}번 포트(웹)를 쓰고 있습니다. 게임은 새 서버에 설치하는 편이 안전합니다."
+fi
+
 say "3/7 게임 전용 계정과 폴더"
 id nebula >/dev/null 2>&1 || useradd --system --home-dir "$HOME_DIR" --shell /usr/sbin/nologin nebula
 mkdir -p "$HOME_DIR/bin" "$DATA_DIR/backup"
