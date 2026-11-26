@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="kr.nebulaforge.game.test" android:versionCode="3" android:versionName="0.2.0">
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- usesCleartextTraffic is set by build.py: true only for a test build that may open an http:// address. -->
+    <application android:label="성운의 모루" android:icon="@drawable/forge_icon" android:theme="@style/GameTheme" android:hardwareAccelerated="true" android:allowBackup="false" android:enableOnBackInvokedCallback="false" android:usesCleartextTraffic="false">
+        <activity android:name="kr.nebulaforge.game.ForgeActivity" android:exported="true" android:screenOrientation="portrait" android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize" android:windowSoftInputMode="adjustResize">
+            <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+        </activity>
+    </application>
+</manifest>
