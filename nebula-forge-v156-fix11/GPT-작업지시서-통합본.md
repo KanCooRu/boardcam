@@ -1,6 +1,6 @@
 # 성운의 모루 — GPT 작업 지시서 통합본 (에셋·사운드 중심)
 
-기준: 웹 v156 + **fix10**(2026-11-26). fix10을 먼저 적용한 뒤에 사용합니다. 이전에 드린 지시서(v157)는 이 파일로 대체합니다.
+기준: 웹 v156 + **fix11**(2026-11-26). fix11을 먼저 적용한 뒤에 사용합니다. 이전에 드린 지시서(v157)는 이 파일로 대체합니다.
 
 ## 사용하는 방법 (사람이 읽는 부분)
 
@@ -15,7 +15,7 @@ GPT는 여러 일을 한꺼번에 주면 일부만 하거나 섞어서 처리합
 카드끼리는 순서를 바꿔도 되게 만들었습니다. 예외는 **S3(S2 다음에만 가능)** 하나입니다.
 
 추천 순서(효과 대비 사용량이 적은 순):
-**S1 → A1 → A2 → A4 → A8 → S2 → A3 → A9 → A10 → A5 → S3 → A6 → S4 → A7 → C1**
+**S1 → A1 → A2 → A4 → A8 → S2 → A3 → A9 → A10 → A11 → S5 → A5 → S3 → A6 → S4 → A7 → C1**
 
 | 카드 | 내용 | 결과물 수 | 사용량 |
 | --- | --- | --- | --- |
@@ -27,7 +27,9 @@ GPT는 여러 일을 한꺼번에 주면 일부만 하거나 섞어서 처리합
 | S2 | 강화 실패·파괴 소리 | 소리 2 | 적음 |
 | A3 | 성좌 각인 별자리 지도 그림(밤하늘 1 · 별 메달 3 · 자물쇠 1) | 이미지 5 | 보통 |
 | A9 | 용광로 제련 그림(전체 화면 바탕·제목 장식·용광로·불꽃·덩이·주괴 등) | 이미지 14 | 많음 |
-| A10 | 동료 배치전 그림(전체 화면 바탕·제목 장식·판 바닥·칸 표시·역할 아이콘·효과·리본) | 이미지 18 | 많음 |
+| A10 | 동료 배치전 배경·판·효과 그림(전체 화면 바탕·제목 장식·판 바닥·칸 표시·효과·리본) | 이미지 12 | 많음 |
+| A11 | 동료 배치전 카드·아이콘·배지 그림(상점 카드 틀·코인·별·역할 아이콘·차례 배지) | 이미지 15 | 많음 |
+| S5 | 동료 배치전 효과음 15개와 배경 음악 1곡 | 소리 16 | 많음 |
 | A5 | 거점 코인 4종·패스 코인·이벤트 코인 | 이미지 6 | 보통 |
 | S3 | 레벨업·스테이지 클리어·보스 경고 등 소리 | 소리 9 | 보통 |
 | A6 | 다이아 상품 그림 2장 + 월드보스 배경 1장 | 이미지 3 | 보통 |
@@ -55,7 +57,7 @@ GPT는 여러 일을 한꺼번에 주면 일부만 하거나 섞어서 처리합
     - web/game/minigames.js 파일이 있다
     - web/game/first-adventure.js 안에 lockMark 라는 이름이 있다
     - web/game/minigames.js 안에 FURNACE_ART 라는 이름이 있다 (fix7이 적용된 프로젝트다)
-    - web/game/minigames.js 안에 BOARD_SHOP 이라는 이름이 있다 (fix10이 적용된 프로젝트다)
+    - web/game/minigames.js 안에 BOARD_UI_ART 라는 이름이 있다 (fix11이 적용된 프로젝트다)
     - web/game/anvil-awakening.js 파일이 없다
     - AGENTS.md에 "성장·경제 개편 (2026-11-25)" 항목이 있다
     폴더 안내:
@@ -669,190 +671,510 @@ CSS는 이미 있다. 추가하지 않는다.
 ```
 
 
-### 카드 A10 — 동료 배치전 그림 18장
+### 카드 A10 — 동료 배치전: 배경·판·효과 그림 12장
 
 ```
-[작업 카드 A10] 동료 배치전 그림 18장
+[작업 카드 A10] 동료 배치전 — 배경·판·효과 그림 12장
 
-■ 먼저 확인 (아니면 작업을 멈추고 사용자에게 알린다)
-- web/game/minigames.js 안에 BOARD_SHOP 이라는 이름이 있다 (fix10이 적용된 프로젝트다).
-  없으면 이 카드를 진행하지 않는다.
-- 예전 A10 카드로 만든 그림이 dist/client/assets/minigames/ 에 이미 있다면:
-  tile-foe.webp 는 지우고, board-bg.webp 와 tile-ally.webp 는 이 카드의 새 크기로 다시 만든다.
-  나머지(역할 아이콘 6장, fx 2장, 리본 2장, frame-board, title-board)는 그대로 써도 된다.
+■ 먼저 확인 (하나라도 아니면 아무것도 하지 말고 그 사실만 보고한다)
+- web/game/minigames.js 안에 "const BOARD_UI_ART=false;" 라는 줄이 있다 (fix11이 적용된 프로젝트다).
+- 같은 파일 안에 "BOARD_ART=false;" 라는 글자가 정확히 한 번 나온다.
+- dist/client/assets/minigames/ 폴더에 예전 카드로 만든 board-bg.webp, tile-ally.webp, tile-foe.webp 가
+  있다면 세 파일을 지운다(크기가 달라 다시 만든다). 폴더가 없으면 새로 만든다.
 
-■ 이미 만들어져 있는 것 (읽기만 한다. 규칙·배치·움직임은 고치지 않는다)
-- 던전 → 미니게임 → 동료 배치전을 누르면 전체 화면으로 열린다(상단 바·탭·하단 메뉴를 덮는다).
-  전체 화면의 구성: 맨 위에 제목 영역(오늘 클리어 수, 보유 재화, 제목 글자 "동료 배치전"),
-  가운데에 놀이 영역, 맨 아래에 가이드 버튼(왼쪽)과 빨간 나가기 버튼(오른쪽).
-  제목 글자와 버튼은 코드가 그린다.
-- 놀이 영역 가운데에 "판"이 하나 있다. 판은 가로 5칸 × 세로 6칸 = 30칸이고,
-  판 전체의 비율은 가로 25 : 세로 27, 칸 하나의 비율은 가로 200 : 세로 180 이다.
-  · 맨 위 두 줄에 적이 서 있다.
-  · 맨 아래 두 줄이 동료를 놓는 구역이다.
-  · 가운데 두 줄에는 "별빛 칸"이 1~2개 있다(그 위에 서면 공격이 1.5배).
-- 화면은 두 단계다.
-  (1) 영입·배치 화면: 판을 위에서 똑바로 내려다본 모습. 아래 두 줄의 빈 칸에 + 표시가 있다.
-      판 아래에 차례로: 코인 수와 "새 카드" 버튼, 상점 카드 4장(동료 그림·역할 이름·동료 이름·값),
-      내가 영입한 동료 목록, "처음부터 / 자동 배치 / 전투 시작" 버튼이 있다.
-      카드를 누르면 그 동료가 판에 올라가고, 같은 동료 두 장은 별 2개짜리로 합쳐진다(이름표에 금색 별이 붙는다).
-      카드의 테두리·글자·"합체" 딱지·코인 표시는 모두 코드가 그린다. 카드용 그림은 만들지 않는다.
-  (2) 전투 화면(턴제): 같은 판이 뒤로 15도 기울어지고(코드가 기울인다) 동료와 몬스터가 칸 위에 서 있다.
-      동료를 누르면 갈 수 있는 칸이 하늘색으로, 공격할 수 있는 적의 칸이 붉은색으로 표시된다.
-      판 아래에 동료 목록(체력 막대)과 "자동 / 나가기 / 턴 종료" 버튼이 있다.
-- 칸 위에 서는 동료·몬스터 그림은 게임에 이미 있는 것을 쓴다(dist/client/assets/actor-poses/).
-  발밑의 원(아군 파랑, 적 빨강), 머리 위의 이름표(역할 이름+체력 숫자)와 체력 막대는 코드가 그린다.
-- 공격받은 칸 위에 타격 효과가, 회복받은 칸 위에 회복 효과가 0.4초 번쩍이고, 숫자(-14, +8)는 코드가 쓴다.
-- 전투가 끝나면 판 전체를 어둡게 덮고 가운데에 리본 그림과 "승리" 또는 "패배" 글자가 나온다.
-  글자는 코드가 쓴다.
-- 이름표와 아래쪽 동료 목록의 역할 이름 앞에 18px 크기의 역할 아이콘이 붙는다.
-- 지금은 그림이 없어서 색만 칠한 판과 빛 덩어리가 보인다.
+■ 이 카드가 하는 일 (한 줄 요약)
+그림 12장을 만들어 dist/client/assets/minigames/ 에 넣고, 스위치 한 곳(BOARD_ART)을 켠다. 그 외에는 아무것도 바꾸지 않는다.
 
-■ 목적
-그림 18장을 만들고 스위치 한 곳을 켠다. 그 외에는 아무것도 바꾸지 않는다.
+■ 이미 만들어져 있는 것 (읽기만 한다. 규칙·배치·움직임·글자는 고치지 않는다)
+- 던전 → 미니게임 → 동료 배치전 "입장"을 누르면 전체 화면으로 열린다.
+- 화면 구성(위에서 아래로): 맨 위 줄(오늘 클리어 수, 보유 재화) → 제목 "동료 배치전" → 판 → 안내 글 →
+  상점 카드 4장 → 내 동료 → 버튼 3개 → 맨 아래 줄(가이드 버튼, 빨간 나가기 버튼).
+- "판"은 가로 5칸 × 세로 6칸 = 30칸이다. 판 전체 비율은 가로 25 : 세로 27, 칸 하나는 가로 200 : 세로 180.
+  · 맨 위 두 줄: 적이 서 있는 곳
+  · 가운데 두 줄: 빈 땅. 여기에 "별빛 칸"이 1~2개 있다(그 위에 서면 공격이 1.5배)
+  · 맨 아래 두 줄: 내 동료를 놓는 곳
+- 영입·배치 화면에서는 판을 "바로 위에서" 본다. 전투 화면에서는 코드가 같은 판을 뒤로 15도 기울인다.
+  그래서 판 바닥 그림은 반드시 "바로 위에서 수직으로 내려다본 그림"이어야 한다.
+- 칸 위에 서는 동료·몬스터 그림은 게임에 이미 있다(dist/client/assets/actor-poses/). 새로 그리지 않는다.
+- 동료 발밑의 원(내 편 파랑, 적 빨강), 머리 위 이름표와 체력 막대, 피해 숫자는 코드가 그린다.
+- 지금은 그림이 없어서 색만 칠한 판과 둥근 빛 덩어리가 보인다.
 
-■ 공통 화풍 (18장 모두)
-- 반실사 판타지 채색, 보라+금색. 광원 왼쪽 위. 두꺼운 검은 외곽선·만화풍·픽셀아트·사진 금지.
-- 색: 밤하늘 남보라(#17132c, #231b45), 돌의 회보라(#3d3550), 금 장식(#f1c986),
-      아군 쪽 포인트는 푸른색(#4f8fff), 적 쪽 포인트는 붉은색(#e0503f),
-      이동 표시는 하늘색(#6fdcff), 별빛 칸은 금색(#ffd98a).
-- 그리지 않는 것: 글자, 숫자, 사람, 동료나 몬스터(이미 있는 그림이 칸 위에 놓인다), 모루,
+■ 공통 화풍 (12장 모두 똑같이 지킨다)
+- 무대: "별빛 연무장" — 밤하늘 아래의 돌바닥 훈련장.
+- 반실사 판타지 채색(붓으로 칠한 느낌). 광원은 왼쪽 위의 달빛.
+- 쓰지 않는 것: 두꺼운 검은 외곽선, 만화풍, 픽셀아트, 사진, 3D 렌더 느낌, 글자, 숫자, 사람, 동료, 몬스터, 모루,
   다른 게임의 캐릭터·화면·UI.
-- 기준으로 먼저 열어 볼 파일:
-    dist/client/assets/ui-regalia/stat-attack.webp, stat-hp.webp   (아이콘의 금 장식과 크기감)
-    dist/client/assets/region-hd/void.webp                         (어두운 배경의 채도)
-    dist/client/assets/actor-poses/companion-6.webp                (칸 위에 서는 동료 그림의 화풍)
-    dist/client/assets/actor-poses/creature_2_0.webp               (칸 위에 서는 몬스터 그림의 화풍)
-- 모든 파일은 dist/client/assets/minigames/ 폴더에 둔다.
+- 색 (이 값에서 벗어나지 않는다)
+    밤하늘 남보라      #17132c , #231b45
+    돌바닥 회보라      #3d3550 , #2a2238
+    금 장식           #f1c986 (밝은 곳) , #a8823a (어두운 곳)
+    내 편 = 파랑       #4f8fff
+    적 = 빨강          #e0503f
+    갈 수 있는 칸 = 하늘색 #6fdcff
+    별빛 칸 = 금색      #ffd98a
+    회복 = 초록         #7fd08a
+- 먼저 열어 보고 채도·붓 느낌을 맞출 기준 파일
+    dist/client/assets/region-hd/void.webp               (어두운 배경의 채도와 붓 느낌)
+    dist/client/assets/ui-regalia/stat-attack.webp       (금 장식의 색과 광택)
+    dist/client/assets/actor-poses/companion-6.webp      (판 위에 서는 동료)
+    dist/client/assets/actor-poses/creature_2_0.webp     (판 위에 서는 몬스터)
+- 저장 위치: 12장 모두 dist/client/assets/minigames/ (하위 폴더를 만들지 않는다)
+- 형식: 12장 모두 webp
 
-■ 만들 파일
+■ 만들 파일 12장
 
-1. board-bg.webp — 1000×1080, 불투명, 300KB 이하
-   판 전체의 바닥. 밤의 석조 연무장 바닥을 "바로 위에서 수직으로" 내려다본 모습(비스듬한 시점 금지.
-   기울이는 것은 코드가 한다).
-   - 넓적한 돌판이 깔린 바닥. 돌 이음매는 아주 옅게. 격자선은 그리지 않는다(칸 경계선은 코드가 얇게 그린다).
-   - 위쪽 3분의 1(세로 0~360)은 붉은 기운이 아주 옅게(적 진영), 아래쪽 3분의 1(세로 720~1080)은
-     푸른 기운이 아주 옅게(아군 진영), 가운데(세로 360~720)는 중립의 회보라.
-   - 전체가 고르게 어둡고 대비가 낮아야 한다(그 위에 동료·몬스터·이름표가 놓인다).
-   - 네 가장자리 20픽셀 안쪽에만 얇은 금색 테두리 장식을 둔다. 물건(횃불, 깃발, 상자)은 그리지 않는다.
-   영문 문장: "A night-time stone training ground floor seen from directly above, strict top-down orthographic view,
-   large worn flagstones with very faint seams, no grid lines, a very subtle crimson tint on the top third,
-   neutral grey-violet in the middle, a very subtle blue tint on the bottom third, evenly dark and low contrast so
+───────────────────────────────────────────────────────────────
+[1] frame-board.webp          720×1280   불투명   320KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 전체 화면의 맨 뒤 바탕. 그 위에 제목, 판, 카드, 버튼이 모두 놓인다.
+무엇을 그리나: 세로로 긴 "밤의 연무장" 풍경.
+  - 위쪽 4분의 1 (세로 0~320픽셀): 별이 뜬 남보라 밤하늘. 왼쪽 위에 초승달 하나.
+    양옆 가장자리에 돌기둥이 하나씩 있고, 기둥마다 깃발이 걸려 있다(왼쪽 깃발 파랑, 오른쪽 깃발 빨강).
+    가운데(가로 110~610)는 하늘만 있고 아무것도 그리지 않는다(그 자리에 제목이 놓인다).
+  - 아래쪽 4분의 3 (세로 320~1280픽셀): 어두운 돌벽이 아래로 갈수록 더 어두워진다.
+    무늬가 거의 없고 고르게 어둡다. 가장 밝은 곳도 #2a2238보다 밝지 않다.
+그리지 않는 것: 사람, 동물, 글자, 판, 횃불처럼 밝은 광원, 가운데의 물건.
+스스로 확인: 세로 320 아래 부분을 흑백으로 바꿔 봤을 때 거의 한 가지 어두운 색으로 보여야 한다.
+영문 문장:
+  "A tall vertical night scene of a stone training courtyard for a full-screen mobile game backdrop.
+   Top quarter: a deep indigo starry sky with a small crescent moon at the upper left, one stone pillar at each
+   side edge, a blue banner hanging on the left pillar and a red banner on the right pillar, the middle of the
+   sky left empty. Lower three quarters: a plain dark grey-violet stone wall that gets darker toward the bottom,
+   almost no detail, low contrast. Semi-realistic painterly style, indigo and aubergine tones, no characters,
+   no text, no bright light sources."
+
+───────────────────────────────────────────────────────────────
+[2] title-board.webp          1024×360   배경 투명   110KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 제목 글자 "동료 배치전" 바로 뒤. 화면에서는 가로 약 310픽셀로 줄어든다.
+무엇을 그리나: 가로로 긴 어두운 석판 명패. 금색 테두리. 양 끝에 작은 삼각 깃발 장식 하나씩.
+            위쪽 가운데에 "방패 뒤로 검 두 자루가 X자로 교차한" 작은 문장 하나.
+꼭 지킬 것: 그림 한가운데의 가로 560 × 세로 130 픽셀 영역(왼쪽 232~오른쪽 792, 위 115~아래 245)은
+          무늬 없이 고르게 어두운 색(#231b45 근처)으로 비워 둔다. 그 위에 코드가 제목 글자를 쓴다.
+그리지 않는 것: 글자, 숫자.
+영문 문장:
+  "A wide ornate fantasy title plaque on a fully transparent background: a dark indigo stone slab with a
+   polished gold rim, a small pennant ornament at each end, and a small crest of a shield with two crossed swords
+   at the top center. The middle of the slab is plain, dark and empty for a title. Semi-realistic painted UI
+   ornament, no text, no letters."
+
+───────────────────────────────────────────────────────────────
+[3] board-bg.webp             1000×1080  불투명   300KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 판 전체의 바닥. 이 위에 가로 5칸 × 세로 6칸의 칸 경계선(코드가 얇게 그림)과 동료·몬스터가 놓인다.
+무엇을 그리나: 연무장의 돌바닥을 "바로 위에서 수직으로" 내려다본 모습.
+  - 크고 넓적한 돌판이 깔려 있다. 돌판 사이의 틈은 아주 옅게.
+  - 위쪽 3분의 1 (세로 0~360): 붉은 기운이 아주 옅게 깔린다(적의 자리).
+  - 가운데 3분의 1 (세로 360~720): 붉지도 푸르지도 않은 회보라.
+  - 아래쪽 3분의 1 (세로 720~1080): 푸른 기운이 아주 옅게 깔린다(내 자리).
+  - 네 가장자리에서 20픽셀 안쪽에만 얇은 금색 테두리 장식을 두른다.
+꼭 지킬 것:
+  - 비스듬한 시점 금지. 위가 좁아지는 원근 금지. (기울이는 것은 코드가 한다)
+  - 격자선·칸 테두리를 그리지 않는다. (칸 경계선은 코드가 그린다)
+  - 전체가 고르게 어둡고 대비가 낮다. 가장 밝은 곳도 #4a4260보다 밝지 않다.
+그리지 않는 것: 횃불, 깃발, 상자, 무기, 발자국, 사람, 동물, 글자.
+영문 문장:
+  "A night-time stone training ground floor seen from directly above, strict top-down orthographic view, large
+   worn flagstones with very faint seams, no grid lines, a very subtle red tint on the top third, neutral
+   grey-violet in the middle third, a very subtle blue tint on the bottom third, evenly dark and low contrast so
    game pieces can stand on it, a thin gold trim along the outer edge only, no objects, no characters, no text."
 
-2~5. 칸 표시 4장 — 각 200×180, 배경 투명, 각 30KB 이하
-   판의 칸 하나 위에 겹쳐 놓는 표시다. 네 장 모두 "바로 위에서 본" 납작한 빛 표시이고,
-   칸 가장자리를 따라 테두리가 있고 가운데는 거의 비어 있다(그 위에 동료가 선다).
-   - tile-ally.webp  배치 구역 칸: 푸른색(#4f8fff) 점선 느낌의 얇은 테두리, 안쪽은 푸른색이 20% 정도로 옅게.
-   - tile-move.webp  이동 가능 칸: 하늘색(#6fdcff)으로 밝게 빛나는 굵은 테두리, 안쪽은 하늘색이 30% 정도로 옅게.
-   - tile-aim.webp   공격 대상 칸: 붉은색(#ff6a5a)으로 빛나는 굵은 테두리, 네 모서리에 조준 꺾쇠 표시,
-                     안쪽은 붉은색이 30% 정도로 옅게.
-   - tile-star.webp  별빛 칸: 테두리 없이, 가운데에 금색(#ffd98a) 네 갈래 별 문양이 바닥에 새겨져 은은히 빛난다.
-                     별 문양의 크기는 칸 세로의 절반 정도.
-   네 장 공통: 테두리는 그림 가장자리에서 6픽셀 안쪽에 그린다. 네 장을 나란히 놓았을 때 색만으로 구별되어야 한다.
-   영문 문장(괄호만 바꾼다): "A flat glowing floor marker for one board tile seen from directly above, on a fully
-   transparent background, ( a thin dashed blue outline with a faint blue fill / a bright thick sky-blue outline with
-   a faint sky-blue fill / a bright thick red outline with small corner brackets and a faint red fill / no outline,
+───────────────────────────────────────────────────────────────
+[4]~[7] 칸 표시 4장           각 200×180  배경 투명  각 30KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 판의 칸 하나 위에 겹쳐진다. 그 위에 동료가 선다.
+네 장 공통: "바로 위에서 본" 납작한 빛 표시. 그림 가장자리에서 6픽셀 안쪽에 테두리를 그리고,
+          가운데는 거의 비워 둔다. 네 장을 나란히 놓으면 색만으로 구별되어야 한다.
+  [4] tile-ally.webp   내 동료를 놓을 수 있는 칸.
+                       파란색(#4f8fff) 얇은 점선 테두리. 안쪽은 파란색을 20% 정도로 아주 옅게.
+  [5] tile-move.webp   갈 수 있는 칸.
+                       하늘색(#6fdcff)으로 밝게 빛나는 굵은 실선 테두리. 안쪽은 하늘색을 30% 정도로 옅게.
+  [6] tile-aim.webp    공격할 수 있는 적이 선 칸.
+                       빨간색(#ff6a5a)으로 빛나는 굵은 실선 테두리. 네 모서리에 ㄱ자 조준 꺾쇠. 안쪽은 빨강 30%.
+  [7] tile-star.webp   별빛 칸.
+                       테두리 없음. 한가운데에 금색(#ffd98a) 네 갈래 별 문양이 바닥에 새겨져 은은히 빛난다.
+                       별 문양의 크기는 세로 90픽셀 정도(칸 세로의 절반).
+영문 문장(괄호 안만 바꿔 네 번 만든다):
+  "A flat glowing floor marker for one rectangular board tile seen from directly above, on a fully transparent
+   background, ( a thin dashed blue outline with a very faint blue fill / a bright thick sky-blue outline with a
+   faint sky-blue fill / a bright thick red outline with small corner brackets and a faint red fill / no outline,
    a softly glowing gold four-pointed star engraved in the center ), the center mostly empty. Painted game UI
    overlay, no text."
 
-6~11. 역할 아이콘 6장 — 각 96×96, 배경 투명, 각 12KB 이하
-   - role-guard.webp   방패: 금테 둥근 방패
-   - role-striker.webp 돌격: 앞으로 찌르는 검 한 자루와 속도선 두 줄
-   - role-piercer.webp 관통: 고리 세 개를 꿰뚫고 지나가는 화살
-   - role-blast.webp   폭발: 세 갈래로 터지는 불꽃
-   - role-sniper.webp  저격: 조준 원 안의 네 갈래 별
-   - role-healer.webp  치유: 잎사귀 두 장이 감싼 물방울
-   여섯 장은 화면에서 18×18로 줄여 쓴다. 그래서 선을 굵게, 형태를 단순하게, 색은 밝은 금색 위주로.
-   18×18로 줄여 나란히 놓았을 때 여섯 개가 서로 구별되는지 꼭 확인한다.
-   영문 문장(괄호만 바꾼다): "A bold simple gold emblem icon of ( a round shield / a thrusting sword with two
-   speed lines / an arrow piercing through three rings / a three-way burst of flame / a four-pointed star inside
-   a targeting circle / a water drop wrapped by two leaves ) on a fully transparent background, centered, thick
-   shapes readable at 18 pixels, polished gold with a dark-gold shadow. Fantasy RPG UI icon, no text."
+───────────────────────────────────────────────────────────────
+[8] fx-hit.webp   [9] fx-heal.webp     각 256×256  배경 투명  각 40KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 맞거나 회복받은 칸 위에서 0.4초만 번쩍이고 사라진다.
+  [8] fx-hit.webp   타격. 가운데에서 바깥으로 터지는 날카로운 빛살(가운데 흰색, 가장자리 주황)과 비스듬한 베기 자국 한 줄.
+  [9] fx-heal.webp  회복. 가운데의 부드러운 초록 빛과, 아래에서 위로 떠오르는 연두색 빛 알갱이 여섯~여덟 개.
+꼭 지킬 것: 한눈에 "맞았다(흰색+주황)"와 "회복됐다(초록)"가 구별된다. 가장자리는 투명으로 부드럽게 사라진다.
+영문 문장(괄호 안만 바꿔 두 번 만든다):
+  "( A sharp impact burst with one diagonal slash streak, white core and orange rays / A soft green healing glow
+   with small light-green motes rising upward ) on a fully transparent background, centered, feathered edges.
+   Painted game VFX sprite, no text."
 
-12. fx-hit.webp — 256×256, 배경 투명, 40KB 이하
-   타격 효과. 가운데에서 바깥으로 터지는 날카로운 빛살(흰색 중심, 주황 가장자리)과 비스듬한 베기 자국 한 줄.
-13. fx-heal.webp — 256×256, 배경 투명, 40KB 이하
-   회복 효과. 아래에서 위로 떠오르는 연두색 빛 알갱이와 가운데의 부드러운 초록 빛.
-   두 장 공통: 화면에서 0.4초만 보인다. 한눈에 "맞았다 / 회복됐다"가 구별되게 색을 분명히 한다
-   (타격은 흰색+주황, 회복은 초록). 가장자리는 투명으로 사라진다.
-   영문 문장(괄호만 바꾼다): "( A sharp impact burst with a diagonal slash streak, white core and orange rays /
-   A soft healing glow with small green light motes rising ) on a fully transparent background, centered,
-   feathered edges. Painted game VFX sprite, no text."
+───────────────────────────────────────────────────────────────
+[10] banner-win.webp   [11] banner-lose.webp    각 768×256  배경 투명  각 90KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 전투가 끝나면 판 한가운데에 뜬다. 그 위에 코드가 "승리" 또는 "패배" 글자를 쓴다.
+  [10] banner-win.webp   가로로 긴 리본. 금색 테두리, 양 끝이 제비꼬리처럼 갈라진다. 위쪽 가운데에 작은 금색 별 하나.
+                         가운데 넓은 면은 무늬 없는 어두운 보라색.
+  [11] banner-lose.webp  같은 모양. 금색 대신 빛바랜 회청색 테두리, 별 대신 금이 간 작은 방패. 가운데 면은 어두운 회색.
+꼭 지킬 것: 그림 한가운데 가로 360 × 세로 110 픽셀은 글자 자리다. 무늬를 넣지 않는다. 글자를 그리지 않는다.
+영문 문장(괄호 안만 바꿔 두 번 만든다):
+  "A wide horizontal fantasy ribbon banner with swallow-tail ends on a fully transparent background, ( polished
+   gold trim with a small gold star ornament on top, plain dark violet center / faded grey-blue trim with a small
+   cracked shield ornament on top, plain dark grey center ). The center is left empty for a label. Semi-realistic
+   painted UI ornament, no text, no letters."
 
-14. banner-win.webp — 768×256, 배경 투명, 90KB 이하
-   가로로 긴 금색 리본. 양 끝이 제비꼬리 모양으로 갈라지고, 가운데 위에 작은 별 장식. 가운데 넓은 면은
-   무늬 없이 어두운 보라색이다(그 위에 "승리" 글자가 놓인다).
-15. banner-lose.webp — 768×256, 배경 투명, 90KB 이하
-   같은 모양의 리본이되 금색 대신 빛바랜 회청색, 별 장식 대신 금이 간 방패 장식. 가운데 면은 어두운 회색.
-   두 장 공통: 가운데 가로 360 × 세로 110 픽셀 영역은 글자 자리이므로 무늬를 넣지 않는다. 글자를 그리지 않는다.
-   영문 문장(괄호만 바꾼다): "A wide horizontal fantasy ribbon banner with swallow-tail ends on a fully transparent
-   background, ( polished gold trim with a small star ornament on top, dark violet plain center / faded grey-blue
-   trim with a small cracked shield ornament on top, dark grey plain center ). The center is left empty for a
-   label. Semi-realistic painted UI ornament, no text, no letters."
+───────────────────────────────────────────────────────────────
+[12] hub-board.webp           256×256    배경 투명   45KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 던전 → 미니게임 목록의 "동료 배치전" 줄 왼쪽에 64×64 크기로 작게 보인다.
+무엇을 그리나: 칸이 나뉜 석조 작전판을 비스듬히 내려다본 모습. 판 위에 작은 금색 말 세 개와 빨간 말 두 개가 마주 서 있다.
+꼭 지킬 것: 64×64로 줄여도 "판 위에 말이 놓였다"는 것이 보일 만큼 단순하게.
+영문 문장:
+  "A small stone tactics board with a tile grid seen at an angle, three small gold pawn pieces facing two small
+   red pawn pieces on it, on a fully transparent background, simple and readable at icon size. Semi-realistic
+   painted fantasy game icon, no text."
 
-16. hub-board.webp — 256×256, 배경 투명, 45KB 이하
-   미니게임 목록에 쓰는 작은 그림. 칸이 나뉜 석조 작전판을 비스듬히 본 모습, 그 위에 작은 금색 말 세 개와
-   붉은 말 두 개가 마주 서 있다.
-
-17. frame-board.webp — 720×1280, 불투명, 320KB 이하
-   전체 화면의 바탕 그림. 세로로 긴 밤의 연무장.
-   - 위쪽 4분의 1(세로 0~320): 별이 뜬 밤하늘과 양옆에 걸린 깃발 두 개(왼쪽 푸른색, 오른쪽 붉은색). 이 부분이 제목 뒤에 보인다.
-   - 그 아래(세로 320~1280): 어두운 돌벽과 바닥. 무늬가 거의 없이 고르게 어둡다(그 위에 판과 버튼이 놓인다).
-   영문 문장: "A tall vertical night-time stone training yard for a full-screen mobile game backdrop. The top quarter
-   shows a starry sky with two hanging banners, blue on the left and crimson on the right; below it plain
-   dark stone that stays evenly dark and low in detail, fading darker toward the bottom. Semi-realistic painterly,
-   indigo and aubergine tones, no characters, no text."
-
-18. title-board.webp — 1024×360, 배경 투명, 110KB 이하
-   제목 글자 뒤에 깔리는 장식. 가로로 긴 석판에 금테, 양 끝에 작은 깃발 장식, 위 가운데에 방패와 교차한 검 장식.
-   - 가운데 가로 560 × 세로 130 픽셀 영역은 무늬 없이 어둡게 비워 둔다(그 위에 코드가 제목 글자를 쓴다).
-   - 그림 안에 글자를 넣지 않는다.
-   영문 문장: "A wide ornate fantasy title plaque on a fully transparent background: dark stone slab with a gold rim,
-   small pennant ornaments at both ends and a shield with crossed swords crest at the top center. The middle of the
-   slab is plain, dark and empty for a title. Semi-realistic painted UI ornament, no text, no letters."
-
-■ 만든 뒤 스스로 확인 (하나라도 아니면 다시 만든다)
-1. 18개 파일의 가로×세로가 위에 적은 값과 정확히 같다.
-2. board-bg와 frame-board 두 장만 불투명이고, 나머지 16개는 배경이 투명하다.
-3. 투명 그림을 #221c30 색 바탕 위에 올렸을 때 가장자리에 흰 띠나 회색 얼룩이 없다.
-4. board-bg는 수직으로 내려다본 그림이다(원근으로 위가 좁아지는 그림이면 다시 만든다).
-5. board-bg 위에 칸 표시를 겹쳐 본다. 칸 하나는 200×180이므로
-   tile-ally는 (0,720)에, tile-move는 (400,540)에, tile-aim은 (200,180)에, tile-star는 (600,360)에 올린다.
-   네 표시가 바닥 무늬에 묻히지 않고 한눈에 구별된다.
-6. 그 위에 dist/client/assets/actor-poses/companion-6.webp를 가로 190으로 줄여 (405,545) 근처 칸에 올렸을 때
-   동료가 바닥과 칸 표시에 묻히지 않는다.
-7. 역할 아이콘 6장을 18×18로 줄여 나란히 놓았을 때 서로 구별된다.
-8. 용량이 각각 한도 이하다.
+■ 만든 뒤 스스로 확인 (하나라도 아니면 그 그림을 다시 만든다)
+1. 12개 파일의 이름과 가로×세로가 위에 적은 것과 글자 하나, 픽셀 하나 다르지 않다.
+2. frame-board.webp 와 board-bg.webp 두 장만 불투명이다. 나머지 10장은 배경이 투명하다.
+3. 투명한 그림을 #221c30 색 바탕 위에 올렸을 때 가장자리에 흰 띠나 회색 얼룩이 없다.
+4. board-bg.webp 는 수직으로 내려다본 그림이다(위가 좁아지면 다시 만든다). 격자선이 없다.
+5. board-bg.webp 위에 칸 표시를 올려 본다. 칸 하나가 200×180이므로
+     tile-ally 를 (0, 720) 에,  tile-move 를 (400, 540) 에,  tile-aim 을 (200, 180) 에,  tile-star 를 (600, 360) 에 올린다.
+   네 표시가 바닥에 묻히지 않고 한눈에 구별된다.
+6. 그 위 (405, 545) 근처에 dist/client/assets/actor-poses/companion-6.webp 를 가로 190으로 줄여 올렸을 때
+   동료가 바닥과 표시에 묻히지 않는다.
+7. title-board.webp 의 가운데 560×130 영역, banner 두 장의 가운데 360×110 영역에 무늬가 없다.
+8. 어느 그림에도 글자·숫자·사람·동물·모루가 없다.
+9. 용량이 각각 한도 이하다.
 
 ■ 고칠 파일: web/game/minigames.js (이 파일 하나만, 한 곳만)
    찾기:  BOARD_ART=false;
    바꾸기: BOARD_ART=true;
-이 한 곳 외에는 이 파일의 어떤 것도 바꾸지 않는다(역할 수치, 이동·사거리, 적의 움직임, 카드 값·코인, 보상, 턴 수 모두 그대로).
-CSS는 이미 있다. 추가하지 않는다.
+이 한 곳 외에는 이 파일의 글자를 하나도 바꾸지 않는다. CSS는 이미 있다. CSS 파일을 고치지 않는다.
 
 ■ 완료 확인
 - 공통 규칙 [6]의 명령 4개 통과, node tests/minigames.cjs 통과
-- 던전 → 미니게임: 동료 배치전 카드 왼쪽에 작은 그림이 보인다
-- 동료 배치전 영입·배치 화면(전체 화면)
-  · 화면 전체에 바탕 그림이 깔리고, 제목 글자 뒤에 석판 장식이 보이며 제목 글자가 또렷이 읽힌다
-  · 맨 아래의 가이드·나가기 버튼이 바탕 그림에 묻히지 않는다
-  · 판에 바닥 그림이 보이고, 아래 두 줄에 푸른 배치 표시가, 가운데 줄에 금색 별 표시가 보인다
-  · 적과 동료의 이름표(역할 이름·체력 숫자)가 또렷이 읽힌다
-- 전투 화면 (상점 카드를 3장 눌러 영입 → "전투 시작")
+- 던전 → 미니게임: "동료 배치전" 줄 왼쪽에 작은 그림이 보인다
+- "입장"을 눌렀을 때
+  · 화면 전체에 밤의 연무장 바탕이 깔리고, 제목 글자 뒤에 석판 명패가 보이며, 제목이 명패 한가운데에 놓인다
+  · 판에 돌바닥이 보이고, 아래 두 줄에 파란 배치 표시가, 가운데 줄에 금색 별 표시가 보인다
+  · 맨 아래의 가이드·나가기 버튼과 상점 카드의 글자가 바탕에 묻히지 않는다
+- 상점 카드를 3장 눌러 영입한 뒤 "전투 시작"을 눌렀을 때
   · 판이 뒤로 기울어 보이고 동료와 몬스터가 그 위에 서 있다
-  · 동료를 누르면 하늘색 이동 표시와 붉은 공격 표시가 보인다
-  · 공격하면 맞은 칸에 타격 그림이, 치유하면 회복 그림이 번쩍인다
-  · 이겼을 때 금색 리본과 "승리", 졌을 때 회청색 리본과 "패배"가 보인다
-  · 이름표와 아래 동료 목록의 역할 이름 앞에 역할 아이콘이 보인다
+  · 내 동료를 누르면 하늘색 이동 표시와 빨간 공격 표시가 보인다
+  · 공격하면 맞은 칸에 타격 그림이 번쩍인다
+  · 이기면 금색 리본과 "승리", 지면 회청색 리본과 "패배"가 보인다
 - 폭 360px 화면에서도 판이 화면 밖으로 나가지 않는다
 
 ■ 보고에 꼭 넣을 것
-- 18개 파일 각각의 가로×세로와 용량
-- 화면 전체 캡처 4장: 카드를 영입해 판에 세운 장면, 전투 중 동료를 눌러 이동·공격 표시가 보이는 장면,
-  타격 효과가 보이는 장면, 승리 리본이 뜬 장면
+- 12개 파일 각각의 가로×세로와 용량
+- 화면 전체 캡처 4장: (1) 영입·배치 화면 (2) 전투 중 동료를 눌러 하늘색·빨간색 표시가 보이는 장면
+  (3) 타격 그림이 보이는 장면 (4) 승리 리본이 뜬 장면
 ```
 
+### 카드 A11 — 동료 배치전: 카드·아이콘·배지 그림 15장
+
+```
+[작업 카드 A11] 동료 배치전 — 카드·아이콘·배지 그림 15장
+
+■ 먼저 확인 (하나라도 아니면 아무것도 하지 말고 그 사실만 보고한다)
+- web/game/minigames.js 안에 "const BOARD_UI_ART=false;" 라는 줄이 정확히 한 번 나온다 (fix11이 적용된 프로젝트다).
+- dist/client/assets/minigames/ 폴더가 없으면 새로 만든다.
+
+■ 이 카드가 하는 일 (한 줄 요약)
+그림 15장을 만들어 dist/client/assets/minigames/ 에 넣고, 스위치 한 곳(BOARD_UI_ART)을 켠다. 그 외에는 아무것도 바꾸지 않는다.
+
+■ 이미 만들어져 있는 것 (읽기만 한다. 글자·배치·크기는 고치지 않는다)
+- 영입·배치 화면의 판 아래에 차례로 놓인 것:
+  (가) 코인 표시: 둥근 알약 모양 안에 "코인 4" 같은 글자.
+  (나) 상점 카드 4장: 가로로 나란히. 카드 한 장은 화면에서 가로 약 86 × 세로 약 100 픽셀이고, 휴대폰 폭에 따라 가로가 달라진다.
+       카드 안에는 위에서부터 동료 그림(42픽셀), 역할 이름, 동료 이름, 값(코인 2)이 들어간다. 모두 코드가 넣는다.
+       같은 동료를 이미 갖고 있으면 그 카드 오른쪽 위에 "합체" 딱지가 붙는다. 이미 산 자리는 "영입함"이라고 쓰인 빈 카드가 된다.
+  (다) 내 동료: 작은 카드가 가로로 나란히(가로 약 50 × 세로 약 58 픽셀). 동료 그림과 역할 이름이 들어간다.
+- 전투 화면의 맨 위에 "내 차례" 또는 "적 차례"라고 쓰인 배지가 있다(가로 108 × 세로 32 픽셀). 글자는 코드가 쓴다.
+- 합체한 동료(2성, 3성)는 이름 앞에 작은 별이 2개 또는 3개 붙는다(별 하나 13픽셀).
+- 역할 이름 앞에 작은 역할 아이콘이 붙는다(18픽셀. 판 위의 이름표에서는 13픽셀).
+- 지금은 그림이 없어서 색만 칠한 네모와 글자 "★", "코인"이 보인다.
+
+■ 아주 중요: "늘어나는 틀" 4장 (card-frame, card-frame-twin, card-sold, unit-frame)
+카드는 휴대폰 폭에 따라 크기가 달라진다. 그래서 코드는 그림을 이렇게 쓴다.
+  - 네 모서리(각 24×24 픽셀)는 모양 그대로 둔다.
+  - 네 변(모서리 사이의 띠, 두께 24픽셀)은 길이 방향으로 늘린다.
+  - 가운데(가장자리에서 24픽셀 안쪽 전부)는 가로세로로 늘린다.
+그러므로 이 4장은 반드시 아래처럼 그린다.
+  1. 모서리 장식은 각 모서리의 24×24 픽셀 안에만 넣는다. 그 밖으로 삐져나오지 않는다.
+  2. 네 변의 테두리 띠는 길이 방향으로 무늬가 없다(점, 매듭, 보석을 띠 중간에 넣지 않는다). 처음부터 끝까지 똑같은 띠다.
+  3. 가운데는 무늬 없이 고른 색이다. 그라데이션을 넣는다면 위에서 아래로 아주 약하게만 넣는다.
+     문양, 얼룩, 빛줄기, 질감 무늬를 가운데에 넣지 않는다(늘어나면 뭉개진다).
+  4. 테두리의 두께는 바깥에서 14픽셀을 넘지 않는다.
+
+■ 공통 화풍 (15장 모두 똑같이 지킨다)
+- "금테 석판" — 어두운 보라색 석판에 얇은 금 테두리. 반실사 판타지 채색. 광원 왼쪽 위.
+- 쓰지 않는 것: 두꺼운 검은 외곽선, 만화풍, 픽셀아트, 사진, 글자, 숫자, 사람, 동료, 몬스터, 모루,
+  다른 게임의 캐릭터·화면·UI.
+- 색 (이 값에서 벗어나지 않는다)
+    석판 보라         #34285a (위) → #1d1733 (아래)
+    금 장식           #f1c986 (밝은 곳) , #a8823a (어두운 곳)
+    합체·코인·별 = 밝은 금색 #ffd24a
+    내 편 = 파랑       #2d5fc4
+    적 = 빨강          #b5301f
+- 먼저 열어 보고 금 장식의 색과 광택을 맞출 기준 파일
+    dist/client/assets/ui-regalia/stat-attack.webp
+    dist/client/assets/ui-regalia/stat-hp.webp
+- 저장 위치: 15장 모두 dist/client/assets/minigames/ (하위 폴더를 만들지 않는다)
+- 형식: 15장 모두 webp, 배경 투명
+
+■ 만들 파일 15장
+
+───────────────────────────────────────────────────────────────
+[1]~[6] 역할 아이콘 6장        각 96×96   배경 투명   각 12KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 역할 이름 앞. 화면에서는 18×18(판 위에서는 13×13)로 아주 작게 줄어든다.
+  [1] role-guard.webp    방패  → 금테를 두른 둥근 방패 하나
+  [2] role-striker.webp  돌격  → 오른쪽 위로 찌르는 검 한 자루와 그 뒤의 속도선 두 줄
+  [3] role-piercer.webp  관통  → 고리 세 개를 꿰뚫고 지나가는 화살 하나
+  [4] role-blast.webp    폭발  → 세 갈래로 터지는 불꽃
+  [5] role-sniper.webp   저격  → 동그란 조준 원 안의 십자선
+  [6] role-healer.webp   치유  → 잎사귀 두 장이 감싼 물방울 하나
+꼭 지킬 것:
+  - 선이 굵고 형태가 단순하다. 색은 밝은 금색 한 가지에 어두운 금색 그림자만.
+  - 대상이 캔버스의 85%를 채운다.
+  - 6장을 13×13으로 줄여 나란히 놓았을 때 여섯 개가 서로 구별되어야 한다. 구별되지 않으면 더 단순하게 다시 그린다.
+영문 문장(괄호 안만 바꿔 여섯 번 만든다):
+  "A bold simple gold emblem icon of ( a round shield / a thrusting sword with two speed lines / an arrow
+   piercing through three rings / a three-way burst of flame / a crosshair inside a targeting circle / a water
+   drop wrapped by two leaves ) on a fully transparent background, centered, thick shapes readable at 13 pixels,
+   polished gold with a dark-gold shadow. Fantasy RPG UI icon, no text."
+
+───────────────────────────────────────────────────────────────
+[7] card-frame.webp           192×240    배경 투명   30KB 이하   ← 늘어나는 틀
+───────────────────────────────────────────────────────────────
+어디에 보이나: 상점 카드 한 장의 바탕.
+무엇을 그리나: 모서리가 둥근 세로 카드. 가운데는 보라 석판(#34285a에서 #1d1733으로 위→아래 아주 약한 그라데이션),
+            가장자리에 얇은 금 테두리(#f1c986), 네 모서리에 작은 금색 모서리 장식.
+꼭 지킬 것: 위의 "늘어나는 틀" 규칙 4가지.
+
+[8] card-frame-twin.webp      192×240    배경 투명   30KB 이하   ← 늘어나는 틀
+어디에 보이나: 합체할 수 있는 카드의 바탕.
+무엇을 그리나: [7]과 같은 모양. 테두리가 더 밝은 금색(#ffd24a)이고 테두리 안쪽으로 금빛이 은은히 번진다.
+            가운데 석판은 따뜻한 어두운 금갈색(#4a3a1e)이다.
+꼭 지킬 것: [7]과 나란히 놓았을 때 "이 카드가 특별하다"가 색만으로 보인다. "늘어나는 틀" 규칙 4가지.
+
+[9] card-sold.webp            192×240    배경 투명   20KB 이하   ← 늘어나는 틀
+어디에 보이나: 이미 영입해서 비어 있는 카드 자리.
+무엇을 그리나: [7]과 같은 모양이지만 꺼진 상태. 테두리는 금색 대신 어두운 회보라(#5a506e)의 가는 실선,
+            모서리 장식 없음, 가운데는 거의 검은 보라(#14121e)를 80% 정도의 불투명도로.
+꼭 지킬 것: "늘어나는 틀" 규칙 4가지. 테두리를 점선으로 그리지 않는다(늘어나면 점의 길이가 달라진다).
+
+영문 문장([7][8][9] 괄호 안만 바꿔 세 번 만든다):
+  "A blank portrait game card frame with rounded corners on a fully transparent background, ( a dark violet stone
+   panel with a thin polished gold border and tiny gold corner ornaments / a warm dark gold-brown panel with a
+   bright glowing gold border and tiny gold corner ornaments / a nearly black translucent panel with a dim
+   thin grey-violet solid border and no corner ornaments, switched-off look ). The panel center is completely plain and flat with no pattern,
+   the border bands are uniform along their length, ornaments only inside the four corners. Semi-realistic painted
+   UI frame, no text, no icons."
+
+───────────────────────────────────────────────────────────────
+[10] unit-frame.webp          192×192    배경 투명   25KB 이하   ← 늘어나는 틀
+───────────────────────────────────────────────────────────────
+어디에 보이나: "내 동료" 줄의 작은 카드, 전투 화면 아래쪽 동료 카드의 바탕.
+무엇을 그리나: 모서리가 둥근 정사각 판. 가운데는 어두운 보라(#231b3a), 얇은 연보라 금속 테두리(#8f7fb8), 네 모서리에 작은 징.
+꼭 지킬 것: "늘어나는 틀" 규칙 4가지. [7] 카드보다 수수해야 한다(상점 카드가 더 눈에 띄어야 한다).
+영문 문장:
+  "A blank square game slot frame with rounded corners on a fully transparent background, a dark violet panel with
+   a thin muted lavender metal border and a tiny rivet in each corner. The center is completely plain and flat, the
+   border bands are uniform along their length. Semi-realistic painted UI frame, no text, no icons."
+
+───────────────────────────────────────────────────────────────
+[11] coin.webp                96×96      배경 투명   12KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 코인 표시의 숫자 앞, 카드 값의 숫자 앞. 화면에서는 18×18로 줄어든다.
+무엇을 그리나: 정면에서 본 금색 주화 하나. 가운데에 네 갈래 별이 새겨져 있다. 테두리에 얇은 홈.
+꼭 지킬 것: 이 게임의 골드(dist/client/assets/ui-regalia 의 금화 그림)와 헷갈리지 않게, 주화 바깥에 얇은 남보라색 고리를 두른다.
+          18×18로 줄였을 때 "별이 새겨진 동전"으로 보인다.
+영문 문장:
+  "A single gold coin seen from the front with a four-pointed star engraved in the center and a thin indigo outer
+   ring, on a fully transparent background, bold and simple, readable at 18 pixels. Semi-realistic painted fantasy
+   game icon, no text, no numbers."
+
+───────────────────────────────────────────────────────────────
+[12] rank-star.webp           64×64      배경 투명   6KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 합체한 동료의 이름 앞에 2개 또는 3개가 나란히. 화면에서는 13×13으로 줄어든다.
+무엇을 그리나: 다섯 갈래 별 하나. 밝은 금색(#ffd24a), 얇은 어두운 금색 테두리. 캔버스의 90%를 채운다.
+영문 문장:
+  "A single bold five-pointed star, bright gold with a thin dark-gold edge, on a fully transparent background,
+   filling the canvas, flat and simple, readable at 13 pixels. Game UI icon, no text."
+
+───────────────────────────────────────────────────────────────
+[13] badge-twin.webp          160×64     배경 투명   12KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 합체할 수 있는 카드의 오른쪽 위. 그 위에 코드가 "합체"라는 글자(어두운 갈색)를 쓴다. 화면에서는 가로 약 46 × 세로 약 20.
+무엇을 그리나: 가로로 긴 작은 딱지. 밝은 금색(#ffd24a) 면, 양 끝이 살짝 뾰족한 리본 모양, 얇은 어두운 금색 테두리.
+꼭 지킬 것: 가운데 가로 110 × 세로 40 픽셀은 무늬 없는 밝은 금색 면이다(글자 자리). 글자를 그리지 않는다.
+영문 문장:
+  "A small wide bright-gold ribbon tag with slightly pointed ends and a thin dark-gold edge on a fully transparent
+   background, the center plain and empty for a label. Painted game UI badge, no text, no letters."
+
+───────────────────────────────────────────────────────────────
+[14] turn-ally.webp   [15] turn-foe.webp     각 324×96   배경 투명   각 20KB 이하
+───────────────────────────────────────────────────────────────
+어디에 보이나: 전투 화면 맨 위 가운데. 그 위에 코드가 흰 글자로 "내 차례" 또는 "적 차례"를 쓴다. 화면에서는 108×32.
+  [14] turn-ally.webp  가로로 긴 알약 모양 배지. 파란색(#2d5fc4) 면, 얇은 금 테두리, 왼쪽 끝에 작은 방패 무늬.
+  [15] turn-foe.webp   같은 모양. 빨간색(#b5301f) 면, 얇은 금 테두리, 왼쪽 끝에 작은 발톱 자국 무늬.
+꼭 지킬 것: 가운데 가로 200 × 세로 60 픽셀은 무늬 없는 한 가지 색 면이다(글자 자리). 글자를 그리지 않는다.
+          두 장은 색만 보고도 구별된다.
+영문 문장(괄호 안만 바꿔 두 번 만든다):
+  "A wide pill-shaped game UI badge on a fully transparent background, ( a deep blue face with a thin gold rim and
+   a tiny shield mark at the left end / a deep red face with a thin gold rim and a tiny claw-mark at the left end ),
+   the middle plain and empty for a label. Semi-realistic painted UI ornament, no text, no letters."
+
+■ 만든 뒤 스스로 확인 (하나라도 아니면 그 그림을 다시 만든다)
+1. 15개 파일의 이름과 가로×세로가 위에 적은 것과 글자 하나, 픽셀 하나 다르지 않다.
+2. 15장 모두 배경이 투명하다.
+3. #221c30 색 바탕 위에 올렸을 때 가장자리에 흰 띠나 회색 얼룩이 없다.
+4. 역할 아이콘 6장을 13×13으로 줄여 나란히 놓았을 때 서로 구별된다.
+5. "늘어나는 틀" 4장 시험: card-frame.webp 를 가로 172 × 세로 200 으로, 다시 가로 120 × 세로 200 으로
+   "9조각 방식(모서리 24픽셀 고정)"으로 늘려 본다. 두 경우 모두 모서리 장식이 찌그러지지 않고,
+   변의 띠와 가운데가 뭉개지거나 줄무늬가 생기지 않는다. 나머지 3장도 같은 시험을 한다.
+6. coin.webp 를 18×18, rank-star.webp 를 13×13으로 줄여도 무엇인지 알아볼 수 있다.
+7. badge-twin, turn-ally, turn-foe 의 글자 자리에 무늬가 없다. 어느 그림에도 글자·숫자가 없다.
+8. 용량이 각각 한도 이하다.
+
+■ 고칠 파일: web/game/minigames.js (이 파일 하나만, 한 곳만)
+   찾기:  const BOARD_UI_ART=false;
+   바꾸기: const BOARD_UI_ART=true;
+이 한 곳 외에는 이 파일의 글자를 하나도 바꾸지 않는다. CSS는 이미 있다. CSS 파일을 고치지 않는다.
+
+■ 완료 확인
+- 공통 규칙 [6]의 명령 4개 통과, node tests/minigames.cjs 통과
+- 던전 → 미니게임 → 동료 배치전 "입장"
+  · 상점 카드 4장이 금테 석판 그림으로 보이고, 카드 안의 동료 그림·역할 이름·동료 이름·값이 또렷이 읽힌다
+  · 코인 표시와 카드 값의 숫자 앞에 동전 그림이 보인다
+  · 역할 이름 앞에 역할 아이콘이 보인다
+- 카드를 한 장 영입한 뒤 "새 카드"를 눌러 같은 동료가 나오면
+  · 그 카드가 금빛 카드로 보이고 오른쪽 위에 금색 딱지와 "합체" 글자가 보인다
+  · 그 카드를 영입하면 판 위 동료의 이름표와 "내 동료" 카드에 금색 별 두 개가 보인다
+- 이미 영입한 자리는 꺼진 카드와 "영입함" 글자로 보인다
+- "전투 시작"을 누르면 맨 위에 파란 배지와 "내 차례"가, 적이 움직일 때는 빨간 배지와 "적 차례"가 보인다
+- 폭 360px 화면에서도 카드 4장이 화면 밖으로 나가지 않고, 카드 안의 글자가 테두리에 겹치지 않는다
+
+■ 보고에 꼭 넣을 것
+- 15개 파일 각각의 가로×세로와 용량
+- 역할 아이콘 6장을 13×13으로 줄여 나란히 놓은 그림 한 장
+- 화면 전체 캡처 3장: (1) 상점 카드 4장이 보이는 장면 (2) "합체" 딱지가 붙은 금빛 카드가 보이는 장면
+  (3) 전투 화면에서 "내 차례" 배지가 보이는 장면
+```
+
+### 카드 S5 — 동료 배치전: 효과음 15개와 배경 음악 1곡
+
+```
+[작업 카드 S5] 동료 배치전 — 효과음 15개와 배경 음악 1곡
+
+■ 먼저 확인 (하나라도 아니면 아무것도 하지 말고 그 사실만 보고한다)
+- web/game/minigames.js 안에 "const BOARD_SOUND=false;" 라는 줄이 정확히 한 번 나온다 (fix11이 적용된 프로젝트다).
+- dist/client/assets/minigames/sfx/ 폴더가 없으면 새로 만든다.
+
+■ 이 카드가 하는 일 (한 줄 요약)
+소리 파일 16개를 만들어 dist/client/assets/minigames/sfx/ 에 넣고, 출처를 적고, 스위치 한 곳(BOARD_SOUND)을 켠다.
+그 외에는 아무것도 바꾸지 않는다.
+
+■ 이미 만들어져 있는 것 (읽기만 한다)
+- 아래 16개 파일 이름은 코드에 이미 적혀 있다. 이름이 한 글자라도 다르면 소리가 나지 않는다.
+- 언제 어떤 소리를 낼지도 코드에 이미 연결되어 있다. 재생 코드를 새로 쓰지 않는다.
+- 스위치를 켜기 전에는 게임의 기존 소리(타격·보상 소리)가 대신 난다.
+- 스위치를 켜면 동료 배치전 화면이 열려 있는 동안 배경 음악이 board-bgm.mp3 로 바뀌고, 나가면 원래 음악으로 돌아온다.
+- 설정에서 효과음·배경음을 끄면 이 소리들도 나지 않는다.
+
+■ 소리의 성격 (16개 모두 똑같이 지킨다)
+- 실제로 녹음된 소리만 쓴다(나무, 돌, 쇠, 종, 북, 카드, 동전). 라이선스는 CC0 또는 CC BY.
+- 신시사이저의 삐 소리, 8비트 게임 소리, 사람 목소리, 무음 파일, 한 소리를 이름만 바꿔 여러 번 쓰는 것은 안 된다.
+- 분위기: 밤의 돌바닥 훈련장에서 나무 말과 카드로 하는 놀이. 따뜻하고 또렷하며, 시끄럽거나 무섭지 않다.
+- 형식: mp3, 32kHz, 스테레오, 192kbps (배경 음악만 128kbps).
+- 각 소리의 앞 무음은 0.02초 이하. 끝은 뚝 끊기지 않게 자연스럽게 줄인다.
+- 음량: 기존 효과음 묶음(dist/client/assets/048c959f1c5abcf00835.mp3)의 reward 구간과 번갈아 들어 비슷한 크기로 맞춘다.
+  단, 아래 표에 "작게"라고 적힌 소리는 그보다 한 단계 작게.
+- 자주 나는 소리(이동, 놓기, 타격)는 열 번 연달아 들어도 거슬리지 않아야 한다.
+
+■ 만들 파일 16개 (모두 dist/client/assets/minigames/sfx/ 에 둔다)
+
+번호  파일 이름              길이(초)     언제 나나                       어떤 소리
+────────────────────────────────────────────────────────────────────────────────────────────
+ 1   board-buy.mp3         0.25~0.45   상점 카드를 눌러 영입할 때         두꺼운 카드 한 장을 탁 내려놓는 소리에 작은 동전 소리 한 번
+ 2   board-merge.mp3       0.8~1.2     같은 동료 두 장이 합체할 때        맑은 유리 종 두 음이 올라가며 반짝이는 소리(기분 좋은 보상 느낌)
+ 3   board-reroll.mp3      0.35~0.6    "새 카드"를 눌렀을 때             카드 여러 장을 촤르륵 넘기는 소리
+ 4   board-place.mp3       0.15~0.3    동료를 칸에 놓을 때 (작게)         나무 말을 돌판에 톡 내려놓는 소리
+ 5   board-start.mp3       0.8~1.2     "전투 시작"을 눌렀을 때            북 두 번과 짧은 뿔나팔 한 음
+ 6   board-move.mp3        0.15~0.3    동료나 적이 칸을 옮길 때 (작게)    돌바닥 위의 가벼운 발걸음 두 번
+ 7   board-melee.mp3       0.25~0.45   방패·돌격이 붙어서 때릴 때         둔탁한 타격에 쇠가 부딪히는 소리가 살짝 섞인 한 방
+ 8   board-ranged.mp3      0.25~0.45   저격·관통·치유가 멀리서 쏠 때      화살이 날아가 탁 박히는 소리
+ 9   board-blast.mp3       0.5~0.8     폭발이 공격할 때                  작고 짧은 폭발(불꽃이 퍽 터지는 소리. 크지 않게)
+10   board-heal.mp3        0.6~0.9     치유가 회복시킬 때                부드러운 종과 반짝이는 물방울 소리
+11   board-down.mp3        0.4~0.7     누군가 쓰러질 때 (작게)           나무 말이 돌판에 넘어져 구르는 소리
+12   board-turn-ally.mp3   0.3~0.5     내 차례가 시작될 때 (작게)         밝은 작은 종 한 번
+13   board-turn-foe.mp3    0.3~0.5     적 차례가 시작될 때 (작게)         낮은 북 한 번
+14   board-win.mp3         1.8~2.6     이겼을 때                        짧고 밝은 승리 팡파르(금관 세 음과 종)
+15   board-lose.mp3        1.5~2.2     졌을 때                          낮은 현악이 두 음 내려가는 소리(슬프지만 무겁지 않게)
+16   board-bgm.mp3         60~90       동료 배치전 화면이 열려 있는 동안    아래 "배경 음악" 참고
+
+■ 배경 음악 (board-bgm.mp3)
+- 사용자가 음악 파일을 함께 주었다면 그 파일을 쓴다(이 경우 "실제 녹음만" 규칙의 예외다. 출처에 "사용자 제공"이라고 적는다).
+  할 일은 세 가지뿐이다: 60~90초로 자르기, 끝과 처음이 끊김 없이 이어지게 다듬기, 음량 맞추기.
+- 사용자가 주지 않았다면 CC0 또는 CC BY 곡을 고른다. 고르는 기준:
+  · 느린 손북과 하프(또는 칼림바·류트)가 중심이고, 낮은 현악과 작은 종이 받친다
+  · 빠르기는 분당 85~100박
+  · "생각하는 놀이" 분위기. 웅장한 전투 음악, 슬픈 음악, 전자음악은 안 된다
+  · 처음부터 끝까지 세기가 비슷하다(조용히 시작해 커지는 곡, 크게 끝나는 곡은 안 된다)
+- 반복: 곡이 끝나고 처음으로 돌아갈 때 "뚝" 하는 소리나 박자가 어긋나는 느낌이 없어야 한다.
+- 음량: 게임의 기존 곡(dist/client/assets/9331195598f14cc5d0cc.mp3)과 번갈아 틀어 비슷하게 맞춘다.
+- 형식: mp3, 32kHz, 스테레오, 128kbps, 60~90초.
+
+■ 만든 뒤 스스로 확인 (하나라도 아니면 그 소리를 다시 만든다)
+1. 16개 파일의 이름이 위 표와 글자 하나 다르지 않다(모두 소문자, 가운데는 빼기표 "-").
+2. 16개 파일이 모두 dist/client/assets/minigames/sfx/ 안에 있다.
+3. 각 파일의 길이가 표의 범위 안이다.
+4. 16개가 모두 서로 다른 소리다. 같은 녹음을 두 파일에 쓰지 않았다.
+5. board-melee, board-ranged, board-blast, board-heal 네 개를 눈 감고 들어도 서로 구별된다.
+6. board-move 와 board-place 를 각각 열 번 연달아 틀어도 거슬리지 않는다.
+7. board-bgm 을 두 번 이어 붙여 들었을 때 이음매에서 끊기는 소리가 없다.
+8. 모든 소리의 출처 주소와 라이선스를 적어 두었다.
+
+■ 고칠 파일 (두 파일, 각각 한 곳)
+1. web/game/minigames.js
+   찾기:  const BOARD_SOUND=false;
+   바꾸기: const BOARD_SOUND=true;
+   이 한 곳 외에는 이 파일의 글자를 하나도 바꾸지 않는다(소리 이름, 음량 값, 재생 코드 모두 그대로).
+2. web/game/soundtrack.js
+   이 파일에 있는 기존 출처(크레딧) 문장과 같은 형식으로, 이번에 쓴 소리의 제작자와 라이선스를 그 문장 뒤에 덧붙인다.
+   CC BY 소리는 제작자 이름을 반드시 적는다. 다른 것은 바꾸지 않는다.
+
+■ 완료 확인
+- 공통 규칙 [6]의 명령 4개 통과, node tests/minigames.cjs 통과, node tests/music-scope.cjs 통과
+- 브라우저에서 설정의 효과음과 배경음을 켠 상태로 던전 → 미니게임 → 동료 배치전 "입장"
+  · 들어가면 1~2초 안에 배경 음악이 board-bgm 으로 바뀐다
+  · 카드를 영입할 때, "새 카드"를 누를 때, 동료를 다른 칸으로 옮길 때 각각 다른 소리가 난다
+  · 같은 동료 두 장이 합체할 때 종소리가 난다
+  · "전투 시작"을 누르면 북과 뿔나팔 소리가 난다
+  · 전투에서 이동·근접 타격·원거리 타격·폭발·회복·쓰러짐 소리가 각각 다르게 난다
+  · 내 차례와 적 차례가 바뀔 때 종과 북이 번갈아 난다
+  · 이기면 팡파르, 지면 낮은 현악 소리가 난다
+  · "자동"을 켜고 한 판을 끝까지 들었을 때 소리가 겹쳐 찢어지거나 시끄럽지 않다
+  · 빨간 나가기 버튼으로 나오면 1~2초 안에 원래 배경 음악으로 돌아온다
+- 설정에서 효과음을 끄면 위 효과음이 나지 않고, 배경음을 끄면 board-bgm 이 나지 않는다
+- 듣지 못한 소리가 있으면 보고의 5번에 적는다
+
+■ 보고에 꼭 넣을 것
+- 16개 파일 각각의 길이(초)와 용량
+- 16개 파일 각각의 출처 주소, 제작자, 라이선스
+- 위 "완료 확인"의 소리 중 실제로 들은 것과 듣지 못한 것
+```
+
+배경 음악을 직접 만들 때의 문장과 화면 그림 설명은 `GPT-배치전-그림·UI·소리-상세.md`의 1번에 있습니다.
 
 ### 카드 A5 — 거점 코인·패스 코인·이벤트 코인 아이콘
 
@@ -1108,4 +1430,4 @@ CSS는 이미 있다. 추가하지 않는다.
 - 일반 몬스터 30종의 난이도별 변형(카드 A7을 보스로 먼저 검증한 뒤)
 - 능력 강화·유물·동료·스킬 레벨·장비 구매를 서버 명령으로 옮기기
 - 유료 시즌 패스·월 정액 결제 연결
-- 앱(안드로이드) 버전에 fix10 반영
+- 앱(안드로이드) 버전에 fix11 반영

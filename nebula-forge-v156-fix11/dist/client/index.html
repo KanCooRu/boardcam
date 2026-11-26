@@ -4673,7 +4673,7 @@ function exchangeHavenItem(id){return onlineAct('townExchange',{id})}
 function raidComingPopup(){return partyRaid.lobby()}
 EXTRA_POPUPS.havenShop=['성운의 상점',havenShopPopup];
 EXTRA_POPUPS.raidComing=['레이드',raidComingPopup];
-</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-d852e6dc3ab5907a.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
+</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-b4e8f83cee3a3037.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
 
 const ADVENTURE_TERMS={
  '공격력':'평타와 공격 스킬의 피해를 계산할 때 사용하는 기본 수치입니다.',
@@ -5617,6 +5617,10 @@ const MINIGAME_GATES={furnace:20,petBoard:30};
 // Painted art for each minigame. Set a switch to true once that game's files (work orders
 // A9 and A10) are in dist/client/assets/minigames/. Until then the scenes draw simple shapes.
 const FURNACE_ART=false,BOARD_ART=false;
+// The formation battle has two more switches. BOARD_UI_ART: painted cards, coin, stars, role icons and turn
+// badges (work order A11). BOARD_SOUND: its own sound effects and music in assets/minigames/sfx/ (work order S5).
+const BOARD_UI_ART=false;
+const BOARD_SOUND=false;
 function minigameArt(on,name,cls,width,height){return on?'<img class="'+cls+'" src="./assets/minigames/'+name+'.webp" width="'+width+'" height="'+height+'" alt="">':''}
 function minigameOpen(key,state=s){return state.maxStage>MINIGAME_GATES[key]}
 function minigameLockText(key){return stageText(MINIGAME_GATES[key])+'을 클리어하면 열립니다.'}
@@ -6010,9 +6014,9 @@ function furnaceGrade(purity){return 3-FURNACE_GRADES.findIndex(([need])=>purity
 const boardDraft={day:'',n:-1,draft:null,place:new Map(),pick:-1,note:'',battle:null,banner:''};
 function openMinigame(key){
  if(!minigameOpen(key)){openMenu('starLocked',minigameLockText(key));return false}
- miniView=key;miniRefresh();return true;
+ miniView=key;miniRefresh();if(key==='petBoard')boardMusic();return true;
 }
-function closeMinigame(){stopBoardBattle();miniView='hub';miniRefresh()}
+function closeMinigame(){stopBoardBattle();miniView='hub';miniRefresh();boardMusic()}
 // A minigame takes the whole screen: its own title, the play area, and a bar with the guide and the exit.
 let miniStageEl=null;
 const MINI_STAGES={
@@ -6029,7 +6033,7 @@ function miniStageHTML(){
  const chips=stage.chips.map(key=>`<span>${art(RESOURCE_ART[key])}<b>${compact(s[key]||0)}</b></span>`).join('');
  return `<div class="mini-stage-frame ${name}${painted?' painted':''}${miniView==='petBoard'&&boardDraft.battle?' fighting':''}">
  <header class="mini-stage-top"><small class="mini-stage-left">${stage.left()}</small><div class="mini-stage-chips">${chips}</div>
- ${minigameArt(painted,'title-'+name,'mini-stage-title',1024,360)}<h2>${stage.title}</h2></header>
+ <div class="mini-stage-name">${minigameArt(painted,'title-'+name,'mini-stage-title',1024,360)}<h2>${stage.title}</h2></div></header>
  <div class="mini-stage-body">${stage.body()}</div>
  <footer class="mini-stage-bar"><button class="mini-stage-guide" onclick="openMenu('miniGuide','${miniView}')"><ui-mark data-shape=info aria-hidden=true></ui-mark>가이드</button>
  <button class="mini-stage-exit" onclick="closeMinigame()" aria-label="미니게임 나가기"><ui-mark data-shape=close aria-hidden=true></ui-mark></button></footer></div>`;
@@ -6120,6 +6124,43 @@ function furnaceAct(op){
  try{const result=economyClaimRule(s,{source:'furnace',id:op},Math.random,Date.now());save();return done(result)}
  catch(error){notice(error.message);return done(null)}
 }
+// The battle's sounds. Each name is one file, assets/minigames/sfx/board-<file>.mp3, used once BOARD_SOUND is on.
+// Until then the value after the file name, a cue the game already has, is played instead ('' plays nothing).
+const BOARD_SOUNDS={buy:['buy','forge'],merge:['merge','reward'],reroll:['reroll',''],place:['place',''],start:['start',''],
+ move:['move',''],melee:['melee','heavy'],ranged:['ranged','heavy'],blast:['blast','heavy'],heal:['heal','heal'],down:['down',''],
+ turnAlly:['turn-ally',''],turnFoe:['turn-foe',''],win:['win','victory'],lose:['lose','']};
+const BOARD_SOUND_GAIN={move:.45,place:.6,reroll:.7,turnAlly:.7,turnFoe:.7,down:.8};
+const boardSfx={buffers:new Map(),pending:new Set(),last:new Map()};
+function boardSoundLoad(name){
+ if(boardSfx.buffers.has(name)||boardSfx.pending.has(name)||!soundContext)return;
+ const context=soundContext;boardSfx.pending.add(name);
+ fetch('./assets/minigames/sfx/board-'+BOARD_SOUNDS[name][0]+'.mp3').then(response=>{if(!response.ok)throw Error('sound unavailable');return response.arrayBuffer()})
+  .then(bytes=>new Promise((resolve,reject)=>context.decodeAudioData(bytes,resolve,reject)))
+  .then(buffer=>boardSfx.buffers.set(name,buffer)).catch(()=>{}).finally(()=>boardSfx.pending.delete(name));
+}
+function boardSoundWarm(){if(BOARD_SOUND&&s?.sound&&soundContext)for(const name of Object.keys(BOARD_SOUNDS))boardSoundLoad(name)}
+function boardSound(name){
+ if(!BOARD_SOUND){const cue=BOARD_SOUNDS[name][1];return cue?playSound(cue):false}
+ if(!s?.sound||document.hidden||!soundContext||soundContext.state!=='running')return false;
+ const buffer=boardSfx.buffers.get(name),now=Date.now();
+ if(!buffer){boardSoundLoad(name);return false}
+ if(now-(boardSfx.last.get(name)||0)<60)return false;
+ boardSfx.last.set(name,now);
+ const bus=soundBus();bus.gain.setValueAtTime(soundVolume()*.65,soundContext.currentTime);
+ playSoundClip(buffer,[0,buffer.duration],soundContext.currentTime,BOARD_SOUND_GAIN[name]||.85,1,bus);
+ return true;
+}
+// The sound of one action: by the role of the unit acting, then a fall if someone went down.
+function boardHitSound(state,unit,hit){
+ const role=BOARD_ROLES[unit.role];
+ boardSound(hit.heal?'heal':role.shape==='burst'?'blast':role.reach>1?'ranged':'melee');
+ if(!hit.heal&&hit.cells.some(struck=>!boardAt(state,struck.cell)))setTimeout(()=>boardSound('down'),160);
+}
+// With its own sounds on, the battle also has its own music while its screen is open.
+if(BOARD_SOUND)BGM_TRACKS['mini-board']={title:'별빛 연무장',scene:'동료 배치전',src:'./assets/minigames/sfx/board-bgm.mp3',duration:9999,encounter:true};
+const bgmSceneBeforeMinigames=bgmScene;
+bgmScene=function(){return BOARD_SOUND&&miniView==='petBoard'?'mini-board':bgmSceneBeforeMinigames()};
+function boardMusic(){if(BOARD_SOUND){boardSoundWarm();syncMusic()}}
 // The battle on screen. The device plays it out with the same rules, records each companion's move,
 // and hands the record to the server when the last enemy falls.
 function boardSync(){
@@ -6159,13 +6200,13 @@ function buyBoardCard(slot){
  }
  if(!place.has(unit.id)&&place.size<stage.limit){const cell=boardFreeCell(unit.pet);if(cell>=0)place.set(unit.id,cell)}
  boardDraft.note=bought.gone.length?COMPANIONS[unit.pet][0]+' '+unit.star+'성으로 합체!':'';
- playSound(bought.gone.length?'reward':'forge');miniRefresh();return true;
+ boardSound(bought.gone.length?'merge':'buy');miniRefresh();return true;
 }
 function rerollBoardShop(){
  const stage=boardSync();
  if(boardDraft.battle)return false;
  try{boardDraftStep(stage,boardDraft.draft,'r')}catch(error){notice(error.message);return false}
- boardDraft.note='';miniRefresh();return true;
+ boardDraft.note='';boardSound('reroll');miniRefresh();return true;
 }
 function boardPace(){return s.speed===2?240:400}
 function boardUnitNote(unit){
@@ -6195,7 +6236,7 @@ function tapBoardCell(cell){
  else{
   if(!here&&!place.has(pick)&&place.size>=stage.limit){notice('판에는 '+stage.limit+'마리까지 세울 수 있습니다');return}
   if(here){if(place.has(pick))place.set(here.id,place.get(pick));else place.delete(here.id)}
-  place.set(pick,cell);
+  place.set(pick,cell);boardSound('place');
  }
  boardDraft.pick=-1;boardDraft.note='';miniRefresh();
 }
@@ -6204,7 +6245,7 @@ function autoBoardPlace(){
  if(boardDraft.battle)return;
  const units=boardDraft.draft.units,cells=boardAutoPlace(stage,units);
  boardDraft.place=new Map(units.map((unit,i)=>[unit.id,cells[i]]).filter(([id,cell])=>cell>=0));
- boardDraft.pick=-1;boardDraft.note='';miniRefresh();
+ boardDraft.pick=-1;boardDraft.note='';boardSound('place');miniRefresh();
 }
 function startBoardBattle(){
  const stage=boardSync(),draft=boardDraft.draft;
@@ -6212,7 +6253,7 @@ function startBoardBattle(){
  if(!boardDraft.place.size){notice(draft.units.length?'동료를 한 마리 이상 판에 세우세요':'먼저 상점에서 카드를 영입하세요');return false}
  boardDraft.battle={stage,state:boardOpen(stage,draft.units,boardPlaces()),code:draft.salt+'/'+draft.text+'/'+boardPlaceCode(),turns:[],current:'',sel:-1,moved:false,
   phase:'ally',busy:false,auto:false,fx:null,timer:0};
- Object.assign(boardDraft,{pick:-1,note:'',banner:''});miniRefresh();return true;
+ Object.assign(boardDraft,{pick:-1,note:'',banner:''});boardSound('start');miniRefresh();return true;
 }
 function leaveBoardBattle(){stopBoardBattle();miniRefresh()}
 function boardFx(b,fx){b.fx={at:Date.now(),...fx}}
@@ -6227,7 +6268,7 @@ function boardBattleTap(b,cell){
   if(boardAims(state,unit).includes(cell)){
    const hit=boardHit(state,unit,cell);
    boardNote(b,unit,cell);unit.done=true;b.sel=-1;b.moved=false;
-   boardFx(b,{lunge:{unit,to:cell},hits:hit.cells,heal:hit.heal});playSound(hit.heal?'heal':'heavy');
+   boardFx(b,{lunge:{unit,to:cell},hits:hit.cells,heal:hit.heal});boardHitSound(state,unit,hit);
    boardAfterMove(b);return;
   }
   if(cell===unit.cell){
@@ -6236,7 +6277,7 @@ function boardBattleTap(b,cell){
   }
   if(b.moved){notice('붉은 칸의 대상을 고르거나, 동료를 다시 눌러 대기하세요');return}
   if(!here&&boardReach(state,unit).has(cell)){
-   const from=unit.cell;unit.cell=cell;b.moved=true;boardFx(b,{walk:{unit,from}});
+   const from=unit.cell;unit.cell=cell;b.moved=true;boardFx(b,{walk:{unit,from}});boardSound('move');
    if(boardAims(state,unit).length)miniRefresh();else boardRest(b,unit);
    return;
   }
@@ -6269,12 +6310,12 @@ function boardShow(b,unit,then){
   if(boardDraft.battle!==b)return;
   if(plan.target>=0){
    const hit=boardHit(b.state,unit,plan.target);
-   boardFx(b,{lunge:{unit,to:plan.target},hits:hit.cells,heal:hit.heal});playSound(hit.heal?'heal':'heavy');
+   boardFx(b,{lunge:{unit,to:plan.target},hits:hit.cells,heal:hit.heal});boardHitSound(b.state,unit,hit);
   }
   unit.done=true;miniRefresh();
   b.timer=setTimeout(then,plan.target>=0?pace:plan.dest!==from?pace*.4:0);
  };
- if(plan.dest!==from){unit.cell=plan.dest;boardFx(b,{walk:{unit,from}});miniRefresh();b.timer=setTimeout(strike,pace*.7)}
+ if(plan.dest!==from){unit.cell=plan.dest;boardFx(b,{walk:{unit,from}});boardSound('move');miniRefresh();b.timer=setTimeout(strike,pace*.7)}
  else strike();
  return plan;
 }
@@ -6290,10 +6331,10 @@ function boardEndTurn(b){
   boardTurnEnd(b.state);
   b.busy=false;b.phase='ally';
   if(b.state.over){boardFinish(b);return}
-  miniRefresh();
+  boardSound('turnAlly');miniRefresh();
   if(b.auto)boardAutoPhase(b);
  };
- miniRefresh();b.timer=setTimeout(step,boardPace()*.5);
+ boardSound('turnFoe');miniRefresh();b.timer=setTimeout(step,boardPace()*.5);
 }
 function boardAutoPhase(b){
  if(b.busy||b.state.over)return;
@@ -6325,25 +6366,26 @@ function boardFinish(b){
  const state=b.state,win=state.over==='win',day=b.stage.day,n=b.stage.n;
  if(win)b.turns.push(b.current);
  Object.assign(b,{busy:true,sel:-1,moved:false});
- boardDraft.banner=win?'win':'lose';miniRefresh();
+ boardDraft.banner=win?'win':'lose';boardSound(win?'win':'lose');miniRefresh();
  const fresh=!minigamePeek('petBoard').cleared.includes(n);
  if(win&&fresh)claimBoardWin(day,n,day+'/'+n+'/'+b.code+'/'+b.turns.join('.'));
- else if(win){playSound('victory');notice('연습 승리 · 보상은 단계마다 하루 한 번입니다')}
+ else if(win)notice('연습 승리 · 보상은 단계마다 하루 한 번입니다');
  else notice(state.over==='time'?BOARD_TURNS+'턴 안에 끝내지 못했습니다. 배치를 바꿔 보세요':'패배 · 배치를 바꿔 다시 도전하세요');
  b.timer=setTimeout(()=>{if(boardDraft.battle===b){stopBoardBattle();if(miniView==='petBoard')miniRefresh()}},1800);
 }
 function claimBoardWin(day,n,id){
  const paid=result=>{
-  if(result){rewardNotice(result.rewards,(n+1)+'단계 승리');playSound('victory')}
+  if(result)rewardNotice(result.rewards,(n+1)+'단계 승리');
   paint();miniRefresh();return !!result;
  };
  if(saveGuard.usesServer())return saveGuard.command('claim',{source:'petBoard',id}).then(paid,()=>paid(null));
  try{const result=economyClaimRule(s,{source:'petBoard',id},Math.random,Date.now());save();return paid(result)}
  catch(error){notice(error.message);return paid(null)}
 }
-function boardRoleMark(role){return minigameArt(BOARD_ART,'role-'+role,'role-icon',18,18)}
+function boardRoleMark(role){return minigameArt(BOARD_UI_ART,'role-'+role,'role-icon',18,18)}
 // Two and three stars are shown as small gold stars before the role name.
-function boardRank(star){return star>1?'<i class="board-rank" aria-label="'+star+'성">'+'★'.repeat(star)+'</i>':''}
+function boardRank(star){return star>1?'<i class="board-rank" aria-label="'+star+'성">'+(BOARD_UI_ART?minigameArt(true,'rank-star','',14,14):'★').repeat(star)+'</i>':''}
+function boardCoin(){return minigameArt(BOARD_UI_ART,'coin','board-coin',18,18)}
 // The board is two layers: thirty tiles that take the taps, and the pieces standing on them.
 function boardMap(stage){
  const b=boardDraft.battle,units=boardDraft.draft.units,state=b?b.state:boardOpen(stage,units,boardPlaces());
@@ -6371,7 +6413,7 @@ function boardMap(stage){
   if(fx?.walk?.unit===unit){cls+=' walk';style+=`;--dx:${boardCol(fx.walk.from)-col};--dy:${boardRow(fx.walk.from)-row}`}
   if(fx?.lunge?.unit===unit){cls+=' lunge';style+=`;--dx:${Math.sign(boardCol(fx.lunge.to)-col)};--dy:${Math.sign(boardRow(fx.lunge.to)-row)}`}
   const sprite=unit.side==='ally'?'companion-'+unit.pet:BOARD_FOES[unit.kind].art;
-  return `<div class="${cls}" style="${style}"><div class="board-figure"><span class="board-hp"><i style="width:${Math.max(0,unit.hp/unit.max*100)}%"></i></span><img src="./assets/actor-poses/${sprite}.webp" width="256" height="256" alt="" decoding="async"><em>${boardRank(unit.star)}${boardRoleMark(unit.role)}${BOARD_ROLES[unit.role].name} <b>${unit.hp}</b></em></div></div>`;
+  return `<div class="${cls}" style="${style}"><div class="board-figure"><span class="board-hp"><i style="width:${Math.max(0,unit.hp/unit.max*100)}%"></i></span><img src="./assets/actor-poses/${sprite}.webp" width="256" height="256" alt="" decoding="async"><em>${boardRank(unit.star)}${boardRoleMark(unit.role)}${BOARD_UI_ART?'':BOARD_ROLES[unit.role].name+' '}<b>${unit.hp}</b></em></div></div>`;
  }).join('');
  const hits=(fx?.hits||[]).map(hit=>`<i class="board-fx ${fx.heal?'heal':'hit'}" style="${place(hit.cell)}">${minigameArt(BOARD_ART,fx.heal?'fx-heal':'fx-hit','',256,256)}</i><b class="board-dmg${fx.heal?' heal':''}" style="${place(hit.cell)}">${hit.change>0?'+':''}${hit.change}</b>`).join('');
  return `<div class="board-map${b?' battle':''}${BOARD_ART?' painted':''}"><div class="board-tiles">${tiles.join('')}</div><div class="board-pieces" aria-hidden="true">${pieces}${hits}</div></div>`;
@@ -6387,7 +6429,7 @@ function boardScreen(){
   const tip=state.over?'전투가 끝났습니다.':b.phase==='foe'?'적이 움직이는 중입니다.':b.auto?'자동으로 진행하는 중입니다.':
    picked?b.moved?'붉은 칸의 대상을 눌러 공격하거나, 동료를 다시 눌러 대기합니다.':BOARD_ROLES[picked.role].name+' · 파란 칸으로 이동, 붉은 칸을 눌러 공격 · '+BOARD_ROLES[picked.role].tip:
    boardDraft.note||'움직일 동료를 누르세요. 동료마다 한 턴에 이동 한 번, 행동 한 번입니다.';
-  return `<section class="board-panel"><div class="board-turn"><b>${Math.min(state.turn,BOARD_TURNS)} / ${BOARD_TURNS}턴</b><span class="${b.phase}">${b.phase==='foe'?'적 차례':'내 차례'}</span><small>남은 적 ${state.units.filter(unit=>unit.side==='foe'&&unit.hp>0).length}</small></div>
+  return `<section class="board-panel${BOARD_UI_ART?' ui-painted':''}"><div class="board-turn"><b>${Math.min(state.turn,BOARD_TURNS)} / ${BOARD_TURNS}턴</b><span class="${b.phase}">${b.phase==='foe'?'적 차례':'내 차례'}</span><small>남은 적 ${state.units.filter(unit=>unit.side==='foe'&&unit.hp>0).length}</small></div>
   <div class="board-field">${banner}${boardMap(stage)}</div>
   <p class="board-tip" aria-live="polite">${tip}</p>
   <div class="board-bench" style="--n:${Math.max(3,state.units.filter(unit=>unit.side==='ally').length)}">${roster}</div>
@@ -6397,7 +6439,7 @@ function boardScreen(){
  const shop=draft.shop.map((pet,slot)=>{
   if(pet<0)return '<span class="board-card sold">영입함</span>';
   const role=BOARD_ROLES[BOARD_PET_ROLES[pet]],twin=draft.units.some(unit=>unit.pet===pet&&unit.star<BOARD_RANKS.length);
-  return `<button class="board-card${twin?' twin':''}" onclick="buyBoardCard(${slot})" ${draft.coins<BOARD_PRICE?'disabled':''} aria-label="${COMPANIONS[pet][0]}, ${role.name}, ${role.tip}, 코인 ${BOARD_PRICE}${twin?', 합체 가능':''}">${twin?'<i class="board-twin">합체</i>':''}${petArt(pet,'board-pet')}<b>${boardRoleMark(BOARD_PET_ROLES[pet])}${role.name}</b><small>${COMPANIONS[pet][0]}</small><em>코인 ${BOARD_PRICE}</em></button>`;
+  return `<button class="board-card${twin?' twin':''}" onclick="buyBoardCard(${slot})" ${draft.coins<BOARD_PRICE?'disabled':''} aria-label="${COMPANIONS[pet][0]}, ${role.name}, ${role.tip}, 코인 ${BOARD_PRICE}${twin?', 합체 가능':''}">${twin?'<i class="board-twin">합체</i>':''}${petArt(pet,'board-pet')}<b>${boardRoleMark(BOARD_PET_ROLES[pet])}${role.name}</b><small>${COMPANIONS[pet][0]}</small><em>${boardCoin()}${BOARD_UI_ART?'':'코인 '}${BOARD_PRICE}</em></button>`;
  }).join('');
  const bench=draft.units.map(unit=>{
   const role=BOARD_ROLES[BOARD_PET_ROLES[unit.pet]],used=boardDraft.place.has(unit.id);
@@ -6406,10 +6448,10 @@ function boardScreen(){
  const chosen=draft.units.find(unit=>unit.id===boardDraft.pick),picked=chosen?BOARD_ROLES[BOARD_PET_ROLES[chosen.pet]]:null,rank=chosen?BOARD_RANKS[chosen.star-1]:1;
  const tip=picked?picked.name+' · 체력 '+Math.round(picked.hp*rank)+' · '+(picked.shape==='heal'?'회복 ':'공격 ')+Math.round(picked.atk*rank)+' · 이동 '+picked.move+' · '+picked.tip:
   boardDraft.note||(draft.units.length?'내 동료를 누른 뒤 아래 두 줄의 칸을 누르면 자리를 옮깁니다. 적을 누르면 정보를 봅니다.':'상점의 카드를 눌러 동료를 영입하세요. 같은 동료 두 장은 2성으로 합체합니다.');
- return `<section class="board-panel"><div class="tabs board-stages">${tabs}</div>
+ return `<section class="board-panel${BOARD_UI_ART?' ui-painted':''}"><div class="tabs board-stages">${tabs}</div>
  <div class="board-field">${banner}${boardMap(stage)}</div>
  <p class="board-tip" aria-live="polite">${tip}</p>
- <div class="board-shop-head"><b class="board-coins">코인 ${draft.coins}</b><small>${done?'받은 보상':'보상'} · ${passRewardText(stage.rewards)}</small>${button('새 카드 · 코인 '+BOARD_REROLL,'rerollBoardShop()',draft.coins<BOARD_REROLL,true)}</div>
+ <div class="board-shop-head"><b class="board-coins">${boardCoin()}코인 ${draft.coins}</b><small>${done?'받은 보상':'보상'} · ${passRewardText(stage.rewards)}</small>${button('새 카드 · 코인 '+BOARD_REROLL,'rerollBoardShop()',draft.coins<BOARD_REROLL,true)}</div>
  <div class="board-shop">${shop}</div>
  <div class="board-bench owned" aria-label="내 동료">${bench||'<p class="board-empty">영입한 동료가 여기에 모입니다. 판에는 '+stage.limit+'마리까지 세웁니다.</p>'}</div>
  <div class="action-row board-actions">${button('처음부터','resetBoardDraft()',false,true)}${button('자동 배치','autoBoardPlace()',!draft.units.length,true)}${button((done?'연습 시작':'전투 시작')+' · '+placed+' / '+stage.limit,'startBoardBattle()',!placed)}</div></section>`;
@@ -6419,7 +6461,7 @@ const dungeonScreenBeforeMinigames=dungeonScreen;
 dungeonScreen=function(){return screenTab==='minigames'?minigameHub():dungeonScreenBeforeMinigames()};
 // Moving to another screen leaves the minigame first.
 const navigateBeforeMinigames=navigate;
-navigate=function(...args){if(miniStageOpen()){stopBoardBattle();miniView='hub';miniRefresh()}return navigateBeforeMinigames(...args)};
+navigate=function(...args){if(miniStageOpen()){stopBoardBattle();miniView='hub';miniRefresh();boardMusic()}return navigateBeforeMinigames(...args)};
 </script><script>
 /* A second tab must not overwrite a newer game with its stale autosave. */
 function startNebulaGame(){return saveGuard.boot(()=>{init();initExpansion();initDiversity();initProfile();initRewardsDungeons();initTownWardrobe();initClassesCombat();initGameChat();syncAccountNickname().then(restoreChatGuild).catch(()=>{}).finally(scheduleEarnedClaims)})}
