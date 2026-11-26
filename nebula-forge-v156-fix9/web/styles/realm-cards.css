@@ -207,29 +207,6 @@
 .furnace-piece{display:grid;gap:2px;justify-items:center;min-height:76px;padding:8px;border:1px solid #d1b47a;border-radius:12px;background:#2a2140;color:#f8eddb}
 .furnace-piece b{font-size:15px;color:#f4dba5}.furnace-piece small{font-size:12px;color:#cdbfe0}
 .furnace-piece:disabled{opacity:.5}
-.board-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.board-stages button{min-height:44px;font-size:13px}
-.board-field{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px}
-.board-side{display:block;margin:0 0 4px;color:#cdbfe0;font-size:12px;text-align:center}
-.board-versus{color:#f4dba5;font-size:13px}
-.board-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
-.board-cell{position:relative;aspect-ratio:1/1.32;min-width:0;padding:2px;display:grid;justify-items:center;align-content:center;gap:1px;border:1px solid #4a3f5c;border-radius:9px;background:#171520;color:#8f87a0;font-size:12px;overflow:hidden}
-button.board-cell{cursor:pointer}
-.board-cell.empty.front{border-style:dashed;border-color:#d1b47a88}
-.board-cell.ally{border-color:#8f7fb8;background:#241c3d}.board-cell.foe{border-color:#8a4a4a;background:#2a1a1e}
-.board-cell .board-pet,.board-cell .board-foe{width:60%;height:auto;aspect-ratio:1;object-fit:contain}
-.board-cell em{font-style:normal;font-size:12px;line-height:1;color:#f4dba5}
-.board-cell small{font-size:12px;line-height:1;color:#f8eddb}
-.board-hp{display:block;width:82%;height:4px;border-radius:2px;background:#0c0a18;overflow:hidden}.board-hp i{display:block;height:100%;background:#7fd08a}
-.board-cell.foe .board-hp i{background:#e0705f}
-.board-cell.acting{box-shadow:0 0 0 2px #ffe2a6 inset}.board-cell.hit{background:#5a1f1f}.board-cell.healed{background:#1f4a2c}
-.board-cell.down{opacity:.3;filter:grayscale(1)}
-.board-tip{min-height:36px;margin:0;color:#ffdeb0;font-size:13px;line-height:1.4;text-align:center}
-.board-bench{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.board-unit{display:grid;justify-items:center;gap:1px;min-height:88px;padding:5px 2px;border:1px solid #6d5a86;border-radius:10px;background:#231b3a;color:#f8eddb}
-.board-unit .board-pet{width:40px;height:40px;object-fit:contain}
-.board-unit b{font-size:13px;color:#f4dba5}.board-unit small{font-size:12px;line-height:1.15;color:#cdbfe0;text-align:center}
-.board-unit.picked{border-color:#ffe2a6;box-shadow:0 0 0 2px #ffe2a6 inset}.board-unit.used{opacity:.45}
-@media(max-width:359px){.board-bench{grid-template-columns:repeat(3,minmax(0,1fr))}.board-cell em{display:none}}
 .mini-card.painted{grid-template-columns:64px minmax(0,1fr) auto}
 .mini-thumb{width:64px;height:64px;object-fit:contain;border-radius:10px}
 .role-icon{width:18px;height:18px;margin-right:3px;vertical-align:-3px;object-fit:contain}
@@ -267,22 +244,7 @@ button.board-cell{cursor:pointer}
 @keyframes furnace-steam{0%{transform:translateY(20%) scale(.5);opacity:0}25%{opacity:.9}100%{transform:translateY(-55%) scale(1.25);opacity:0}}
 @keyframes furnace-pop{0%{opacity:0;transform:scale(.92)}100%{opacity:1;transform:none}}
 /* Board scene: arena, tiles, hit and heal flashes, and the result banner. */
-.board-field{position:relative}
-.board-field.painted{padding:10px 8px;border-radius:12px;background:#0f0c19 url('./assets/minigames/board-bg.webp') center/cover no-repeat}
-.board-field.painted .board-cell{background-color:transparent;background-size:cover;background-position:center;border-color:transparent}
-.board-field.painted .board-grid.ally .board-cell{background-image:url('./assets/minigames/tile-ally.webp')}
-.board-field.painted .board-grid.foe .board-cell{background-image:url('./assets/minigames/tile-foe.webp')}
-.board-field.painted .board-side{color:#f8eddb;text-shadow:0 1px 2px #000}
-.board-fx{position:absolute;inset:-6%;display:block;pointer-events:none;animation:board-fx .28s ease-out both}
-.board-fx img{width:100%;height:100%;object-fit:contain}
-.board-fx.hit:empty{background:radial-gradient(circle,#fff 0%,#ffb45a 30%,transparent 62%)}
-.board-fx.heal:empty{background:radial-gradient(circle,#eaffef 0%,#7fd08a 32%,transparent 64%)}
-.board-banner{position:absolute;inset:0;z-index:2;display:grid;place-items:center;border-radius:12px;background:#0f0c19cc;animation:furnace-pop .35s ease-out both}
-.board-banner img{position:absolute;left:4%;top:50%;width:92%;height:auto;transform:translateY(-50%)}
-.board-banner b{position:relative;font-size:30px;letter-spacing:2px;color:#ffe9bd;text-shadow:0 2px 6px #000}
-.board-banner.lose b{color:#c9c2d6}
-@keyframes board-fx{0%{opacity:0;transform:scale(.6)}40%{opacity:1}100%{opacity:0;transform:scale(1.15)}}
-@media(prefers-reduced-motion:reduce){.furnace-flame,.furnace-drop,.furnace-steam,.furnace-result.fresh,.board-fx,.board-banner{animation:none}}
+@media(prefers-reduced-motion:reduce){.furnace-flame,.furnace-drop,.furnace-steam,.furnace-result.fresh{animation:none}}
 /* Full-screen minigame stage: title on top, the play area in the middle, guide and exit at the bottom. */
 .mini-stage{position:absolute;inset:0;z-index:50;background:#0c0a18;color:var(--ink)}
 .mini-stage-frame{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:radial-gradient(120% 55% at 50% 0%,#2c2356 0%,#17132c 52%,#0c0a18 100%)}
@@ -304,3 +266,85 @@ button.board-cell{cursor:pointer}
 .mini-stage-exit{width:56px;height:56px;display:grid;place-items:center;border:2px solid #ffd9c2;border-radius:16px;background:linear-gradient(#e2573f,#b5301f);color:#fff;font-size:24px;box-shadow:0 3px 0 #7a1d12}
 .mini-guide-list{margin:8px 0 14px;padding-left:20px;display:grid;gap:8px;font-size:14px;line-height:1.5}
 .board-reward{margin:0;color:#cdbfe0;font-size:13px;text-align:center}.board-reward b{color:#ffdeb0}
+/* Formation battle: a board of 5 x 6 tiles with the pieces standing on it. */
+.board-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.board-stages button{min-height:40px;font-size:13px}
+.mini-stage-frame.board .mini-stage-top{min-height:104px;padding-top:calc(env(safe-area-inset-top,0px) + 36px)}
+.mini-stage-frame.board .mini-stage-top h2{margin-bottom:8px;font-size:24px}
+.mini-stage .board-panel{gap:8px;padding:10px}
+.board-turn{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:0 4px;color:#f8eddb}
+.board-turn b{font-size:17px;color:#ffe9bd}.board-turn small{font-size:13px;color:#cdbfe0}
+.board-turn span{min-width:84px;padding:5px 12px;border-radius:14px;font-size:14px;font-weight:700;text-align:center}
+.board-turn span.ally{background:#2d5fc4;color:#fff}.board-turn span.foe{background:#b5301f;color:#fff}
+.board-field{position:relative;display:grid;justify-items:center}
+.board-map{--rest:570px;position:relative;width:min(100%,calc((100vh - var(--rest))*25/27));min-width:250px;aspect-ratio:25/27;border-radius:12px;background:linear-gradient(#3a2530 0%,#2a2238 34%,#25213a 66%,#1d2c4a 100%);box-shadow:0 0 0 2px #6d5a86,0 6px 14px #0008}
+@supports(height:100dvh){.board-map{width:min(100%,calc((100dvh - var(--rest))*25/27))}}
+.board-tiles{position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr))}
+.board-tile{position:relative;min-width:0;min-height:0;padding:0;border:1px solid #ffffff1c;border-radius:0;background:none;color:#bcd2ff;font-size:20px;cursor:pointer}
+.board-tile.zone{background:#4f7fe033;border:1px dashed #8fb0ff}
+.board-tile.star::after{content:'';position:absolute;left:50%;top:50%;width:46%;aspect-ratio:1;transform:translate(-50%,-50%);background:#ffd98a;opacity:.75;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);pointer-events:none}
+.board-tile.star{background:radial-gradient(circle,#ffd98a40 0%,#ffd98a00 70%)}
+.board-tile.move{background:#3fc8ff4d;box-shadow:0 0 0 2px #7fe0ff inset}
+.board-tile.aim{background:#ff5a4a59;box-shadow:0 0 0 2px #ff9a8a inset}
+.board-tile.mend{background:#5fd07a59;box-shadow:0 0 0 2px #9ff0b0 inset}
+.board-pieces{position:absolute;inset:0;pointer-events:none}
+.board-piece{position:absolute;width:20%;height:16.6667%}
+.board-figure{position:absolute;inset:0}
+.board-figure::before{content:'';position:absolute;left:10%;right:10%;bottom:3%;height:34%;border-radius:50%;background:#4f8fff66;box-shadow:0 0 0 2px #9cc4ff}
+.board-piece.foe .board-figure::before{background:#e0503f66;box-shadow:0 0 0 2px #ff9a8a}
+.board-figure img{position:absolute;left:50%;bottom:8%;width:92%;height:auto;transform:translateX(-50%);filter:drop-shadow(0 3px 2px #000a)}
+.board-piece.foe .board-figure img{width:86%}
+.board-figure em{position:absolute;left:50%;top:-14%;z-index:2;transform:translateX(-50%);display:inline-flex;align-items:center;gap:2px;padding:1px 5px;border-radius:7px;background:#0c0a18d9;color:#f4dba5;font-style:normal;font-size:12px;line-height:1.2;white-space:nowrap}
+.board-figure em b{color:#fff;font-weight:700}
+.board-piece.foe .board-figure em{color:#ffc0b4}
+.board-hp{display:block;height:5px;border-radius:3px;background:#0c0a18;overflow:hidden;box-shadow:0 0 0 1px #000}
+.board-hp i{display:block;height:100%;background:#7fd08a}
+.board-figure .board-hp{position:absolute;left:14%;right:14%;top:11%;z-index:2}
+.board-piece.foe .board-hp i{background:#e0705f}
+.board-piece.picked .board-figure::before{background:#ffd98a88;box-shadow:0 0 0 3px #ffe9bd,0 0 10px #ffd98a}
+.board-piece.picked .board-figure img{animation:board-bob .7s ease-in-out infinite alternate}
+.board-piece.done .board-figure img{filter:grayscale(.85) brightness(.75) drop-shadow(0 3px 2px #000a)}
+.board-piece.done .board-figure::before{background:#77777755;box-shadow:0 0 0 2px #999}
+.board-piece.walk{animation:board-walk .26s ease-out both}
+.board-piece.lunge{animation:board-lunge .3s ease-out both}
+.board-fx{position:absolute;width:20%;height:16.6667%;z-index:9;display:block;animation:board-fx .4s ease-out both}
+.board-fx img{position:absolute;left:-20%;top:-30%;width:140%;height:auto}
+.board-fx.hit:empty{background:radial-gradient(circle,#fff 0%,#ffb45a 30%,transparent 62%)}
+.board-fx.heal:empty{background:radial-gradient(circle,#eaffef 0%,#7fd08a 32%,transparent 64%)}
+.board-dmg{position:absolute;width:20%;z-index:10;margin-top:-4%;text-align:center;font-size:20px;font-weight:800;color:#fff;text-shadow:0 0 3px #b5301f,0 2px 2px #000;animation:board-dmg .5s ease-out both}
+.board-dmg.heal{color:#c8ffd2;text-shadow:0 0 3px #1f7a3a,0 2px 2px #000}
+.board-banner{position:absolute;inset:0;z-index:20;display:grid;place-items:center;border-radius:12px;background:#0f0c19cc;animation:furnace-pop .35s ease-out both}
+.board-banner img{position:absolute;left:4%;top:50%;width:92%;height:auto;transform:translateY(-50%)}
+.board-banner b{position:relative;font-size:34px;letter-spacing:2px;color:#ffe9bd;text-shadow:0 2px 6px #000}
+.board-banner.lose b{color:#c9c2d6}
+/* During the battle the board leans back and the pieces stand upright on it. */
+.board-map.battle{--rest:412px;min-width:220px;margin-top:-5%;transform:perspective(1100px) rotateX(15deg);transform-origin:50% 100%;transform-style:preserve-3d}
+.board-map.battle .board-pieces,.board-map.battle .board-piece{transform-style:preserve-3d}
+.board-map.battle .board-figure{transform:rotateX(-15deg);transform-origin:50% 90%}
+.board-map.battle .board-figure img{width:104%}.board-map.battle .board-piece.foe .board-figure img{width:98%}
+.board-map.battle .board-figure em{font-size:13px;top:-24%}.board-map.battle .board-figure .board-hp{top:3%}
+/* Effects are lifted off the leaning board so the standing pieces do not hide them. */
+.board-map.battle .board-fx,.board-map.battle .board-dmg{translate:0 0 46px;rotate:x -15deg}
+/* While fighting, the big title gives its room to the board. */
+.mini-stage-frame.board.fighting .mini-stage-top{min-height:0;padding-top:calc(env(safe-area-inset-top,0px) + 44px);padding-bottom:0}
+.mini-stage-frame.board.fighting .mini-stage-top h2,.mini-stage-frame.board.fighting .mini-stage-title{display:none}
+.board-tip{min-height:38px;margin:0;color:#ffdeb0;font-size:13px;line-height:1.4;text-align:center}
+.board-bench{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:6px}
+.board-unit{display:grid;justify-items:center;align-content:start;gap:2px;min-height:72px;padding:5px 2px;border:1px solid #6d5a86;border-radius:10px;background:#231b3a;color:#f8eddb}
+.board-unit .board-pet{width:40px;height:40px;object-fit:contain}
+.board-unit b{display:inline-flex;align-items:center;gap:2px;font-size:13px;color:#f4dba5}.board-unit small{font-size:12px;line-height:1.15;color:#cdbfe0;text-align:center}
+.board-unit .board-hp{width:82%}
+.board-unit.picked{border-color:#ffe2a6;box-shadow:0 0 0 2px #ffe2a6 inset}.board-unit.used{opacity:.5}.board-unit.down{opacity:.3;filter:grayscale(1)}
+.role-icon{width:18px;height:18px;object-fit:contain}
+.board-actions{display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:6px}.board-actions button{min-width:0;min-height:46px;padding:0 4px;font-size:14px}
+.board-map.painted{background:#0f0c19 url('./assets/minigames/board-bg.webp') center/100% 100% no-repeat}
+.board-map.painted .board-tile{border-color:#ffffff12}
+.board-map.painted .board-tile.zone{border:0;background:url('./assets/minigames/tile-ally.webp') center/100% 100% no-repeat}
+.board-map.painted .board-tile.move{box-shadow:none;background:url('./assets/minigames/tile-move.webp') center/100% 100% no-repeat}
+.board-map.painted .board-tile.aim{box-shadow:none;background:url('./assets/minigames/tile-aim.webp') center/100% 100% no-repeat}
+.board-map.painted .board-tile.star::after{left:0;top:0;width:100%;height:100%;transform:none;opacity:1;clip-path:none;background:url('./assets/minigames/tile-star.webp') center/100% 100% no-repeat}
+@keyframes board-walk{from{transform:translate(calc(var(--dx)*100%),calc(var(--dy)*100%))}to{transform:none}}
+@keyframes board-lunge{0%,100%{transform:none}45%{transform:translate(calc(var(--dx)*34%),calc(var(--dy)*34%))}}
+@keyframes board-bob{from{margin-bottom:0}to{margin-bottom:6%}}
+@keyframes board-fx{0%{opacity:0;transform:scale(.6)}40%{opacity:1}100%{opacity:0;transform:scale(1.2)}}
+@keyframes board-dmg{0%{opacity:0;transform:translateY(40%)}25%{opacity:1}100%{opacity:0;transform:translateY(-70%)}}
+@media(prefers-reduced-motion:reduce){.board-fx,.board-dmg,.board-banner,.board-piece.walk,.board-piece.lunge,.board-piece.picked .board-figure img{animation:none}}
