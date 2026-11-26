@@ -4673,7 +4673,7 @@ function exchangeHavenItem(id){return onlineAct('townExchange',{id})}
 function raidComingPopup(){return partyRaid.lobby()}
 EXTRA_POPUPS.havenShop=['성운의 상점',havenShopPopup];
 EXTRA_POPUPS.raidComing=['레이드',raidComingPopup];
-</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-af2e46ecb773f31a.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
+</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-d852e6dc3ab5907a.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
 
 const ADVENTURE_TERMS={
  '공격력':'평타와 공격 스킬의 피해를 계산할 때 사용하는 기본 수치입니다.',
@@ -5673,10 +5673,15 @@ function furnaceRule(state,op,random,day){
 }
 
 // ---------- Companion formation battle ----------
-// A small turn-based battle without dice, on a board five tiles wide and six deep. The enemy holds the two
-// top rows and the day's companions are placed on the two bottom rows. The sides then take turns, and on
-// its turn each unit may walk and then act once. The server replays the recorded turns before it pays.
+// A small turn-based battle on a board five tiles wide and six deep. The enemy holds the two top rows.
+// The player first recruits companions from a shop of four random cards (coins buy a card or deal a new
+// hand; two of the same companion join into a stronger one), places them on the two bottom rows, and the
+// sides then take turns: each unit may walk and then act once. The battle itself has no dice. The server
+// deals the same cards from the same numbers and replays the recorded turns before it pays.
 const BOARD_W=5,BOARD_H=6,BOARD_TURNS=12,BOARD_SAMPLES=24,BOARD_STAR=1.5;
+// The shop: four cards at a time, the price of a card, the price of a new hand, and how much stronger a
+// companion of two and of three stars is.
+const BOARD_SHOP=4,BOARD_PRICE=2,BOARD_REROLL=1,BOARD_RANKS=[1,1.6,2.5];
 const BOARD_ROLES={
  guard:{name:'방패',hp:60,atk:6,move:2,reach:1,tip:'붙어 있는 적 하나를 공격. 체력이 높아 길을 막기 좋다'},
  striker:{name:'돌격',hp:30,atk:14,move:3,reach:1,tip:'3칸까지 달려가, 붙어 있는 적 하나를 강하게 공격'},
@@ -5695,9 +5700,9 @@ const BOARD_FOES={
  healer:{name:'회복형',hp:30,atk:7,art:'creature_1_2',act:'healer'}
 };
 const BOARD_STAGES=[
- {loans:3,stars:1,foes:['guard','striker','striker','sniper'],share:.30,rewards:{starIron:5,petShards:4}},
- {loans:3,stars:2,foes:['guard','guard','striker','sniper','healer'],share:.10,rewards:{starIron:8,petShards:6}},
- {loans:4,stars:2,foes:['guard','guard','striker','striker','sniper','healer'],share:.03,rewards:{starIron:12,petShards:10,gems:30}}
+ {coins:8,limit:3,stars:1,foes:['guard','striker','striker','sniper'],share:.5,rewards:{starIron:5,petShards:4}},
+ {coins:10,limit:4,stars:2,foes:['guard','guard','striker','sniper','healer'],share:.3,rewards:{starIron:8,petShards:6}},
+ {coins:12,limit:5,stars:2,foes:['guard','guard','striker','striker','sniper','healer'],share:.15,rewards:{starIron:12,petShards:10,gems:30}}
 ];
 function boardSeed(text){let hash=2166136261;for(const c of text)hash=Math.imul(hash^c.charCodeAt(0),16777619)>>>0;return hash}
 function boardRandom(seed){let x=seed||1;return ()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296}}
@@ -5716,16 +5721,87 @@ function boardNear(cell){
 }
 function boardAt(state,cell){return state.units.find(unit=>unit.hp>0&&unit.cell===cell)}
 function boardAlly(state,slot){return state.units.find(unit=>unit.side==='ally'&&unit.slot===slot)}
-// A battle in its opening position. place holds one cell for each of the day's companions, or -1 when left out.
-function boardOpen(stage,place){
- const units=[];
- place.forEach((cell,slot)=>{
-  if(cell<0)return;
-  const pet=stage.loans[slot],role=BOARD_PET_ROLES[pet],stats=BOARD_ROLES[role];
-  units.push({side:'ally',slot,pet,role,cell,hp:stats.hp,max:stats.hp,atk:stats.atk,done:false});
+function boardFront(pet){return ['guard','striker'].includes(BOARD_PET_ROLES[pet])}
+// The cards on offer after a number of new hands. They follow from the day, the stage and the attempt's
+// own number (salt), so the server deals exactly what the player saw. The first hand always has a front-liner.
+function boardShop(stage,salt,roll){
+ const random=boardRandom(boardSeed('shop|'+stage.day+'|'+stage.n+'|'+salt+'|'+roll));
+ const cards=Array.from({length:BOARD_SHOP},()=>Math.floor(random()*BOARD_PET_ROLES.length));
+ if(!roll&&!cards.some(boardFront)){
+  const fronts=BOARD_PET_ROLES.map((role,pet)=>pet).filter(boardFront);
+  cards[0]=fronts[Math.floor(random()*fronts.length)];
+ }
+ return cards;
+}
+function boardDraftOpen(stage,salt){return {salt,coins:stage.coins,roll:0,shop:boardShop(stage,salt,0),units:[],serial:0,text:''}}
+// One step of recruiting: 'r' deals a new hand, '0'-'3' buys that card. Two companions of the same kind and
+// rank join at once into one of the next rank, which keeps the place of the earlier one.
+function boardDraftStep(stage,draft,op){
+ if(op==='r'){
+  if(draft.coins<BOARD_REROLL)throw Error('코인이 부족합니다.');
+  draft.coins-=BOARD_REROLL;draft.roll++;draft.shop=boardShop(stage,draft.salt,draft.roll);draft.text+='r';
+  return {unit:null,gone:[]};
+ }
+ const slot=/^\d$/.test(op)?Number(op):-1,pet=draft.shop[slot];
+ if(pet===undefined||pet<0)throw Error('영입할 수 없는 카드입니다.');
+ if(draft.coins<BOARD_PRICE)throw Error('코인이 부족합니다.');
+ draft.coins-=BOARD_PRICE;draft.shop[slot]=-1;draft.text+=op;
+ let unit={id:draft.serial++,pet,star:1};
+ const gone=[];
+ draft.units.push(unit);
+ while(unit.star<BOARD_RANKS.length){
+  const twin=draft.units.find(other=>other!==unit&&other.pet===unit.pet&&other.star===unit.star);
+  if(!twin)break;
+  const [kept,lost]=twin.id<unit.id?[twin,unit]:[unit,twin];
+  draft.units.splice(draft.units.indexOf(lost),1);gone.push(lost.id);
+  kept.star++;unit=kept;
+ }
+ return {unit,gone};
+}
+function boardDraftRun(stage,salt,text){
+ if(typeof salt!=='string'||!/^[0-9a-z]{1,3}$/.test(salt)||typeof text!=='string'||text.length>stage.coins)throw Error('영입 기록을 확인하세요.');
+ const draft=boardDraftOpen(stage,salt);
+ for(const op of text)boardDraftStep(stage,draft,op);
+ return draft;
+}
+// Recruiting without a player, used to choose how tough the day's enemies are: join a pair when one is on
+// offer, fill the board with a front-liner first, and pay for a new hand only when nothing on offer helps.
+function boardAutoDraft(stage,salt){
+ const draft=boardDraftOpen(stage,salt);
+ while(draft.coins>=BOARD_PRICE){
+  const offer=test=>draft.shop.findIndex(pet=>pet>=0&&test(pet));
+  let slot=offer(pet=>draft.units.some(unit=>unit.pet===pet&&unit.star<BOARD_RANKS.length));
+  if(slot<0&&draft.units.length<stage.limit){
+   if(!draft.units.some(unit=>boardFront(unit.pet)))slot=offer(boardFront);
+   if(slot<0)slot=offer(pet=>BOARD_PET_ROLES[pet]!=='healer'||!draft.units.some(unit=>BOARD_PET_ROLES[unit.pet]==='healer'));
+   if(slot<0)slot=offer(()=>true);
+  }
+  if(slot>=0){boardDraftStep(stage,draft,String(slot));continue}
+  if(draft.coins<BOARD_PRICE+BOARD_REROLL&&draft.units.length>=stage.limit)break;
+  boardDraftStep(stage,draft,'r');
+ }
+ return draft;
+}
+// A placement made without a player: the strongest companions up to the board's limit, front-liners on the
+// upper of the two rows and the others behind them, from the middle outward.
+function boardAutoPlace(stage,units){
+ const chosen=[...units].sort((a,b)=>b.star-a.star||a.id-b.id).slice(0,stage.limit),columns=[2,1,3,0,4],used=[0,0];
+ return units.map(unit=>{
+  if(!chosen.includes(unit))return -1;
+  const back=boardFront(unit.pet)?0:1,row=used[back]<BOARD_W?back:1-back;
+  return (BOARD_H-2+row)*BOARD_W+columns[used[row]++];
  });
- stage.foes.forEach((foe,slot)=>units.push({side:'foe',slot,kind:foe.kind,role:BOARD_FOES[foe.kind].act,cell:foe.cell,hp:foe.hp,max:foe.hp,atk:foe.atk,done:false}));
- return {units,stars:stage.stars,turn:1,over:''};
+}
+// A battle in its opening position. place holds one cell for each recruited companion, or -1 when left out.
+function boardOpen(stage,units,place){
+ const list=[];
+ units.forEach((unit,slot)=>{
+  if(place[slot]<0)return;
+  const role=BOARD_PET_ROLES[unit.pet],stats=BOARD_ROLES[role],rank=BOARD_RANKS[unit.star-1],hp=Math.round(stats.hp*rank);
+  list.push({side:'ally',slot,pet:unit.pet,star:unit.star,role,cell:place[slot],hp,max:hp,atk:Math.round(stats.atk*rank),done:false});
+ });
+ stage.foes.forEach((foe,slot)=>list.push({side:'foe',slot,kind:foe.kind,role:BOARD_FOES[foe.kind].act,cell:foe.cell,hp:foe.hp,max:foe.hp,atk:foe.atk,done:false}));
+ return {units:list,stars:stage.stars,turn:1,over:''};
 }
 // Every tile the unit can walk to this turn, with the number of steps. Units block the way.
 function boardReach(state,unit){
@@ -5818,8 +5894,8 @@ function boardTurnEnd(state){
  for(const unit of state.units)unit.done=false;
 }
 // Both sides playing by themselves. Used to choose how tough the day's enemies are.
-function boardAutoBattle(stage,place){
- const state=boardOpen(stage,place);
+function boardAutoBattle(stage,units,place){
+ const state=boardOpen(stage,units,place);
  while(!state.over){
   for(const unit of state.units)if(unit.side==='ally'&&unit.hp>0&&!state.over)boardPlay(state,unit);
   if(!state.over)boardFoeTurn(state);
@@ -5849,8 +5925,8 @@ function boardCellOf(letter){
  if(cell<0||cell>=BOARD_W*BOARD_H)throw Error('기록을 확인하세요.');
  return cell;
 }
-function boardReplay(stage,place,record){
- const state=boardOpen(stage,place),turns=String(record).split('.');
+function boardReplay(stage,units,place,record){
+ const state=boardOpen(stage,units,place),turns=String(record).split('.');
  if(turns.length>BOARD_TURNS)throw Error('기록을 확인하세요.');
  for(const turn of turns){
   if(turn.length%3)throw Error('기록을 확인하세요.');
@@ -5863,63 +5939,62 @@ function boardReplay(stage,place,record){
  return state;
 }
 const boardStageCache=new Map();
-// The day's stage: the companions everyone is given, the enemy formation, the star tiles, and an enemy
-// toughness chosen so that the stated share of placements win even when the companions play by themselves.
+// The day's stage: the enemy formation, the star tiles, the coins and the board's limit, and an enemy
+// toughness chosen so that the stated share of attempts win even when nobody plays (cards recruited,
+// placed and moved by the rules above).
 function boardStage(dayKey,n){
  const key=dayKey+'|'+n;
  if(boardStageCache.has(key))return boardStageCache.get(key);
  const spec=BOARD_STAGES[n],random=boardRandom(boardSeed('board|'+key));
- // The day's companions: one front-liner first, and never more than one healer, so they can always deal damage.
- const front=boardShuffle(BOARD_PET_ROLES.map((role,i)=>i).filter(i=>['guard','striker'].includes(BOARD_PET_ROLES[i])),random);
- const loans=[front[0]];
- for(const pet of boardShuffle(BOARD_PET_ROLES.map((role,i)=>i).filter(i=>i!==front[0]),random)){
-  if(loans.length>=spec.loans)break;
-  if(BOARD_PET_ROLES[pet]==='healer'&&loans.some(i=>BOARD_PET_ROLES[i]==='healer'))continue;
-  loans.push(pet);
- }
  // Healers and shooters stand on the enemy's back row, the others on the row in front of it.
  const rear=boardShuffle([0,1,2,3,4],random),van=boardShuffle([5,6,7,8,9],random);
  const layout=spec.foes.map(kind=>({kind,cell:(kind==='healer'||kind==='sniper'?rear:van).pop()})).sort((a,b)=>a.cell-b.cell);
  const stars=boardShuffle([10,11,12,13,14,15,16,17,18,19],random).slice(0,spec.stars).sort((a,b)=>a-b);
- const samples=Array.from({length:BOARD_SAMPLES},()=>boardShuffle([20,21,22,23,24,25,26,27,28,29],random).slice(0,spec.loans));
- const build=scale=>({loans,stars,foes:layout.map(({kind,cell})=>({kind,cell,hp:Math.round(BOARD_FOES[kind].hp*scale),atk:BOARD_FOES[kind].atk}))});
+ const build=scale=>({day:dayKey,n,coins:spec.coins,limit:spec.limit,stars,
+  foes:layout.map(({kind,cell})=>({kind,cell,hp:Math.round(BOARD_FOES[kind].hp*scale),atk:BOARD_FOES[kind].atk}))});
+ const plain=build(1),samples=Array.from({length:BOARD_SAMPLES},(unused,i)=>{
+  const units=boardAutoDraft(plain,'s'+i.toString(36)).units;
+  return {units,place:boardAutoPlace(plain,units)};
+ });
  const need=Math.max(2,Math.ceil(BOARD_SAMPLES*spec.share));
- // Whether enough of the sample placements win at this toughness; it stops counting once that is settled.
+ // Whether enough of the sample attempts win at this toughness; it stops counting once that is settled.
  const enough=scale=>{
   const trial=build(scale);
   let won=0;
-  for(let i=0;i<samples.length&&won<need&&won+samples.length-i>=need;i++)if(boardAutoBattle(trial,samples[i]).over==='win')won++;
+  for(let i=0;i<samples.length&&won<need&&won+samples.length-i>=need;i++)if(boardAutoBattle(trial,samples[i].units,samples[i].place).over==='win')won++;
   return won>=need;
  };
- // The toughest setting that still leaves the wanted share of winning placements. Tougher enemies win
+ // The toughest setting that still leaves the wanted share of winning attempts. Tougher enemies win
  // more often, so the list is searched by halves. If even the weakest setting falls short, the enemies are
  // made weaker still.
- const scales=[.3,.4,.5,.6,.7,.8,.9,1,1.1,1.25,1.4,1.6,1.8,2.1,2.4];
+ const scales=[.3,.4,.5,.6,.7,.8,.9,1,1.1,1.25,1.4,1.6,1.8,2.1,2.4,2.8,3.2];
  let low=0,high=scales.length-1,scale=.2;
  while(low<=high){
   const middle=(low+high)>>1;
   if(enough(scales[middle])){scale=scales[middle];low=middle+1}else high=middle-1;
  }
- const stage={day:dayKey,n,scale,rewards:spec.rewards,...build(scale)};
+ const stage={scale,rewards:spec.rewards,...build(scale)};
  if(boardStageCache.size>12)boardStageCache.clear();
  boardStageCache.set(key,stage);return stage;
 }
-// A placement is one character for each of the day's companions: its tile on the two bottom rows, or '-'.
-// Only the day's companions take part, so the companions a player owns make no difference.
-function boardPlace(stage,text){
- if(typeof text!=='string'||text.length!==stage.loans.length)throw Error('배치를 확인하세요.');
+// A placement is one character for each recruited companion: its tile on the two bottom rows, or '-'.
+// Only recruited companions take part, so the companions a player owns make no difference.
+function boardPlace(stage,units,text){
+ if(typeof text!=='string'||text.length!==units.length)throw Error('배치를 확인하세요.');
  const place=[...text].map(letter=>letter==='-'?-1:boardCellOf(letter)),set=place.filter(cell=>cell>=0);
- if(!set.length||new Set(set).size!==set.length||set.some(cell=>boardRow(cell)<BOARD_H-2))throw Error('배치를 확인하세요.');
+ if(!set.length||set.length>stage.limit||new Set(set).size!==set.length||set.some(cell=>boardRow(cell)<BOARD_H-2))throw Error('배치를 확인하세요.');
  return place;
 }
+// A claim is written as day/stage/salt/recruiting/placement/turns.
 function boardRule(state,id,day){
  if(!minigameOpen('petBoard',state))throw Error(minigameLockText('petBoard'));
- const [stamp,number,layout,record]=String(id).split('/'),n=Number(number);
+ const [stamp,number,salt,recruits,layout,record]=String(id).split('/'),n=Number(number);
  if(stamp!==day)throw Error('날짜가 바뀌었습니다. 오늘의 배치전을 다시 여세요.');
  if(!Number.isInteger(n)||!BOARD_STAGES[n]||typeof record!=='string')throw Error('배치를 확인하세요.');
  const book=minigameBook(state,'petBoard',day);
  if(book.cleared.includes(n))rejectEconomyClaim();
- const stage=boardStage(day,n),result=boardReplay(stage,boardPlace(stage,layout),record);
+ const stage=boardStage(day,n),units=boardDraftRun(stage,salt,recruits).units;
+ const result=boardReplay(stage,units,boardPlace(stage,units,layout),record);
  if(result.over!=='win')throw Error('이 기록으로는 이기지 못합니다.');
  book.cleared.push(n);book.cleared.sort();
  return {rewards:{...stage.rewards},board:{n,turns:result.turn}};
@@ -5930,7 +6005,9 @@ let miniView='hub',furnaceBusy=false,furnaceNote='',furnaceFx=null,furnaceLast=n
 // The ingot shown at the end is named by its purity. The name is for show; the reward follows the purity.
 const FURNACE_GRADES=[[23,'명장의 주괴'],[16,'빛나는 주괴'],[8,'단단한 주괴'],[0,'거친 주괴']];
 function furnaceGrade(purity){return 3-FURNACE_GRADES.findIndex(([need])=>purity>=need)}
-const boardDraft={day:'',n:0,place:[],pick:-1,note:'',battle:null,banner:''};
+// What the player is doing on the board: the cards recruited so far (draft), where each recruit stands
+// (place, by the recruit's id), the recruit picked up to be placed, and the battle once it has begun.
+const boardDraft={day:'',n:-1,draft:null,place:new Map(),pick:-1,note:'',battle:null,banner:''};
 function openMinigame(key){
  if(!minigameOpen(key)){openMenu('starLocked',minigameLockText(key));return false}
  miniView=key;miniRefresh();return true;
@@ -5944,7 +6021,7 @@ const MINI_STAGES={
   guide:['성운석 덩이를 넣어 순도를 올리고, 온도가 100을 넘기 전에 주괴를 꺼냅니다.','작은 덩이는 온도 +8~14 · 순도 +2, 큰 덩이는 온도 +16~26 · 순도 +5입니다.','냉각수는 한 판에 한 번, 온도를 15 낮춥니다.','온도가 100을 넘으면 과열되어 순도의 절반만 남습니다.','보상은 순도 3마다 별철 1개, 순도 1마다 강화석 10개입니다. 입장은 무료이고 하루 3판입니다.']},
  petBoard:{title:'동료 배치전',art:()=>BOARD_ART,chips:['starIron','petShards'],body:()=>boardScreen(),
   left:()=>'오늘 클리어 '+minigamePeek('petBoard').cleared.length+' / '+BOARD_STAGES.length,
-  guide:['아래 목록에서 동료를 고르고 판의 아래 두 줄에 배치합니다. 자동 배치로 한 번에 놓을 수도 있습니다.','전투는 턴제입니다. 내 차례에 동료를 누르면 갈 수 있는 칸이 파랗게, 공격할 수 있는 적이 붉게 표시됩니다.','동료마다 한 턴에 이동 한 번, 행동 한 번입니다. 모두 움직였으면 적의 차례가 됩니다. '+BOARD_TURNS+'턴 안에 적을 모두 쓰러뜨리면 승리합니다.','방패·돌격은 붙어 있는 적을, 저격은 4칸 안의 적을 공격합니다. 관통은 직선 3칸의 적 전부를, 폭발은 고른 적과 그 옆의 적을 함께 공격합니다. 치유는 3칸 안의 아군을 회복합니다.','별빛 칸에 서서 행동하면 공격과 회복이 1.5배가 됩니다.','자동을 켜면 동료가 스스로 움직입니다. 운은 없으며, 모두가 같은 오늘의 동료로 겨룹니다. 가진 동료와는 상관없습니다.']}
+  guide:['상점에 카드 4장이 무작위로 나옵니다. 카드를 누르면 코인 '+BOARD_PRICE+'개로 그 동료를 영입하고, "새 카드"를 누르면 코인 '+BOARD_REROLL+'개로 카드 4장을 새로 받습니다.','같은 동료를 두 장 모으면 2성으로 합체해 체력과 공격이 1.6배가 됩니다. 2성 둘은 3성(2.5배)이 됩니다. 상점에서 합체할 수 있는 카드에는 "합체" 표시가 붙습니다.','영입한 동료는 판의 아래 두 줄에 놓입니다. 판에 세울 수 있는 수는 단계마다 정해져 있습니다(3 · 4 · 5마리). 내 동료를 누른 뒤 칸을 누르면 자리를 옮깁니다.','전투는 턴제입니다. 내 차례에 동료를 누르면 갈 수 있는 칸이 파랗게, 공격할 수 있는 적이 붉게 표시됩니다. 동료마다 한 턴에 이동 한 번, 행동 한 번이고, '+BOARD_TURNS+'턴 안에 적을 모두 쓰러뜨리면 승리합니다.','방패·돌격은 붙어 있는 적을, 저격은 4칸 안의 적을 공격합니다. 관통은 직선 3칸의 적 전부를, 폭발은 고른 적과 그 옆의 적을 함께 공격합니다. 치유는 3칸 안의 아군을 회복합니다.','별빛 칸에 서서 행동하면 공격과 회복이 1.5배가 됩니다. 자동을 켜면 동료가 스스로 움직입니다.','"처음부터"를 누르면 새 카드로 다시 시작합니다. 코인과 카드는 이 놀이 안에서만 쓰이며, 내가 가진 동료나 다이아와는 상관없습니다.']}
 };
 function miniStageOpen(){return Object.hasOwn(MINI_STAGES,miniView)}
 function miniStageHTML(){
@@ -5987,7 +6064,7 @@ function minigameHub(){
  };
  return `<div class="masterwork-intro"><h2>미니게임</h2><p>하루에 정해진 횟수만 즐기는 짧은 놀이입니다. 전투력과 상관없이 같은 조건으로 진행합니다.</p></div>`+
   card('furnace','용광로 제련','성운석을 넣어 순도를 올리고, 과열되기 전에 꺼내세요.','오늘 남은 제련 '+(FURNACE.runs-furnace.runs+(furnace.run?1:0))+' / '+FURNACE.runs,furnace.run?'이어 하기':'입장')+
-  card('petBoard','동료 배치전','오늘의 동료를 판에 배치하고, 턴마다 움직여 적을 물리칩니다.','오늘 클리어 '+board.cleared.length+' / '+BOARD_STAGES.length,'입장');
+  card('petBoard','동료 배치전','무작위로 나오는 카드에서 동료를 영입해 판에 세우고, 턴마다 움직여 적을 물리칩니다.','오늘 클리어 '+board.cleared.length+' / '+BOARD_STAGES.length,'입장');
 }
 function furnaceScreen(){
  const book=minigamePeek('furnace'),run=book.run,left=FURNACE.runs-book.runs;
@@ -6047,58 +6124,93 @@ function furnaceAct(op){
 // and hands the record to the server when the last enemy falls.
 function boardSync(){
  const day=today();
- if(boardDraft.day!==day){stopBoardBattle();Object.assign(boardDraft,{day,n:0,place:[],pick:-1,note:'',banner:''})}
+ if(boardDraft.day!==day){stopBoardBattle();Object.assign(boardDraft,{day,n:0,draft:null})}
+ if(boardDraft.n<0)boardDraft.n=0;
  const stage=boardStage(day,boardDraft.n);
- if(boardDraft.place.length!==stage.loans.length)boardDraft.place=stage.loans.map(()=>-1);
+ if(!boardDraft.draft)newBoardDraft(stage);
  return stage;
 }
-function boardPlaceCode(){return boardDraft.place.map(cell=>cell<0?'-':boardCell(cell)).join('')}
+// A fresh attempt: its own number decides which cards the shop will deal.
+function newBoardDraft(stage){
+ Object.assign(boardDraft,{draft:boardDraftOpen(stage,Math.floor(Math.random()*46656).toString(36)),place:new Map(),pick:-1,note:''});
+}
+function boardPlaces(){return boardDraft.draft.units.map(unit=>boardDraft.place.has(unit.id)?boardDraft.place.get(unit.id):-1)}
+function boardPlaceCode(){return boardPlaces().map(cell=>cell<0?'-':boardCell(cell)).join('')}
 function stopBoardBattle(){if(boardDraft.battle)clearTimeout(boardDraft.battle.timer);boardDraft.battle=null;boardDraft.banner=''}
-function selectBoardStage(n){if(!BOARD_STAGES[n]||boardDraft.battle)return;Object.assign(boardDraft,{n,place:[],pick:-1,note:''});miniRefresh()}
+function selectBoardStage(n){if(!BOARD_STAGES[n]||boardDraft.battle)return;Object.assign(boardDraft,{n,draft:null});miniRefresh()}
+function resetBoardDraft(){if(boardDraft.battle)return;boardDraft.draft=null;miniRefresh()}
+// The first free tile for a new recruit: front-liners on the upper of the two rows, the others behind.
+function boardFreeCell(pet){
+ const taken=new Set(boardDraft.place.values()),rows=boardFront(pet)?[BOARD_H-2,BOARD_H-1]:[BOARD_H-1,BOARD_H-2];
+ for(const row of rows)for(const column of [2,1,3,0,4])if(!taken.has(row*BOARD_W+column))return row*BOARD_W+column;
+ return -1;
+}
+function buyBoardCard(slot){
+ const stage=boardSync(),draft=boardDraft.draft;
+ if(boardDraft.battle)return false;
+ let bought;
+ try{bought=boardDraftStep(stage,draft,String(slot))}catch(error){notice(error.message);return false}
+ const unit=bought.unit,place=boardDraft.place;
+ // A joined companion stays where either half stood; a new one steps onto the board while there is room.
+ for(const id of bought.gone){
+  if(place.has(id)&&!place.has(unit.id))place.set(unit.id,place.get(id));
+  place.delete(id);
+  if(boardDraft.pick===id)boardDraft.pick=-1;
+ }
+ if(!place.has(unit.id)&&place.size<stage.limit){const cell=boardFreeCell(unit.pet);if(cell>=0)place.set(unit.id,cell)}
+ boardDraft.note=bought.gone.length?COMPANIONS[unit.pet][0]+' '+unit.star+'성으로 합체!':'';
+ playSound(bought.gone.length?'reward':'forge');miniRefresh();return true;
+}
+function rerollBoardShop(){
+ const stage=boardSync();
+ if(boardDraft.battle)return false;
+ try{boardDraftStep(stage,boardDraft.draft,'r')}catch(error){notice(error.message);return false}
+ boardDraft.note='';miniRefresh();return true;
+}
 function boardPace(){return s.speed===2?240:400}
 function boardUnitNote(unit){
  const role=BOARD_ROLES[unit.role],name=unit.side==='ally'?COMPANIONS[unit.pet][0]:BOARD_FOES[unit.kind].name;
  return name+' · 체력 '+unit.hp+' · '+(role.shape==='heal'?'회복 ':'공격 ')+unit.atk+' · 이동 '+role.move+' · '+role.tip;
 }
 // Bench and roster buttons: before the battle they pick a companion to place, during it they select the piece.
-function pickBoardUnit(slot){
+function pickBoardUnit(key){
  const b=boardDraft.battle;
- if(!b){boardDraft.pick=boardDraft.pick===slot?-1:slot;boardDraft.note='';miniRefresh();return}
- const unit=boardAlly(b.state,slot);
+ if(!b){boardDraft.pick=boardDraft.pick===key?-1:key;boardDraft.note='';miniRefresh();return}
+ const unit=boardAlly(b.state,key);
  if(unit&&unit.hp>0)tapBoardCell(unit.cell);
 }
 function tapBoardCell(cell){
  const stage=boardSync();
  if(boardDraft.battle){boardBattleTap(boardDraft.battle,cell);return}
- const place=boardDraft.place,here=place.indexOf(cell),foe=stage.foes.find(unit=>unit.cell===cell);
+ const place=boardDraft.place,units=boardDraft.draft.units,here=units.find(unit=>place.get(unit.id)===cell),foe=stage.foes.find(unit=>unit.cell===cell);
  if(foe){boardDraft.note=boardUnitNote({side:'foe',kind:foe.kind,role:BOARD_FOES[foe.kind].act,hp:foe.hp,atk:foe.atk});miniRefresh();return}
  if(boardRow(cell)<BOARD_H-2){notice(stage.stars.includes(cell)?'별빛 칸 · 이 칸에 서면 공격과 회복이 1.5배가 됩니다':'동료는 아래 두 줄에만 놓을 수 있습니다');return}
- if(boardDraft.pick<0){
-  if(here<0){notice('아래에서 동료를 먼저 고르세요');return}
-  boardDraft.pick=here;miniRefresh();return;
+ const pick=boardDraft.pick;
+ if(pick<0){
+  if(!here){notice(units.length?'아래 내 동료에서 놓을 동료를 고르세요':'먼저 상점에서 카드를 영입하세요');return}
+  boardDraft.pick=here.id;miniRefresh();return;
  }
  // Tapping the picked companion's own tile takes it off the board; another companion's tile swaps the two.
- if(here===boardDraft.pick)place[here]=-1;
- else{if(here>=0)place[here]=place[boardDraft.pick];place[boardDraft.pick]=cell}
+ if(here?.id===pick)place.delete(pick);
+ else{
+  if(!here&&!place.has(pick)&&place.size>=stage.limit){notice('판에는 '+stage.limit+'마리까지 세울 수 있습니다');return}
+  if(here){if(place.has(pick))place.set(here.id,place.get(pick));else place.delete(here.id)}
+  place.set(pick,cell);
+ }
  boardDraft.pick=-1;boardDraft.note='';miniRefresh();
 }
-function clearBoard(){if(boardDraft.battle)return;boardDraft.place=boardDraft.place.map(()=>-1);boardDraft.pick=-1;miniRefresh()}
-// Front-liners on the upper of the two rows, the others behind them, from the middle outward.
 function autoBoardPlace(){
  const stage=boardSync();
  if(boardDraft.battle)return;
- const columns=[2,1,3,0,4],used=[0,0];
- boardDraft.place=stage.loans.map(pet=>{
-  const back=['guard','striker'].includes(BOARD_PET_ROLES[pet])?0:1;
-  return (BOARD_H-2+back)*BOARD_W+columns[used[back]++];
- });
+ const units=boardDraft.draft.units,cells=boardAutoPlace(stage,units);
+ boardDraft.place=new Map(units.map((unit,i)=>[unit.id,cells[i]]).filter(([id,cell])=>cell>=0));
  boardDraft.pick=-1;boardDraft.note='';miniRefresh();
 }
 function startBoardBattle(){
- const stage=boardSync();
+ const stage=boardSync(),draft=boardDraft.draft;
  if(boardDraft.battle)return false;
- if(!boardDraft.place.some(cell=>cell>=0)){notice('동료를 한 마리 이상 배치하세요');return false}
- boardDraft.battle={stage,state:boardOpen(stage,boardDraft.place),code:boardPlaceCode(),turns:[],current:'',sel:-1,moved:false,
+ if(!boardDraft.place.size){notice(draft.units.length?'동료를 한 마리 이상 판에 세우세요':'먼저 상점에서 카드를 영입하세요');return false}
+ boardDraft.battle={stage,state:boardOpen(stage,draft.units,boardPlaces()),code:draft.salt+'/'+draft.text+'/'+boardPlaceCode(),turns:[],current:'',sel:-1,moved:false,
   phase:'ally',busy:false,auto:false,fx:null,timer:0};
  Object.assign(boardDraft,{pick:-1,note:'',banner:''});miniRefresh();return true;
 }
@@ -6230,9 +6342,11 @@ function claimBoardWin(day,n,id){
  catch(error){notice(error.message);return paid(null)}
 }
 function boardRoleMark(role){return minigameArt(BOARD_ART,'role-'+role,'role-icon',18,18)}
+// Two and three stars are shown as small gold stars before the role name.
+function boardRank(star){return star>1?'<i class="board-rank" aria-label="'+star+'성">'+'★'.repeat(star)+'</i>':''}
 // The board is two layers: thirty tiles that take the taps, and the pieces standing on them.
 function boardMap(stage){
- const b=boardDraft.battle,state=b?b.state:boardOpen(stage,boardDraft.place);
+ const b=boardDraft.battle,units=boardDraft.draft.units,state=b?b.state:boardOpen(stage,units,boardPlaces());
  const fx=b?.fx&&Date.now()-b.fx.at<520?b.fx:null;
  const picked=b&&b.sel>=0?boardAlly(state,b.sel):null;
  const reach=picked&&!b.moved?boardReach(state,picked):null,aims=picked?boardAims(state,picked):[];
@@ -6251,45 +6365,54 @@ function boardMap(stage){
  const pieces=state.units.filter(unit=>unit.hp>0).map(unit=>{
   const row=boardRow(unit.cell),col=boardCol(unit.cell);
   let cls='board-piece '+unit.side,style=place(unit.cell)+';z-index:'+(row+1);
-  if(picked===unit||!b&&unit.side==='ally'&&boardDraft.pick===unit.slot)cls+=' picked';
+  if(picked===unit||!b&&unit.side==='ally'&&boardDraft.pick===units[unit.slot].id)cls+=' picked';
+  if(unit.star>1)cls+=' rank-'+unit.star;
   if(b&&unit.side==='ally'&&unit.done&&!state.over)cls+=' done';
   if(fx?.walk?.unit===unit){cls+=' walk';style+=`;--dx:${boardCol(fx.walk.from)-col};--dy:${boardRow(fx.walk.from)-row}`}
   if(fx?.lunge?.unit===unit){cls+=' lunge';style+=`;--dx:${Math.sign(boardCol(fx.lunge.to)-col)};--dy:${Math.sign(boardRow(fx.lunge.to)-row)}`}
   const sprite=unit.side==='ally'?'companion-'+unit.pet:BOARD_FOES[unit.kind].art;
-  return `<div class="${cls}" style="${style}"><div class="board-figure"><span class="board-hp"><i style="width:${Math.max(0,unit.hp/unit.max*100)}%"></i></span><img src="./assets/actor-poses/${sprite}.webp" width="256" height="256" alt="" decoding="async"><em>${boardRoleMark(unit.role)}${BOARD_ROLES[unit.role].name} <b>${unit.hp}</b></em></div></div>`;
+  return `<div class="${cls}" style="${style}"><div class="board-figure"><span class="board-hp"><i style="width:${Math.max(0,unit.hp/unit.max*100)}%"></i></span><img src="./assets/actor-poses/${sprite}.webp" width="256" height="256" alt="" decoding="async"><em>${boardRank(unit.star)}${boardRoleMark(unit.role)}${BOARD_ROLES[unit.role].name} <b>${unit.hp}</b></em></div></div>`;
  }).join('');
  const hits=(fx?.hits||[]).map(hit=>`<i class="board-fx ${fx.heal?'heal':'hit'}" style="${place(hit.cell)}">${minigameArt(BOARD_ART,fx.heal?'fx-heal':'fx-hit','',256,256)}</i><b class="board-dmg${fx.heal?' heal':''}" style="${place(hit.cell)}">${hit.change>0?'+':''}${hit.change}</b>`).join('');
  return `<div class="board-map${b?' battle':''}${BOARD_ART?' painted':''}"><div class="board-tiles">${tiles.join('')}</div><div class="board-pieces" aria-hidden="true">${pieces}${hits}</div></div>`;
 }
 function boardScreen(){
  const stage=boardSync(),b=boardDraft.battle,book=minigamePeek('petBoard'),done=book.cleared.includes(stage.n);
- const placed=boardDraft.place.filter(cell=>cell>=0).length;
+ const draft=boardDraft.draft,placed=boardDraft.place.size;
  const tabs=BOARD_STAGES.map((spec,n)=>`<button class="${stage.n===n?'active':''}" aria-pressed="${stage.n===n}" onclick="selectBoardStage(${n})" ${b?'disabled':''}>${n+1}단계${book.cleared.includes(n)?' <ui-mark data-shape=check aria-hidden=true></ui-mark>':''}</button>`).join('');
  const banner=boardDraft.banner?`<div class="board-banner ${boardDraft.banner}" role="status">${minigameArt(BOARD_ART,'banner-'+boardDraft.banner,'',768,256)}<b>${boardDraft.banner==='win'?'승리':'패배'}</b></div>`:'';
  if(b){
   const state=b.state,picked=b.sel>=0?boardAlly(state,b.sel):null;
-  const roster=state.units.filter(unit=>unit.side==='ally').map(unit=>`<button class="board-unit in-battle${b.sel===unit.slot?' picked':''}${unit.hp<=0?' down':unit.done?' used':''}" onclick="pickBoardUnit(${unit.slot})" ${unit.hp<=0?'disabled':''} aria-pressed="${b.sel===unit.slot}" aria-label="${COMPANIONS[unit.pet][0]}, ${BOARD_ROLES[unit.role].name}, 체력 ${unit.hp}">${petArt(unit.pet,'board-pet')}<b>${boardRoleMark(unit.role)}${BOARD_ROLES[unit.role].name}</b><span class="board-hp"><i style="width:${Math.max(0,unit.hp/unit.max*100)}%"></i></span><small>${unit.hp} / ${unit.max}</small></button>`).join('');
+  const roster=state.units.filter(unit=>unit.side==='ally').map(unit=>`<button class="board-unit in-battle${b.sel===unit.slot?' picked':''}${unit.hp<=0?' down':unit.done?' used':''}" onclick="pickBoardUnit(${unit.slot})" ${unit.hp<=0?'disabled':''} aria-pressed="${b.sel===unit.slot}" aria-label="${COMPANIONS[unit.pet][0]}, ${BOARD_ROLES[unit.role].name}, 체력 ${unit.hp}">${petArt(unit.pet,'board-pet')}<b>${boardRank(unit.star)}${boardRoleMark(unit.role)}${BOARD_ROLES[unit.role].name}</b><span class="board-hp"><i style="width:${Math.max(0,unit.hp/unit.max*100)}%"></i></span><small>${unit.hp} / ${unit.max}</small></button>`).join('');
   const tip=state.over?'전투가 끝났습니다.':b.phase==='foe'?'적이 움직이는 중입니다.':b.auto?'자동으로 진행하는 중입니다.':
    picked?b.moved?'붉은 칸의 대상을 눌러 공격하거나, 동료를 다시 눌러 대기합니다.':BOARD_ROLES[picked.role].name+' · 파란 칸으로 이동, 붉은 칸을 눌러 공격 · '+BOARD_ROLES[picked.role].tip:
    boardDraft.note||'움직일 동료를 누르세요. 동료마다 한 턴에 이동 한 번, 행동 한 번입니다.';
   return `<section class="board-panel"><div class="board-turn"><b>${Math.min(state.turn,BOARD_TURNS)} / ${BOARD_TURNS}턴</b><span class="${b.phase}">${b.phase==='foe'?'적 차례':'내 차례'}</span><small>남은 적 ${state.units.filter(unit=>unit.side==='foe'&&unit.hp>0).length}</small></div>
   <div class="board-field">${banner}${boardMap(stage)}</div>
   <p class="board-tip" aria-live="polite">${tip}</p>
-  <div class="board-bench" style="--n:${stage.loans.length}">${roster}</div>
+  <div class="board-bench" style="--n:${Math.max(3,state.units.filter(unit=>unit.side==='ally').length)}">${roster}</div>
   <div class="action-row board-actions">${button(b.auto?'자동 끄기':'자동','toggleBoardAuto()',!!state.over,true)}${button('나가기','leaveBoardBattle()',false,true)}${button('턴 종료','endBoardTurn()',b.busy||b.auto||!!state.over)}</div></section>`;
  }
- const bench=stage.loans.map((pet,slot)=>{
-  const role=BOARD_ROLES[BOARD_PET_ROLES[pet]],used=boardDraft.place[slot]>=0;
-  return `<button class="board-unit${boardDraft.pick===slot?' picked':''}${used?' used':''}" onclick="pickBoardUnit(${slot})" aria-pressed="${boardDraft.pick===slot}" aria-label="${COMPANIONS[pet][0]}, ${role.name}, ${role.tip}">${petArt(pet,'board-pet')}<b>${boardRoleMark(BOARD_PET_ROLES[pet])}${role.name}</b><small>체력 ${role.hp} · 이동 ${role.move}</small><small>${role.shape==='heal'?'회복':'공격'} ${role.atk} · 거리 ${role.reach}</small></button>`;
+ // The shop: four cards. A card that would join with a companion already recruited is marked.
+ const shop=draft.shop.map((pet,slot)=>{
+  if(pet<0)return '<span class="board-card sold">영입함</span>';
+  const role=BOARD_ROLES[BOARD_PET_ROLES[pet]],twin=draft.units.some(unit=>unit.pet===pet&&unit.star<BOARD_RANKS.length);
+  return `<button class="board-card${twin?' twin':''}" onclick="buyBoardCard(${slot})" ${draft.coins<BOARD_PRICE?'disabled':''} aria-label="${COMPANIONS[pet][0]}, ${role.name}, ${role.tip}, 코인 ${BOARD_PRICE}${twin?', 합체 가능':''}">${twin?'<i class="board-twin">합체</i>':''}${petArt(pet,'board-pet')}<b>${boardRoleMark(BOARD_PET_ROLES[pet])}${role.name}</b><small>${COMPANIONS[pet][0]}</small><em>코인 ${BOARD_PRICE}</em></button>`;
  }).join('');
- const picked=boardDraft.pick>=0?BOARD_ROLES[BOARD_PET_ROLES[stage.loans[boardDraft.pick]]]:null;
+ const bench=draft.units.map(unit=>{
+  const role=BOARD_ROLES[BOARD_PET_ROLES[unit.pet]],used=boardDraft.place.has(unit.id);
+  return `<button class="board-unit small${boardDraft.pick===unit.id?' picked':''}${used?' used':''}" onclick="pickBoardUnit(${unit.id})" aria-pressed="${boardDraft.pick===unit.id}" aria-label="${COMPANIONS[unit.pet][0]}, ${unit.star}성 ${role.name}, ${used?'판에 있음':'대기 중'}">${petArt(unit.pet,'board-pet')}<b>${boardRank(unit.star)}${role.name}</b><small>${used?'판 위':'대기'}</small></button>`;
+ }).join('');
+ const chosen=draft.units.find(unit=>unit.id===boardDraft.pick),picked=chosen?BOARD_ROLES[BOARD_PET_ROLES[chosen.pet]]:null,rank=chosen?BOARD_RANKS[chosen.star-1]:1;
+ const tip=picked?picked.name+' · 체력 '+Math.round(picked.hp*rank)+' · '+(picked.shape==='heal'?'회복 ':'공격 ')+Math.round(picked.atk*rank)+' · 이동 '+picked.move+' · '+picked.tip:
+  boardDraft.note||(draft.units.length?'내 동료를 누른 뒤 아래 두 줄의 칸을 누르면 자리를 옮깁니다. 적을 누르면 정보를 봅니다.':'상점의 카드를 눌러 동료를 영입하세요. 같은 동료 두 장은 2성으로 합체합니다.');
  return `<section class="board-panel"><div class="tabs board-stages">${tabs}</div>
- <p class="board-reward">${done?'오늘 받은 보상':'이 단계의 보상'} · <b>${passRewardText(stage.rewards)}</b></p>
  <div class="board-field">${banner}${boardMap(stage)}</div>
- <p class="board-tip" aria-live="polite">${picked?picked.name+' · 이동 '+picked.move+' · '+picked.tip:boardDraft.note||'동료를 고른 뒤 아래 두 줄의 칸을 눌러 배치합니다. 적을 누르면 정보를 봅니다.'}</p>
- <div class="board-bench" style="--n:${stage.loans.length}">${bench}</div>
- <div class="action-row board-actions">${button('자동 배치','autoBoardPlace()',false,true)}${button('전체 해제','clearBoard()',!placed,true)}${button((done?'연습 시작':'전투 시작')+' · '+placed+' / '+stage.loans.length,'startBoardBattle()',!placed)}</div>
- <p class="small masterwork-rules">모두가 같은 오늘의 동료로 겨룹니다. 내가 가진 동료나 레벨은 영향을 주지 않습니다.</p></section>`;
+ <p class="board-tip" aria-live="polite">${tip}</p>
+ <div class="board-shop-head"><b class="board-coins">코인 ${draft.coins}</b><small>${done?'받은 보상':'보상'} · ${passRewardText(stage.rewards)}</small>${button('새 카드 · 코인 '+BOARD_REROLL,'rerollBoardShop()',draft.coins<BOARD_REROLL,true)}</div>
+ <div class="board-shop">${shop}</div>
+ <div class="board-bench owned" aria-label="내 동료">${bench||'<p class="board-empty">영입한 동료가 여기에 모입니다. 판에는 '+stage.limit+'마리까지 세웁니다.</p>'}</div>
+ <div class="action-row board-actions">${button('처음부터','resetBoardDraft()',false,true)}${button('자동 배치','autoBoardPlace()',!draft.units.length,true)}${button((done?'연습 시작':'전투 시작')+' · '+placed+' / '+stage.limit,'startBoardBattle()',!placed)}</div></section>`;
 }
 SCREEN_TABS.dungeon.push(['minigames','미니게임']);
 const dungeonScreenBeforeMinigames=dungeonScreen;

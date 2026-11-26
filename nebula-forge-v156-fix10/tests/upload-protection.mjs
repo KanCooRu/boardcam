@@ -83,7 +83,7 @@ try{
  assert.ok(piece.body.result.furnace.rolled>=16&&piece.body.result.furnace.rolled<=26,'rolled '+piece.body.result.furnace.rolled);
  const cooled=stored('honest');cooled.economyClaims.furnace.run.heat=0;
  await expectStatus(409,post('honest',revision('honest'),cooled));
- const lost=await command('honest','/api/reward/claim',{source:'petBoard',id:stored('honest').day+'/0/k--/'});
+ const lost=await command('honest','/api/reward/claim',{source:'petBoard',id:stored('honest').day+'/0/a/0/k/'});
  assert.equal(lost.status,422);
  await expectStatus(409,post('honest',revision('honest'),{...stored('honest'),gems:stored('honest').gems+1}));
  console.log('PASS tickets, coins and materials stop at their allowance, refill with time, and ordinary play, dismantling and spent entries pass unchanged');

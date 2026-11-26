@@ -97,7 +97,7 @@ function parseCommand(kind,input,headers){
    body={weekKey:input.weekKey};break;
   case 'claim':
    if(['trialEnter','trialFinish','trialForfeit'].includes(input.source))return null;
-   if(!stringId(input.source,64)||!(stringId(input.id,200)||Number.isSafeInteger(input.id)&&input.id>=0))return null;
+   if(!stringId(input.source,64)||!(stringId(input.id,400)||Number.isSafeInteger(input.id)&&input.id>=0))return null;
    body={source:input.source,id:input.id};break;
   default:return null;
  }
