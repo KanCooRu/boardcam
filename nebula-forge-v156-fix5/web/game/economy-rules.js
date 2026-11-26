@@ -334,7 +334,7 @@ function economyClaimRule(state,input,random,now){
  const {source,id}=input,ledger=initializeEconomyClaims(state);
  const number=Number(id),numeric=Number.isSafeInteger(number)&&number>=0&&String(number)===String(id);
  const rewards={};
- let count=0;
+ let count=0,extra={};
  function add(items){
   for(const [key,n] of Object.entries(items||{}))if(Number.isSafeInteger(n)&&n>0)rewards[key]=(rewards[key]||0)+n;
  }
@@ -446,6 +446,9 @@ function economyClaimRule(state,input,random,now){
    requireEarned(ledger.paid[source+'/'+id]||trialPeakFloors(state)>=number);
    once(false);add(row[1]);break;
   }
+  // Minigames: the furnace is rolled here, and a board formation is replayed here before it pays.
+  case 'furnace':{const out=furnaceRule(state,String(id),random,day);add(out.rewards);extra={furnace:out.furnace};count=1;break}
+  case 'petBoard':{const out=boardRule(state,id,day);add(out.rewards);extra={board:out.board};count=1;break}
   case 'nightmare':{
    requireRow(numeric&&number>0);const tour=state.nightmareTour;
    if(!tour||!state.campaignCompleted||tour.step!==10||number!==Math.max(ledger.nightmare,tour.rounds)+1)rejectEconomyClaim();
@@ -524,5 +527,5 @@ function economyClaimRule(state,input,random,now){
   else if(key==='tickets'){for(const {resource} of Object.values(ENTRY_PASSES))state[resource]=(state[resource]||0)+n}
   else state[key]=(state[key]||0)+n;
  }
- return {source,id,rewards,count};
+ return {source,id,rewards,count,...extra};
 }

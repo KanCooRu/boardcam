@@ -76,6 +76,15 @@ try{
   const paid=await upload('honest',s=>{s.constellation=200});
   assert.ok(paid.saved.constellation<=Math.floor(reach.starIron/60)+40,'constellation '+paid.saved.constellation);
  }
+ // Minigame records sit in the server's ledger: it rolls the furnace itself, and a device cannot cool it by editing the record.
+ const lit=await expectStatus(200,command('honest','/api/reward/claim',{source:'furnace',id:'start'}));
+ assert.equal(lit.body.result.furnace.runs,1);
+ const piece=await expectStatus(200,command('honest','/api/reward/claim',{source:'furnace',id:'large'}));
+ assert.ok(piece.body.result.furnace.rolled>=16&&piece.body.result.furnace.rolled<=26,'rolled '+piece.body.result.furnace.rolled);
+ const cooled=stored('honest');cooled.economyClaims.furnace.run.heat=0;
+ await expectStatus(409,post('honest',revision('honest'),cooled));
+ const lost=await command('honest','/api/reward/claim',{source:'petBoard',id:stored('honest').day+'/0/-.-.-.-.-.-.-.-.-'});
+ assert.equal(lost.status,422);
  await expectStatus(409,post('honest',revision('honest'),{...stored('honest'),gems:stored('honest').gems+1}));
  console.log('PASS tickets, coins and materials stop at their allowance, refill with time, and ordinary play, dismantling and spent entries pass unchanged');
 

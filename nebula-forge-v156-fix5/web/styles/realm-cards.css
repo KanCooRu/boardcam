@@ -189,3 +189,49 @@
 .trial-floor-row > b { color: #ffdeb0; font-size: 14px; }
 .trial-floor-row > span { font-size: 13px; line-height: 1.4; }
 .trial-floor-row > button { min-height: 44px; min-width: 68px; font-size: 13px; }
+
+/* Minigames: hub cards, the furnace gauge and the formation board. */
+.mini-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;margin:0 0 10px;padding:14px;border:1px solid #6d5a86;border-radius:14px;background:#1b1726}
+.mini-card h3{margin:0 0 4px;color:#f4dba5;font-size:17px}.mini-card p{margin:0 0 6px;font-size:13px;line-height:1.45}.mini-card small{color:#cdbfe0;font-size:12px}
+.mini-card>button{min-width:84px;min-height:44px}
+.mini-card.locked{border-color:#55505f;background:#201d28;filter:grayscale(1);opacity:.85}
+.mini-back{min-height:44px;margin:0 0 10px;padding:0 14px}
+.furnace-panel,.board-panel{display:grid;gap:10px;padding:14px;border:1px solid #6d5a86;border-radius:14px;background:#1b1726}
+.furnace-panel h3,.board-panel h3{margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:#f4dba5;font-size:18px}
+.furnace-panel h3 small,.board-panel h3 small{color:#cdbfe0;font-size:12px;font-weight:600}
+.furnace-gauge{position:relative;height:34px;border:1px solid #6d5a86;border-radius:17px;overflow:hidden;background:linear-gradient(90deg,#171520 0 65%,#3a2a12 65% 85%,#4a1818 85% 100%)}
+.furnace-gauge i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#7a5fd0,#f1c986);transition:width .25s ease}
+.furnace-gauge.warm i{background:linear-gradient(90deg,#c98a3a,#ffb45a)}.furnace-gauge.danger i{background:linear-gradient(90deg,#d6452f,#ff8a5a)}
+.furnace-gauge b{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:15px;text-shadow:0 1px 2px #000}
+.furnace-note{min-height:20px;margin:0;color:#ffdeb0;font-size:13px;text-align:center}
+.furnace-pieces{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.furnace-piece{display:grid;gap:2px;justify-items:center;min-height:76px;padding:8px;border:1px solid #d1b47a;border-radius:12px;background:#2a2140;color:#f8eddb}
+.furnace-piece b{font-size:15px;color:#f4dba5}.furnace-piece small{font-size:12px;color:#cdbfe0}
+.furnace-piece:disabled{opacity:.5}
+.board-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.board-stages button{min-height:44px;font-size:13px}
+.board-field{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px}
+.board-side{display:block;margin:0 0 4px;color:#cdbfe0;font-size:12px;text-align:center}
+.board-versus{color:#f4dba5;font-size:13px}
+.board-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.board-cell{position:relative;aspect-ratio:1/1.32;min-width:0;padding:2px;display:grid;justify-items:center;align-content:center;gap:1px;border:1px solid #4a3f5c;border-radius:9px;background:#171520;color:#8f87a0;font-size:12px;overflow:hidden}
+button.board-cell{cursor:pointer}
+.board-cell.empty.front{border-style:dashed;border-color:#d1b47a88}
+.board-cell.ally{border-color:#8f7fb8;background:#241c3d}.board-cell.foe{border-color:#8a4a4a;background:#2a1a1e}
+.board-cell .board-pet,.board-cell .board-foe{width:60%;height:auto;aspect-ratio:1;object-fit:contain}
+.board-cell em{font-style:normal;font-size:12px;line-height:1;color:#f4dba5}
+.board-cell small{font-size:12px;line-height:1;color:#f8eddb}
+.board-hp{display:block;width:82%;height:4px;border-radius:2px;background:#0c0a18;overflow:hidden}.board-hp i{display:block;height:100%;background:#7fd08a}
+.board-cell.foe .board-hp i{background:#e0705f}
+.board-cell.acting{box-shadow:0 0 0 2px #ffe2a6 inset}.board-cell.hit{background:#5a1f1f}.board-cell.healed{background:#1f4a2c}
+.board-cell.down{opacity:.3;filter:grayscale(1)}
+.board-tip{min-height:36px;margin:0;color:#ffdeb0;font-size:13px;line-height:1.4;text-align:center}
+.board-bench{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.board-unit{display:grid;justify-items:center;gap:1px;min-height:88px;padding:5px 2px;border:1px solid #6d5a86;border-radius:10px;background:#231b3a;color:#f8eddb}
+.board-unit .board-pet{width:40px;height:40px;object-fit:contain}
+.board-unit b{font-size:13px;color:#f4dba5}.board-unit small{font-size:12px;line-height:1.15;color:#cdbfe0;text-align:center}
+.board-unit.picked{border-color:#ffe2a6;box-shadow:0 0 0 2px #ffe2a6 inset}.board-unit.used{opacity:.45}
+@media(max-width:359px){.board-bench{grid-template-columns:repeat(3,minmax(0,1fr))}.board-cell em{display:none}}
+.mini-card.painted{grid-template-columns:64px minmax(0,1fr) auto}
+.mini-thumb{width:64px;height:64px;object-fit:contain;border-radius:10px}
+.furnace-art{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:cover;border-radius:10px}
+.role-icon{width:18px;height:18px;margin-right:3px;vertical-align:-3px;object-fit:contain}
