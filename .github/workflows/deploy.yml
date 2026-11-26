@@ -1,0 +1,31 @@
+# Deploys the game server when the main branch changes under server/ or the game overlay.
+# Needs two repository secrets:
+#   DEPLOY_SSH_KEY   a private key whose public half is in /home/app/.ssh/authorized_keys on every server
+#   DEPLOY_SERVERS   server addresses separated by spaces, the one to update first coming first
+name: Deploy game server
+on:
+  push:
+    branches: [main]
+    paths: ["server/**", "nebula-forge-*/**", ".github/workflows/deploy.yml"]
+  workflow_dispatch: {}
+concurrency: { group: deploy, cancel-in-progress: false }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check that the host installs and parses
+        run: |
+          cd server/host && npm ci --no-audit --no-fund && cd ..
+          node --check host/main.mjs
+      - name: Set up SSH
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+      - name: Rolling deploy
+        env:
+          SERVERS: ${{ secrets.DEPLOY_SERVERS }}
+          BRANCH: main
+        run: bash server/scripts/deploy.sh
