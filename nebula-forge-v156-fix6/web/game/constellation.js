@@ -15,7 +15,7 @@ const CONSTELLATION_FIGURES=[
 // are in dist/client/assets/constellation/. Until then the map draws itself.
 const CONSTELLATION_ART=false;
 function constellationCore(f){return CONSTELLATION_ART?'<img src="./assets/constellation/node-'+f+'.webp" width="40" height="40" alt="">':'<ui-mark data-shape=spark aria-hidden=true></ui-mark>'}
-function constellationPadlock(){return CONSTELLATION_ART?'<img src="./assets/constellation/lock.webp" width="26" height="26" alt="">':'<ui-mark data-shape=lock aria-hidden=true></ui-mark>'}
+function constellationPadlock(){return lockMark()}
 const CONSTELLATION_STARS=CONSTELLATION_FIGURES.flatMap((figure,f)=>figure.stars.map(([name,x,y])=>({name,x,y,figure:f})));
 // Saves from the first release of this track stored the level as anvilAwakening.
 function constellationLevel(state=s){return Math.floor(bounded(Math.max(Number(state?.constellation)||0,Number(state?.anvilAwakening)||0),0,CONSTELLATION.max))}
@@ -113,7 +113,7 @@ function constellationMap(){
  }).join('');
  const plates=CONSTELLATION_FIGURES.map((figure,f)=>{
   const open=constellationFigureOpen(f,stars),have=constellationFigureCount(f,stars),all=figure.stars.length*cap;
-  return `<button class="star-plate${open?'':' locked'}${have===all?' complete':''}" style="left:${figure.plate[0]}%;top:${figure.plate[1]}%" onclick="tapConstellationFigure(${f})" aria-label="${figure.name}, ${open?have+' / '+all:'잠김'}">${open?'':'<ui-mark data-shape=lock aria-hidden=true></ui-mark>'}<b>${figure.name}</b><small>${have} / ${all}</small></button>`;
+  return `<button class="star-plate${open?'':' locked'}${have===all?' complete':''}" style="left:${figure.plate[0]}%;top:${figure.plate[1]}%" onclick="tapConstellationFigure(${f})" aria-label="${figure.name}, ${open?have+' / '+all:'잠김'}">${open?'':lockMark()}<b>${figure.name}</b><small>${have} / ${all}</small></button>`;
  }).join('');
  const nodes=CONSTELLATION_STARS.map((star,i)=>{
   const open=constellationFigureOpen(star.figure,stars),n=stars[i];

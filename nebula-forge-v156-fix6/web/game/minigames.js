@@ -205,7 +205,7 @@ function minigameHub(){
  const furnace=minigamePeek('furnace'),board=minigamePeek('petBoard');
  const card=(key,title,copy,status,label)=>{
   const open=minigameOpen(key);
-  return `<section class="mini-card${open?'':' locked'}${MINIGAME_ART?' painted':''}">${minigameArt(key==='furnace'?'hub-furnace':'hub-board','mini-thumb',64,64)}<div><h3>${open?'':'<ui-mark data-shape=lock aria-hidden=true></ui-mark> '}${title}</h3><p>${copy}</p><small>${open?status:minigameLockText(key)}</small></div>
+  return `<section class="mini-card${open?'':' locked'}${MINIGAME_ART?' painted':''}">${minigameArt(key==='furnace'?'hub-furnace':'hub-board','mini-thumb',64,64)}<div><h3>${open?'':lockMark()+' '}${title}</h3><p>${copy}</p><small>${open?status:minigameLockText(key)}</small></div>
   <button class="${open?'gold-button':'muted-button'}" onclick="openMinigame('${key}')">${open?label:'잠김'}</button></section>`;
  };
  return `<div class="masterwork-intro"><h2>미니게임</h2><p>하루에 정해진 횟수만 즐기는 짧은 놀이입니다. 전투력과 상관없이 같은 조건으로 진행합니다.</p></div>`+
