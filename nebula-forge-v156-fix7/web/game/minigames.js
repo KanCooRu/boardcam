@@ -282,7 +282,7 @@ function furnaceScene(run,heat,zone){
  <div class="furnace-flame">${image('furnace-flame','',512)}</div>
  ${fx&&FURNACE.pieces[fx.kind]?`<div class="furnace-drop ${fx.kind}">${image('ore-'+fx.kind,'',192)}</div>`:''}
  ${fx?.kind==='cool'?`<div class="furnace-steam">${image('steam','',512)}</div>`:''}
- ${last?`<div class="furnace-result${last.burst?' burst':''} grade-${last.grade}">${image(last.burst?'burst':'ingot-'+last.grade,'',256)}<b>${last.burst?'과열':FURNACE_GRADES[3-last.grade][1]}</b><small>순도 ${last.purity}</small></div>`:''}
+ ${last?`<div class="furnace-result${last.burst?' burst':''}${fx&&Date.now()-fx.at<600?' fresh':''} grade-${last.grade}">${image(last.burst?'burst':'ingot-'+last.grade,'',256)}<b>${last.burst?'과열':FURNACE_GRADES[3-last.grade][1]}</b><small>순도 ${last.purity}</small></div>`:''}
  </div>`;
 }
 function furnaceShow(result){

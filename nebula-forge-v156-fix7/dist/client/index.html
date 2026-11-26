@@ -4673,7 +4673,7 @@ function exchangeHavenItem(id){return onlineAct('townExchange',{id})}
 function raidComingPopup(){return partyRaid.lobby()}
 EXTRA_POPUPS.havenShop=['성운의 상점',havenShopPopup];
 EXTRA_POPUPS.raidComing=['레이드',raidComingPopup];
-</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-28c4da45982068af.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
+</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-08ebda248f84012f.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
 
 const ADVENTURE_TERMS={
  '공격력':'평타와 공격 스킬의 피해를 계산할 때 사용하는 기본 수치입니다.',
@@ -5893,7 +5893,7 @@ function furnaceScene(run,heat,zone){
  <div class="furnace-flame">${image('furnace-flame','',512)}</div>
  ${fx&&FURNACE.pieces[fx.kind]?`<div class="furnace-drop ${fx.kind}">${image('ore-'+fx.kind,'',192)}</div>`:''}
  ${fx?.kind==='cool'?`<div class="furnace-steam">${image('steam','',512)}</div>`:''}
- ${last?`<div class="furnace-result${last.burst?' burst':''} grade-${last.grade}">${image(last.burst?'burst':'ingot-'+last.grade,'',256)}<b>${last.burst?'과열':FURNACE_GRADES[3-last.grade][1]}</b><small>순도 ${last.purity}</small></div>`:''}
+ ${last?`<div class="furnace-result${last.burst?' burst':''}${fx&&Date.now()-fx.at<600?' fresh':''} grade-${last.grade}">${image(last.burst?'burst':'ingot-'+last.grade,'',256)}<b>${last.burst?'과열':FURNACE_GRADES[3-last.grade][1]}</b><small>순도 ${last.purity}</small></div>`:''}
  </div>`;
 }
 function furnaceShow(result){
