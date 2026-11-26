@@ -61,7 +61,27 @@ check('constellation engraving opens after Normal 300, spends star iron and ston
  const saved=migrate(JSON.parse(JSON.stringify(s))),older=migrate({anvilAwakening:7});
  screenTab='constellation';
  return saved.constellation===2&&older.constellation===7&&!('anvilAwakening' in older)&&migrate({constellation:9999}).constellation===300&&
-  characterScreen().includes('밝힌 별 2')&&SCREEN_TABS.character.some(([key])=>key==='constellation')&&!SCREEN_TABS.forge.some(([key])=>key==='awakening');`);
+  characterScreen().includes('2 / 300')&&characterScreen().includes('star-map')&&SCREEN_TABS.character.some(([key])=>key==='constellation')&&!SCREEN_TABS.forge.some(([key])=>key==='awakening');`);
+check('the star map opens figures in order, greys locked stars with a padlock and explains the condition on a tap',`
+ const sum=list=>list.reduce((n,x)=>n+x,0);
+ screenTab='constellation';
+ if(!characterScreen().includes('star-map closed')||(characterScreen().match(/star-node figure-\\d locked/g)||[]).length!==15)return false;
+ if(tapConstellationStar(0)!==false||view!=='starLocked'||!tab.includes('클리어하면'))return false;
+ closeMenu();
+ s.campaignCleared=300;s.maxStage=301;s.starIron=1e9;s.stones=1e9;
+ if(constellationLockReason(0)!==''||!constellationLockReason(5).includes('여명의 기사 자리')||engraveStar(5,1))return false;
+ if(tapConstellationFigure(1)!==false||view!=='starLocked')return false;
+ closeMenu();
+ if(!engraveStar(3,20)||engraveStar(3,1)||constellationStars()[3]!==20)return false;
+ while(constellationLevel()<100)if(!engraveConstellation(10))return false;
+ const map=characterScreen();
+ if(constellationLockReason(5)!==''||!constellationLockReason(10).includes('쌍검 자리'))return false;
+ if((map.match(/star-node figure-0 full/g)||[]).length!==5||(map.match(/star-node figure-2 locked/g)||[]).length!==5||!map.includes('star-plate locked'))return false;
+ if(tapConstellationStar(7)!==true||view!=='starNode'||!starNodePopup().includes('1회 각인'))return false;
+ closeMenu();
+ if(!engraveStar(7,3)||constellationStars()[7]!==3||constellationLevel()!==103||sum(constellationStars())!==103)return false;
+ const old=migrate({constellation:137}).constellationStars,moved=migrate({constellation:5,constellationStars:[0,0,0,0,0,5]}).constellationStars;
+ return sum(old)===137&&old[5]===20&&old[6]===17&&old[7]===0&&moved[0]===5&&moved[5]===0&&sum(migrate({constellation:3,constellationStars:[20,20]}).constellationStars)===3;`);
 check('balance 9 keeps stages 1-100, and a version 8 save keeps its records while moving to a stage it can fight',`
  for(const stage of [1,10,50,100])if(campaignEnemyHp(stage)!==campaignEnemyHp(stage,NORMAL_HP_ANCHORS))return false;
  const old={classId:'warrior',stage:450,maxStage:450,campaignCleared:449,campaignVersion:2,campaignBalanceVersion:8,enemyHp:5,stageKills:4};

@@ -893,14 +893,59 @@ button.collection-cell>small{font-size:var(--min-label,13px);line-height:1.4}
 .monthly-selected .reward-chips,.monthly-totals .reward-chips{display:flex;flex-wrap:wrap;gap:8px}.monthly-selected .reward-chips>span,.monthly-totals .reward-chips>span{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:8px;background:#21192d}.monthly-selected .reward-chips .art,.monthly-totals .reward-chips .art{width:28px;height:28px;flex:0 0 28px}.monthly-selected .reward-chips b,.monthly-totals .reward-chips b{font-size:16px;color:#ffe4ac}.monthly-selected .reward-chips small,.monthly-totals .reward-chips small{font-size:13px;color:#eee2f3}
 .monthly-totals{margin-top:12px;border-top:1px solid #6d5779;padding-top:4px}.monthly-totals>summary{padding:12px 0;font-size:14px;font-weight:700;color:#f7dcac;cursor:pointer}
 
-.constellation-card .constellation-max{color:#bbaac5;font-size:14px;font-weight:600}
-.constellation-emblem{width:80px;height:80px;flex:0 0 80px;object-fit:contain}
-.constellation-meter{display:block;width:100%;margin:10px 0 12px}
-.constellation-costs{grid-template-columns:repeat(2,minmax(0,1fr))}
-.constellation-card .action-row{margin-top:12px}
-.constellation-card .action-row button{min-height:44px}
 /* Eight growth tabs sit in two even rows of four instead of leaving one tab alone on a row. */
 .ui-renewal #screenTabs:has(>button:nth-child(8)):not(:has(>button:nth-child(9)))>button{flex:1 0 22%}
+
+/* Constellation map. Stars and plates are placed by percentage on a 4:5 night sky. */
+.constellation-intro{margin-bottom:10px}
+.constellation-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.constellation-summary>div{display:grid;gap:2px;padding:8px 10px;border:1px solid #4a3f5c;border-radius:10px;background:#171520;text-align:center}
+.constellation-summary span{color:#bbaac5;font-size:12px}.constellation-summary b{color:#ffdeb0;font-size:17px}
+.star-map{position:relative;width:100%;aspect-ratio:4/5;margin:0 0 12px;border:1px solid #6d5a86;border-radius:16px;overflow:hidden;
+ background:radial-gradient(120% 80% at 50% 100%,#2c2356 0%,#17132c 55%,#0c0a18 100%)}
+.star-map::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+ background-image:radial-gradient(1.2px 1.2px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 81% 9%,#fff 50%,transparent 51%),radial-gradient(1.4px 1.4px at 64% 33%,#cfe 50%,transparent 51%),radial-gradient(1px 1px at 28% 61%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 91% 68%,#fdc 50%,transparent 51%),radial-gradient(1px 1px at 7% 79%,#fff 50%,transparent 51%),radial-gradient(1.3px 1.3px at 45% 12%,#fff 50%,transparent 51%)}
+.star-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.star-lines line{stroke:#8f7fb8;stroke-width:1.6;stroke-dasharray:3 3;vector-effect:non-scaling-stroke;opacity:.7}
+.star-lines line.lit{stroke:#ffe2a6;stroke-dasharray:none;opacity:1;filter:drop-shadow(0 0 3px #ffd98a)}
+.star-lines line.locked{stroke:#5b5568;opacity:.45}
+.star-node{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;padding:0;border-radius:50%;display:grid;place-items:center;
+ border:2px solid #8f7fb8;background:radial-gradient(circle at 35% 30%,#3d3266,#1b1630);color:#d9cdf0;box-shadow:0 2px 6px #0008;cursor:pointer}
+.star-node .star-core{display:grid;place-items:center;font-size:24px;line-height:1}
+.star-node>b{position:absolute;right:-4px;bottom:-4px;min-width:22px;height:20px;padding:0 4px;border-radius:10px;border:1px solid #6d5a86;background:#120f1f;color:#ffdeb0;font-size:12px;line-height:18px;text-align:center}
+.star-node.lit{border-color:#e7c98a;color:#ffe9bd;box-shadow:0 0 10px #f6d48a88,0 2px 6px #0008}
+.star-node.full{border-color:#ffe2a6;color:#fff6dc;background:radial-gradient(circle at 35% 30%,#7a5fd0,#33266a);box-shadow:0 0 16px #ffe2a6cc,0 0 4px #fff}
+.star-node.full>b{border-color:#ffe2a6;background:#4a3a12;color:#fff1c9}
+/* A locked star is greyed out and carries a padlock. It still answers a tap with its condition. */
+.star-node.locked{border-color:#55505f;background:#24212b;color:#6f6a79;box-shadow:none;filter:grayscale(1);opacity:.8}
+.star-lock{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;display:grid;place-items:center;border-radius:50%;background:#0d0b14e6;border:1px solid #8b8596;color:#e9e4f2;font-size:15px}
+.star-plate{position:absolute;transform:translate(-50%,-50%);display:grid;gap:1px;justify-items:center;min-width:112px;min-height:44px;padding:5px 12px;
+ border:1px solid #d1b47a;border-radius:12px;background:#2a2140e6;color:#f4dba5;white-space:nowrap;cursor:pointer}
+.star-plate b{font-size:13px}.star-plate small{font-size:12px;color:#cdbfe0}
+.star-plate.complete{background:#4a3a12e6;border-color:#ffe2a6}
+.star-plate.locked{border-color:#55505f;background:#201d28e6;color:#8c8798;filter:grayscale(1)}
+.star-plate.locked small{color:#777283}
+.star-plate>ui-mark{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:15px;color:#e9e4f2}
+.star-plate.locked{padding-left:28px}
+.star-map.closed .star-lines line{stroke:#5b5568;opacity:.45}
+.constellation-meter{display:block;width:100%;margin:10px 0 12px}
+.constellation-costs{grid-template-columns:repeat(2,minmax(0,1fr))}
+.constellation-quick button{min-height:44px}
+.star-detail{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;align-items:center;margin:4px 0 6px}
+.star-detail h3{margin:2px 0;color:#f4dba5;font-size:19px}.star-detail small{color:#bbaac5;font-size:12px}.star-detail span{font-size:13px}
+.star-detail-node{position:static;margin:0;width:64px;height:64px;cursor:default}
+.star-alert{display:grid;justify-items:center;gap:12px;padding:16px 6px 18px;text-align:center}
+.star-alert .star-lock{position:static;margin:0;width:44px;height:44px;font-size:22px}
+.star-alert p{margin:0;font-size:15px;line-height:1.5}
+@media(max-width:359px){.star-node{width:50px;height:50px;margin:-25px 0 0 -25px}.star-plate{min-width:100px;padding-inline:9px}.star-plate.locked{padding-left:26px}}
+.constellation-effect{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* Painted map art, used when CONSTELLATION_ART is true. */
+.star-map.painted{background:#0c0a18 url('./assets/constellation/sky.webp') center/cover no-repeat}
+.star-map.painted::before{display:none}
+.star-core img{width:40px;height:40px;object-fit:contain;display:block}
+.star-detail-node .star-core img{width:46px;height:46px}
+.star-lock img{width:100%;height:100%;object-fit:contain;display:block}
+.star-node.locked .star-core img{filter:grayscale(1) brightness(.55)}
 
 /* page */
 .music-settings{margin:12px 0 22px;padding:16px;border:1px solid #85708e;border-radius:14px;background:#251c32;color:#f7eddf;font-size:15px}

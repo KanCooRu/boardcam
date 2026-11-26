@@ -4,7 +4,7 @@
 #gameBoot .boot-line{width:124px;height:3px;overflow:hidden;margin:20px auto 0;border-radius:3px;background:#655361}#gameBoot .boot-line::after{content:"";display:block;width:55%;height:100%;border-radius:inherit;background:#e9c589;animation:bootTravel 1.4s ease-in-out infinite alternate}
 @keyframes bootTravel{from{transform:translateX(0)}to{transform:translateX(82%)}}@media(prefers-reduced-motion:reduce){#gameBoot .boot-line::after{animation:none;width:100%}}
 #gameBoot button{margin-top:16px;min-height:44px;border:1px solid #baa07b;border-radius:8px;padding:0 16px;background:#3c3047;color:#fbeccc;font:inherit}
-</style><link rel="stylesheet" href="./game-bundle-16b2b292f1fefb58.css">
+</style><link rel="stylesheet" href="./game-bundle-da4bcc6d7c15a0a8.css">
 <style id="visual-audit-fixes">
 /* Anchor each display sprite to the actual sole coordinates in its source frame. */
 .ui-renewal :is(.class-preview-stage,.wardrobe-stage){--display-floor:28px;height:258px;overflow:hidden;isolation:isolate}
@@ -5442,50 +5442,154 @@ EXTRA_POPUPS.trialRanking=['오늘의 탑 주간 순위',trialRankingUI.board];
 EXTRA_POPUPS.trialWeekReward=['지난주 순위 보상',trialRankingUI.reward];
 </script><script>/* Constellation engraving: the long growth track that opens with the Hard difficulty. */
 'use strict';
-// Each star multiplies final attack and health by 2%. Star iron comes from daily
+// Each engraving multiplies final attack and health by 2%. Star iron comes from daily
 // content, so the track keeps pace with play over many months.
-const CONSTELLATION={max:300,stage:300,step:.02};
+const CONSTELLATION={max:300,stage:300,step:.02,perStar:20};
+// Three figures of five stars. A star holds twenty engravings; a figure opens when the one
+// before it is complete. Positions are percentages of the map: [name, left, top].
+const CONSTELLATION_FIGURES=[
+ {name:'여명의 기사 자리',plate:[50,94],stars:[['검 끝',20,85],['방패',38,75],['투구',58,84],['심장',76,73],['깃발',50,64]]},
+ {name:'쌍검 자리',plate:[17,57],stars:[['왼 칼날',72,57],['오른 칼날',86,46],['손잡이',64,42],['칼자루 보석',48,52],['교차점',32,45]]},
+ {name:'성운 왕관 자리',plate:[42,7],stars:[['첫째 보석',18,31],['둘째 보석',34,21],['중심 보석',52,29],['넷째 보석',70,18],['왕관의 별',84,27]]}
+];
+// Painted art for the map: the sky, one star medallion for each figure and the padlock.
+// Set this to true once sky.webp, node-0.webp, node-1.webp, node-2.webp and lock.webp
+// are in dist/client/assets/constellation/. Until then the map draws itself.
+const CONSTELLATION_ART=false;
+function constellationCore(f){return CONSTELLATION_ART?'<img src="./assets/constellation/node-'+f+'.webp" width="40" height="40" alt="">':'<ui-mark data-shape=spark aria-hidden=true></ui-mark>'}
+function constellationPadlock(){return CONSTELLATION_ART?'<img src="./assets/constellation/lock.webp" width="26" height="26" alt="">':'<ui-mark data-shape=lock aria-hidden=true></ui-mark>'}
+const CONSTELLATION_STARS=CONSTELLATION_FIGURES.flatMap((figure,f)=>figure.stars.map(([name,x,y])=>({name,x,y,figure:f})));
 // Saves from the first release of this track stored the level as anvilAwakening.
 function constellationLevel(state=s){return Math.floor(bounded(Math.max(Number(state?.constellation)||0,Number(state?.anvilAwakening)||0),0,CONSTELLATION.max))}
 function constellationBonus(level=constellationLevel()){return Math.pow(1+CONSTELLATION.step,level)-1}
 function constellationCost(level=constellationLevel()){return {starIron:60+6*level,stones:600+60*level}}
 function constellationOpen(){return s.campaignCleared>=CONSTELLATION.stage}
-function constellationBlock(){
- if(!constellationOpen())return stageText(CONSTELLATION.stage)+' 클리어 후 열립니다';
- if(constellationLevel()>=CONSTELLATION.max)return '모든 별을 밝혔습니다';
+// The per-star counts always add up to the level. A level the server lowered, or a save
+// from before the map existed, is laid out again from the first star.
+function constellationStars(state=s){
+ const total=constellationLevel(state),cap=CONSTELLATION.perStar,count=CONSTELLATION_STARS.length;
+ let stars=Array.from({length:count},(_,i)=>Math.floor(bounded(state.constellationStars?.[i],0,cap)));
+ const sum=()=>stars.reduce((n,x)=>n+x,0);
+ const ordered=stars.every((x,i)=>!x||CONSTELLATION_STARS[i].figure===0||
+  stars.every((y,j)=>CONSTELLATION_STARS[j].figure!==CONSTELLATION_STARS[i].figure-1||y===cap));
+ if(!ordered||sum()>total)stars=stars.map((_,i)=>Math.max(0,Math.min(cap,total-i*cap)));
+ for(let i=0,left=total-sum();i<count&&left>0;i++){const add=Math.min(cap-stars[i],left);stars[i]+=add;left-=add}
+ state.constellationStars=stars;return stars;
+}
+function constellationFigureCount(f,stars=constellationStars()){return stars.reduce((n,x,i)=>n+(CONSTELLATION_STARS[i].figure===f?x:0),0)}
+function constellationFigureOpen(f,stars=constellationStars()){
+ return constellationOpen()&&(f===0||constellationFigureCount(f-1,stars)===CONSTELLATION_FIGURES[f-1].stars.length*CONSTELLATION.perStar);
+}
+// Why a star cannot be touched yet, or '' when it can.
+function constellationLockReason(i){
+ const star=CONSTELLATION_STARS[i];
+ if(!star)return '별을 선택하세요';
+ if(!constellationOpen())return stageText(CONSTELLATION.stage)+'을 클리어하면 성좌 각인이 열립니다.';
+ if(!constellationFigureOpen(star.figure))return '「'+CONSTELLATION_FIGURES[star.figure-1].name+'」의 별을 모두 밝히면 열립니다.';
+ return '';
+}
+function constellationBlock(i=nextConstellationStar()){
+ if(!constellationOpen())return constellationLockReason(0);
+ if(constellationLevel()>=CONSTELLATION.max||i<0)return '모든 별을 밝혔습니다';
+ const locked=constellationLockReason(i);
+ if(locked)return locked;
+ if(constellationStars()[i]>=CONSTELLATION.perStar)return '이 별은 모두 밝혔습니다';
  if(dungeonRun||forgeBusy)return '전투 도전·제작 완료 후 이용하세요';
  if(Object.entries(constellationCost()).some(([key,amount])=>!(s[key]>=amount)))return '각인 재료가 부족합니다';
  return '';
 }
-function engraveConstellation(times=1){
- if(!Number.isInteger(times)||times<1)return false;
- const block=constellationBlock();
+function nextConstellationStar(){
+ const stars=constellationStars();
+ return stars.findIndex((n,i)=>n<CONSTELLATION.perStar&&constellationFigureOpen(CONSTELLATION_STARS[i].figure,stars));
+}
+function engraveStar(i,times=1){
+ if(!Number.isInteger(i)||!Number.isInteger(times)||times<1)return false;
+ const block=constellationBlock(i);
  if(block){notice(block);return false}
  let done=0;
- while(done<times&&!constellationBlock()){
+ while(done<times&&!constellationBlock(i)){
   for(const [key,amount] of Object.entries(constellationCost()))s[key]-=amount;
-  s.constellation=constellationLevel()+1;done++;
+  constellationStars()[i]++;s.constellation=constellationLevel()+1;done++;
  }
  heroCurrentHp=Math.min(health(),Math.max(1,heroCurrentHp));
- recordPower();save();paint();if(activeScreen==='character')renderScreen();
- playSound('reward');notice('성좌 각인 '+constellationLevel()+'번째 별 · 공격력·체력 +'+constellationPercent(constellationBonus()));
+ recordPower();save();paint();if(activeScreen==='character')renderScreen();if(view==='starNode')render();
+ playSound('reward');notice(CONSTELLATION_STARS[i].name+' '+constellationStars()[i]+' / '+CONSTELLATION.perStar+' · 공격력·체력 +'+constellationPercent(constellationBonus()));
  return true;
 }
-function constellationPercent(value){return (value*100).toFixed(value<1?1:0)+'%'}
-function constellationScreen(){
- const level=constellationLevel(),max=level>=CONSTELLATION.max,cost=constellationCost(),block=constellationBlock();
- const open=constellationOpen(),next=Math.min(CONSTELLATION.max,level+1);
- const costs=Object.entries(cost).map(([key,amount])=>`<div class="${s[key]>=amount?'enough':''}">${art(RESOURCE_ART[key])}<span>${RESOURCE_NAMES[key]}</span><b>${max?'-':compact(amount)}</b><small>보유 ${compact(s[key])}</small></div>`).join('');
- return `<div class="masterwork-intro"><h2>성좌 각인</h2><p>별철로 밤하늘의 별을 하나씩 밝혀 모든 직업의 공격력과 체력을 함께 올립니다.</p></div>
- <section class="masterwork-card constellation-card"><div class="masterwork-hero">${art('growthEmblem','constellation-emblem')}<div><small>전 직업 공용 · 영구 효과</small><h3>밝힌 별 ${level} <span class="constellation-max">/ ${CONSTELLATION.max}</span></h3><span>공격력·체력 +${constellationPercent(constellationBonus(level))}</span></div></div>
- <progress class="pass-meter constellation-meter" max="${CONSTELLATION.max}" value="${level}" aria-label="밝힌 별의 수"></progress>
- <div class="masterwork-requirements"><span class="${open?'ready':''}"><small>해금</small><b>${open?'<ui-mark data-shape=check aria-hidden=true></ui-mark> ':''}${stageText(CONSTELLATION.stage)} 클리어</b></span><span><small>별 하나당</small><b>최종 공격력·체력 ×${(1+CONSTELLATION.step).toFixed(2)}</b></span></div>
- <div class="masterwork-effect constellation-effect"><div><span>현재 효과</span><b>+${constellationPercent(constellationBonus(level))}</b><small>별 ${level}개</small></div><div><span>다음 별</span><b>${max?'완성':'+'+constellationPercent(constellationBonus(next))}</b><small>${max?'':'별 '+next+'개'}</small></div><div><span>현재 공격력</span><b>${compact(power())}</b><small>체력 ${compact(health())}</small></div></div>
- <div class="masterwork-costs constellation-costs">${costs}</div>
- <div class="action-row">${button(block||'별 1개 각인','engraveConstellation(1)',!!block)}${button('10개 연속','engraveConstellation(10)',!!block,true)}</div>
- <p class="small masterwork-rules">별철은 고대 무기고·오늘의 탑·임무·패스에서 얻습니다. 무기 강화와 같은 별철을 쓰므로 필요한 만큼 나누어 사용하세요.</p></section>`;
+// Engraves the first unfinished star that is open.
+function engraveConstellation(times=1){
+ if(!Number.isInteger(times)||times<1)return false;
+ let done=false;
+ for(let left=times;left>0;left--){
+  const i=nextConstellationStar();
+  if(i<0||constellationBlock(i)){if(!done)notice(constellationBlock(i));break}
+  if(!engraveStar(i,1))break;
+  done=true;
+ }
+ return done;
 }
-function normalizeConstellation(a){a.constellation=constellationLevel(a);delete a.anvilAwakening;return a}
+function constellationPercent(value){return (value*100).toFixed(value<1?1:0)+'%'}
+// A locked star or figure explains its condition instead of opening.
+function tapConstellationStar(i){
+ const locked=constellationLockReason(i);
+ if(locked){openMenu('starLocked',locked);return false}
+ openMenu('starNode',i);return true;
+}
+function tapConstellationFigure(f){
+ const first=CONSTELLATION_STARS.findIndex(star=>star.figure===f),locked=constellationLockReason(first);
+ if(locked){openMenu('starLocked',locked);return false}
+ const stars=constellationStars(),open=CONSTELLATION_STARS.findIndex((star,i)=>star.figure===f&&stars[i]<CONSTELLATION.perStar);
+ openMenu('starNode',open<0?first:open);return true;
+}
+function constellationCostHTML(cost,done){
+ return Object.entries(cost).map(([key,amount])=>`<div class="${s[key]>=amount?'enough':''}">${art(RESOURCE_ART[key])}<span>${RESOURCE_NAMES[key]}</span><b>${done?'-':compact(amount)}</b><small>보유 ${compact(s[key])}</small></div>`).join('');
+}
+function constellationMap(){
+ const stars=constellationStars(),cap=CONSTELLATION.perStar;
+ const lines=CONSTELLATION_FIGURES.map((figure,f)=>{
+  const open=constellationFigureOpen(f,stars),offset=CONSTELLATION_STARS.findIndex(star=>star.figure===f);
+  return figure.stars.slice(1).map(([,x,y],k)=>{
+   const [,px,py]=figure.stars[k],lit=stars[offset+k]>0&&stars[offset+k+1]>0;
+   return `<line class="${!open?'locked':lit?'lit':''}" x1="${px}" y1="${py}" x2="${x}" y2="${y}"/>`;
+  }).join('');
+ }).join('');
+ const plates=CONSTELLATION_FIGURES.map((figure,f)=>{
+  const open=constellationFigureOpen(f,stars),have=constellationFigureCount(f,stars),all=figure.stars.length*cap;
+  return `<button class="star-plate${open?'':' locked'}${have===all?' complete':''}" style="left:${figure.plate[0]}%;top:${figure.plate[1]}%" onclick="tapConstellationFigure(${f})" aria-label="${figure.name}, ${open?have+' / '+all:'잠김'}">${open?'':'<ui-mark data-shape=lock aria-hidden=true></ui-mark>'}<b>${figure.name}</b><small>${have} / ${all}</small></button>`;
+ }).join('');
+ const nodes=CONSTELLATION_STARS.map((star,i)=>{
+  const open=constellationFigureOpen(star.figure,stars),n=stars[i];
+  const state=!open?'locked':n>=cap?'full':n>0?'lit':'empty';
+  return `<button class="star-node figure-${star.figure} ${state}" style="left:${star.x}%;top:${star.y}%" onclick="tapConstellationStar(${i})" aria-label="${star.name}, ${open?n+' / '+cap:'잠김'}"><i class="star-core" aria-hidden="true">${constellationCore(star.figure)}</i>${open?`<b>${n}</b>`:'<span class="star-lock" aria-hidden="true">'+constellationPadlock()+'</span>'}</button>`;
+ }).join('');
+ return `<div class="star-map${constellationOpen()?'':' closed'}${CONSTELLATION_ART?' painted':''}"><svg class="star-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${plates}${nodes}</div>`;
+}
+function constellationScreen(){
+ const level=constellationLevel(),max=level>=CONSTELLATION.max,block=constellationBlock();
+ return `<div class="masterwork-intro constellation-intro"><h2>성좌 각인</h2><p>별을 눌러 별철로 밝히세요. 밝힌 만큼 모든 직업의 공격력과 체력이 함께 오릅니다.</p></div>
+ <div class="constellation-summary"><div><span>밝힌 별빛</span><b>${level} / ${CONSTELLATION.max}</b></div><div><span>공격력·체력</span><b>+${constellationPercent(constellationBonus(level))}</b></div></div>
+ ${constellationMap()}
+ <div class="masterwork-costs constellation-costs">${constellationCostHTML(constellationCost(),max)}</div>
+ <div class="action-row constellation-quick">${button(block||'다음 별 각인','engraveConstellation(1)',!!block)}${button('10회 연속','engraveConstellation(10)',!!block,true)}</div>
+ <p class="small masterwork-rules">한 자리의 별을 모두 밝히면 다음 자리가 열립니다. 별철은 고대 무기고·오늘의 탑·임무·패스에서 얻습니다.</p>`;
+}
+function starNodePopup(){
+ const i=Number(tab),star=CONSTELLATION_STARS[i];
+ if(!Number.isInteger(i)||!star)return '<p>별을 선택하세요.</p>';
+ const n=constellationStars()[i],cap=CONSTELLATION.perStar,done=n>=cap,level=constellationLevel(),block=constellationBlock(i);
+ return `<div class="star-detail"><div class="star-node figure-${star.figure} ${done?'full':n>0?'lit':'empty'} star-detail-node" aria-hidden="true"><i class="star-core">${constellationCore(star.figure)}</i></div>
+ <div><small>${CONSTELLATION_FIGURES[star.figure].name}</small><h3>${star.name}</h3><span>각인 ${n} / ${cap}</span></div></div>
+ <progress class="pass-meter constellation-meter" max="${cap}" value="${n}" aria-label="이 별의 각인 수"></progress>
+ <div class="masterwork-effect constellation-effect"><div><span>현재 효과</span><b>+${constellationPercent(constellationBonus(level))}</b><small>별빛 ${level}</small></div><div><span>각인 1회 후</span><b>${done||level>=CONSTELLATION.max?'-':'+'+constellationPercent(constellationBonus(level+1))}</b><small>공격력·체력</small></div></div>
+ <div class="masterwork-costs constellation-costs">${constellationCostHTML(constellationCost(),done)}</div>
+ <div class="action-row">${button(block||'1회 각인','engraveStar('+i+',1)',!!block)}${button('10회 연속','engraveStar('+i+',10)',!!block,true)}</div>`;
+}
+function starLockedPopup(){
+ return `<div class="star-alert"><span class="star-lock" aria-hidden="true">${constellationPadlock()}</span><p>${safeText(tab)}</p></div><div class="action-row">${button('확인','closeMenu()')}</div>`;
+}
+EXTRA_POPUPS.starNode=['별 각인',starNodePopup];
+EXTRA_POPUPS.starLocked=['알림',starLockedPopup];
+function normalizeConstellation(a){a.constellation=constellationLevel(a);delete a.anvilAwakening;constellationStars(a);return a}
 const starterBeforeConstellation=starter,migrateBeforeConstellation=migrate;
 starter=function(){return normalizeConstellation(starterBeforeConstellation())};
 migrate=function(data){return normalizeConstellation(migrateBeforeConstellation(data))};
