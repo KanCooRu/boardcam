@@ -15,14 +15,21 @@ const helpers=`
   walk([]);return {best,wins,total}};
  const code=(best)=>{const cells=Array(9).fill('-');best.forEach((c,i)=>cells[c]='l'+i);return cells.join('.')};
 `;
-check('minigames stay locked, greyed and explained until their stage is cleared',helpers+`
+check('minigames stay locked, greyed and explained until their stage is cleared, then open as a full-screen stage',helpers+`
  activeScreen='dungeon';screenTab='minigames';s.maxStage=20;
  const hub=dungeonScreen();
  if((hub.match(/mini-card locked/g)||[]).length!==2||openMinigame('furnace')!==false||view!=='starLocked'||!tab.includes('클리어하면'))return false;
  closeMenu();
  if(typeof act('start')!=='string'||typeof fight(today()+'/0/l0.-.-.-.-.-.-.-.-')!=='string')return false;
  s.maxStage=21;
- if((dungeonScreen().match(/mini-card locked/g)||[]).length!==1||openMinigame('furnace')!==true||!dungeonScreen().includes('furnace-gauge'))return false;
+ if((dungeonScreen().match(/mini-card locked/g)||[]).length!==1||openMinigame('furnace')!==true||!miniStageOpen())return false;
+ const stage=miniStageHTML();
+ if(!stage.includes('furnace-gauge')||!stage.includes('furnace-scene')||!stage.includes('mini-stage-exit')||!stage.includes('mini-stage-guide'))return false;
+ if(!miniGuidePopup.call(null,tab='furnace').includes('과열'))return false;
+ closeMinigame();
+ if(miniStageOpen()||!dungeonScreen().includes('mini-card'))return false;
+ openMinigame('furnace');navigate('home');
+ if(miniStageOpen())return false;
  return !s.economyClaims.furnace&&minigamePeek('furnace').runs===0;`);
 check('the furnace rolls heat inside the stated range, cools once, and pays purity when the ingot is taken out',helpers+`
  s.maxStage=31;
@@ -59,7 +66,7 @@ check('the board pays once for a winning formation and refuses losing, borrowed-
  const iron=s.starIron,shards=s.petShards,gems=s.gems,paid=fight(day+'/2/'+code(best));
  if(paid.rewards?.starIron!==12||s.starIron!==iron+12||s.petShards!==shards+10||s.gems!==gems+30)return false;
  return typeof fight(day+'/2/'+code(best))==='string'&&s.economyClaims.petBoard.cleared.join()==='2'&&s.starIron===iron+12;`);
-check('the board screen places, moves and removes companions and limits their number',helpers+`
+check('the board opens as a full-screen stage and places, moves and removes companions within the limit',helpers+`
  s.maxStage=31;activeScreen='dungeon';screenTab='minigames';openMinigame('petBoard');
  const stage=boardSync();
  pickBoardUnit('l0');tapBoardCell(0);pickBoardUnit('l1');tapBoardCell(4);
@@ -72,5 +79,5 @@ check('the board screen places, moves and removes companions and limits their nu
  for(const [unit,cell] of [['l1',1],['l2',2],['l3',3],['p3',5]])if(stage.loans[Number(unit.slice(1))]!==undefined||unit[0]==='p'){pickBoardUnit(unit);tapBoardCell(cell)}
  const placed=boardDraft.cells.filter(c=>c!=='-').length;
  pickBoardUnit('p4');tapBoardCell(8);
- const screen=dungeonScreen();
+ const screen=miniStageHTML();
  return placed===stage.limit&&boardDraft.cells[8]==='-'&&screen.includes('board-grid ally')&&screen.includes('board-grid foe')&&screen.includes('대여');`);
