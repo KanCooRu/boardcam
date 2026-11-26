@@ -46,7 +46,7 @@ check('an overheated furnace still pays half, and three runs a day are free of a
  if(!burst.furnace.burst||burst.furnace.heat!==104||burst.rewards.starIron!==3||burst.rewards.stones!==100||s.starIron!==iron+3||s.stones!==stones+100)return false;
  act('start');act('small');act('take');act('start');act('small');act('take');
  return act('start')==='오늘의 제련을 모두 마쳤습니다.'&&s.gems===gems&&s.gold===gold&&s.economyClaims.furnace.runs===3;`);
-check('every board stage is the same for everyone that day and can be won with the lent companions alone',helpers+`
+check('every board stage is the same for everyone that day and can be won with the companions it gives',helpers+`
  for(const day of ['2026-11-26','2026-11-27','2026-12-03','2027-01-15'])for(let n=0;n<3;n++){
   const stage=boardStage(day,n);boardStageCache.clear();
   if(JSON.stringify(boardStage(day,n))!==JSON.stringify(stage))return false;
@@ -55,14 +55,16 @@ check('every board stage is the same for everyone that day and can be won with t
   if(n===2&&found.wins/found.total>.5)return false;
  }
  return true;`);
-check('the board pays once for a winning formation and refuses losing, borrowed-twice, unowned and stale ones',helpers+`
+check('the board pays once for a winning formation; owned companions take no part, and losing, doubled or stale formations are refused',helpers+`
  s.maxStage=31;const day=today(),stage=boardStage(day,2),best=solve(stage).best;
  const empty=Array(9).fill('-');
  if(typeof fight(day+'/2/'+empty.join('.'))!=='string')return false;
  if(typeof fight(day+'/2/'+['l0','l0',...empty.slice(2)].join('.'))!=='string')return false;
+ s.pets[3]=50;
  if(typeof fight(day+'/2/'+['p3',...empty.slice(1)].join('.'))!=='string')return false;
+ const mixed=code(best).split('.');mixed[mixed.indexOf('-')]='p3';
+ if(typeof fight(day+'/2/'+mixed.join('.'))!=='string'||stage.limit!==stage.loans.length)return false;
  if(typeof fight('2020-01-01/2/'+code(best))!=='string')return false;
- if(typeof fight(day+'/2/'+['l0','l1','l2','l3','p3','p4',...empty.slice(6)].join('.'))!=='string')return false;
  const iron=s.starIron,shards=s.petShards,gems=s.gems,paid=fight(day+'/2/'+code(best));
  if(paid.rewards?.starIron!==12||s.starIron!==iron+12||s.petShards!==shards+10||s.gems!==gems+30)return false;
  return typeof fight(day+'/2/'+code(best))==='string'&&s.economyClaims.petBoard.cleared.join()==='2'&&s.starIron===iron+12;`);
@@ -76,8 +78,8 @@ check('the board opens as a full-screen stage and places, moves and removes comp
  tapBoardCell(0);
  if(boardDraft.cells[0]!=='-')return false;
  s.pets[3]=1;s.pets[4]=1;
- for(const [unit,cell] of [['l1',1],['l2',2],['l3',3],['p3',5]])if(stage.loans[Number(unit.slice(1))]!==undefined||unit[0]==='p'){pickBoardUnit(unit);tapBoardCell(cell)}
+ pickBoardUnit('l1');tapBoardCell(1);pickBoardUnit('l2');tapBoardCell(2);
  const placed=boardDraft.cells.filter(c=>c!=='-').length;
- pickBoardUnit('p4');tapBoardCell(8);
  const screen=miniStageHTML();
- return placed===stage.limit&&boardDraft.cells[8]==='-'&&screen.includes('board-grid ally')&&screen.includes('board-grid foe')&&screen.includes('대여');`);
+ if((screen.match(/class="board-unit/g)||[]).length!==stage.loans.length||screen.includes('내 동료'))return false;
+ return placed===stage.limit&&screen.includes('board-grid ally')&&screen.includes('board-grid foe');`);

@@ -5735,13 +5735,13 @@ function boardBattle(allies,foes,record=false){
  return {win:!f.some(u=>u.hp>0)&&a.some(u=>u.hp>0),rounds,log};
 }
 const boardStageCache=new Map();
-// The day's stage: its lent companions, the enemy formation, and an enemy toughness chosen so that
-// the stated share of formations built from the lent companions alone can win.
+// The day's stage: the companions everyone is given, the enemy formation, and an enemy toughness chosen so that
+// the stated share of formations of those companions can win.
 function boardStage(dayKey,n){
  const key=dayKey+'|'+n;
  if(boardStageCache.has(key))return boardStageCache.get(key);
  const spec=BOARD_STAGES[n],random=boardRandom(boardSeed('board|'+key));
- // Lent companions: one front-liner first, and never more than one healer, so they can always deal damage.
+ // The day's companions: one front-liner first, and never more than one healer, so they can always deal damage.
  const front=boardShuffle(BOARD_PET_ROLES.map((role,i)=>i).filter(i=>['guard','striker'].includes(BOARD_PET_ROLES[i])),random);
  const loans=[front[0]];
  for(const pet of boardShuffle(BOARD_PET_ROLES.map((role,i)=>i).filter(i=>i!==front[0]),random)){
@@ -5771,19 +5771,19 @@ function boardStage(dayKey,n){
   if(won>0&&!fallback)fallback=tried;
  }
  if(fallback)scale=fallback;
- const stage={day:dayKey,n,loans,limit:spec.loans+1,scale,rewards:spec.rewards,
+ const stage={day:dayKey,n,loans,limit:spec.loans,scale,rewards:spec.rewards,
   foes:layout.map(({cell,kind})=>({cell,kind,hp:Math.round(BOARD_FOES[kind].hp*scale),atk:BOARD_FOES[kind].atk}))};
  if(boardStageCache.size>12)boardStageCache.clear();
  boardStageCache.set(key,stage);return stage;
 }
-// A formation is nine cells: '-' empty, 'l2' the third lent companion, 'p7' the player's own companion 7.
-function boardFormation(stage,cells,state=s){
+// A formation is nine cells: '-' empty, 'l2' the third of the day's companions. Only the day's
+// companions take part, so the companions a player owns make no difference.
+function boardFormation(stage,cells){
  if(!Array.isArray(cells)||cells.length!==9)throw Error('배치를 확인하세요.');
  const used=new Set(),allies=[];
  cells.forEach((code,cell)=>{
   if(code==='-')return;
-  const match=/^([lp])(\d{1,2})$/.exec(code),index=match?Number(match[2]):-1;
-  const pet=match?.[1]==='l'?stage.loans[index]:match?.[1]==='p'&&state.pets?.[index]>0?index:undefined;
+  const match=/^l(\d)$/.exec(code),pet=match?stage.loans[Number(match[1])]:undefined;
   if(pet===undefined||used.has(code))throw Error('배치할 수 없는 동료가 있습니다.');
   used.add(code);allies.push(boardUnit(cell,BOARD_PET_ROLES[pet],BOARD_ROLES[BOARD_PET_ROLES[pet]],'ally'));
  });
@@ -5798,7 +5798,7 @@ function boardRule(state,id,day){
  if(!Number.isInteger(n)||!BOARD_STAGES[n]||typeof layout!=='string')throw Error('배치를 확인하세요.');
  const book=minigameBook(state,'petBoard',day);
  if(book.cleared.includes(n))rejectEconomyClaim();
- const stage=boardStage(day,n),result=boardBattle(boardFormation(stage,layout.split('.'),state),boardFoes(stage));
+ const stage=boardStage(day,n),result=boardBattle(boardFormation(stage,layout.split('.')),boardFoes(stage));
  if(!result.win)throw Error('이 배치로는 이기지 못합니다. 자리를 바꿔 보세요.');
  book.cleared.push(n);book.cleared.sort();
  return {rewards:{...stage.rewards},board:{n,rounds:result.rounds}};
@@ -5823,7 +5823,7 @@ const MINI_STAGES={
   guide:['성운석 덩이를 넣어 순도를 올리고, 온도가 100을 넘기 전에 주괴를 꺼냅니다.','작은 덩이는 온도 +8~14 · 순도 +2, 큰 덩이는 온도 +16~26 · 순도 +5입니다.','냉각수는 한 판에 한 번, 온도를 15 낮춥니다.','온도가 100을 넘으면 과열되어 순도의 절반만 남습니다.','보상은 순도 3마다 별철 1개, 순도 1마다 강화석 10개입니다. 입장은 무료이고 하루 3판입니다.']},
  petBoard:{title:'동료 배치전',art:()=>BOARD_ART,chips:['starIron','petShards'],body:()=>boardScreen(),
   left:()=>'오늘 클리어 '+minigamePeek('petBoard').cleared.length+' / '+BOARD_STAGES.length,
-  guide:['아래 목록에서 동료를 고르고 내 진형의 칸을 눌러 배치합니다. 놓인 동료를 누르면 내려놓습니다.','전투는 자동입니다. '+BOARD_ROUNDS+'라운드 안에 적을 모두 쓰러뜨리면 승리합니다.','방패·돌격은 같은 줄 맨 앞의 적을, 저격은 같은 줄 맨 뒤의 적을 공격합니다.','관통은 같은 줄의 적 전부를, 폭발은 세 줄의 맨 앞 적을 한꺼번에 공격합니다. 치유는 가장 다친 아군을 회복합니다.','운은 없습니다. 같은 배치는 항상 같은 결과가 나오며, 대여 동료만으로도 이길 수 있습니다.']}
+  guide:['아래 목록에서 동료를 고르고 내 진형의 칸을 눌러 배치합니다. 놓인 동료를 누르면 내려놓습니다.','전투는 자동입니다. '+BOARD_ROUNDS+'라운드 안에 적을 모두 쓰러뜨리면 승리합니다.','방패·돌격은 같은 줄 맨 앞의 적을, 저격은 같은 줄 맨 뒤의 적을 공격합니다.','관통은 같은 줄의 적 전부를, 폭발은 세 줄의 맨 앞 적을 한꺼번에 공격합니다. 치유는 가장 다친 아군을 회복합니다.','운은 없습니다. 같은 배치는 항상 같은 결과가 나옵니다. 모두가 같은 오늘의 동료로 겨루며, 가진 동료와는 상관없습니다.']}
 };
 function miniStageOpen(){return Object.hasOwn(MINI_STAGES,miniView)}
 function miniStageHTML(){
@@ -5941,7 +5941,7 @@ function tapBoardCell(cell){
  if(from>=0)cells[from]=cells[cell];
  cells[cell]=boardDraft.pick;boardDraft.pick='';miniRefresh();
 }
-function boardPetOf(stage,code){return code[0]==='l'?stage.loans[Number(code.slice(1))]:Number(code.slice(1))}
+function boardPetOf(stage,code){return stage.loans[Number(code.slice(1))]}
 function boardTile(pet,hp,max,extra=''){
  const role=BOARD_ROLES[BOARD_PET_ROLES[pet]];
  return `${petArt(pet,'board-pet')}<em>${role.name}</em><span class="board-hp"><i style="width:${Math.max(0,hp/max*100)}%"></i></span><small>${hp}</small>${extra}`;
@@ -5972,10 +5972,10 @@ function boardGrid(stage,side,frame){
 function boardScreen(){
  const stage=boardSync(),book=minigamePeek('petBoard'),done=book.cleared.includes(stage.n),frame=boardDraft.playing?.frame||null;
  const placed=boardDraft.cells.filter(c=>c!=='-').length;
- const codes=[...stage.loans.map((pet,i)=>'l'+i),...COMPANIONS.map((c,i)=>s.pets?.[i]>0?'p'+i:'').filter(Boolean)];
+ const codes=stage.loans.map((pet,i)=>'l'+i);
  const bench=codes.map(code=>{
   const pet=boardPetOf(stage,code),role=BOARD_ROLES[BOARD_PET_ROLES[pet]],used=boardDraft.cells.includes(code);
-  return `<button class="board-unit${boardDraft.pick===code?' picked':''}${used?' used':''}" onclick="pickBoardUnit('${code}')" aria-pressed="${boardDraft.pick===code}" aria-label="${COMPANIONS[pet][0]}, ${role.name}, ${role.tip}">${petArt(pet,'board-pet')}<b>${minigameArt(BOARD_ART,'role-'+BOARD_PET_ROLES[pet],'role-icon',18,18)}${role.name}</b><small>${code[0]==='l'?'대여':'내 동료'}</small><small>체력 ${role.hp} · ${BOARD_PET_ROLES[pet]==='healer'?'회복':'공격'} ${role.atk}</small></button>`;
+  return `<button class="board-unit${boardDraft.pick===code?' picked':''}${used?' used':''}" onclick="pickBoardUnit('${code}')" aria-pressed="${boardDraft.pick===code}" aria-label="${COMPANIONS[pet][0]}, ${role.name}, ${role.tip}">${petArt(pet,'board-pet')}<b>${minigameArt(BOARD_ART,'role-'+BOARD_PET_ROLES[pet],'role-icon',18,18)}${role.name}</b><small>${COMPANIONS[pet][0]}</small><small>체력 ${role.hp} · ${BOARD_PET_ROLES[pet]==='healer'?'회복':'공격'} ${role.atk}</small></button>`;
  }).join('');
  const picked=boardDraft.pick?BOARD_ROLES[BOARD_PET_ROLES[boardPetOf(stage,boardDraft.pick)]]:null;
  const tabs=BOARD_STAGES.map((spec,n)=>`<button class="${stage.n===n?'active':''}" aria-pressed="${stage.n===n}" onclick="selectBoardStage(${n})">${n+1}단계${book.cleared.includes(n)?' <ui-mark data-shape=check aria-hidden=true></ui-mark>':''}</button>`).join('');
@@ -5985,7 +5985,7 @@ function boardScreen(){
  <p class="board-tip" aria-live="polite">${boardDraft.playing?boardDraft.playing.round+' / '+BOARD_ROUNDS+'라운드':picked?picked.name+' · '+picked.tip:'동료를 고른 뒤 내 진형의 칸을 누르세요. '+BOARD_ROUNDS+'라운드 안에 적을 모두 쓰러뜨리면 승리합니다.'}</p>
  <div class="board-bench">${bench}</div>
  <div class="action-row">${button('배치 비우기','clearBoard()',!placed||!!boardDraft.playing,true)}${button(done?'오늘 클리어함':'전투 시작 · '+placed+' / '+stage.limit,'startBoardBattle()',done||!placed||!!boardDraft.playing)}</div>
- <p class="small masterwork-rules">대여 동료만으로도 이길 수 있는 배치가 있습니다. 내 동료가 있으면 한 마리를 더 세울 수 있습니다. 동료의 레벨은 영향을 주지 않습니다.</p></section>`;
+ <p class="small masterwork-rules">매일 정해지는 오늘의 동료로만 겨룹니다. 내가 가진 동료나 레벨은 영향을 주지 않으며, 이길 수 있는 배치가 반드시 있습니다.</p></section>`;
 }
 function clearBoard(){if(boardDraft.playing)return;boardDraft.cells.fill('-');boardDraft.pick='';miniRefresh()}
 function startBoardBattle(){
