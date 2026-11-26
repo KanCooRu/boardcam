@@ -171,6 +171,19 @@ SERVERS="<api-2 주소> <api-1 주소>" BRANCH=claude/upload-capacity-limit-73zp
 
 한 대씩 바꾸므로 플레이어는 끊기지 않습니다. GitHub Actions를 쓰려면 저장소 Secrets에 `DEPLOY_SSH_KEY`, `DEPLOY_SERVERS`를 넣고 `main` 브랜치에 합치면 됩니다.
 
+### 저절로 받아 가게 하기
+
+서버가 5분마다 이 브랜치를 확인해서, 새로 올라온 것이 있으면 받아서 다시 만들고 재시작합니다. 서버마다 한 번만:
+
+```
+cd ~/game && git pull && cd server && sudo docker compose up -d --build
+sudo bash scripts/auto-update.sh --install
+```
+
+- 새 버전을 만들다 실패하면 돌아가던 게임은 그대로 두고 이전 상태로 되돌립니다.
+- 기록: `/var/log/nebula-auto-update.log` · 끄기: `sudo bash scripts/auto-update.sh --uninstall`
+- 이 브랜치에 올릴 수 있는 사람이 곧 서버에 올릴 수 있는 사람이 됩니다.
+
 ## 부하 시험
 
 시험용 서버(`AUTH_MODE=guest`)에만 돌립니다. 실제 플레이어 데이터가 있는 DB에는 돌리지 않습니다.
