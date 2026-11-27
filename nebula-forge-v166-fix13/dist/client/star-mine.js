@@ -2,7 +2,7 @@
 const mineScene=(()=>{
  let field=null,canvas=null,ctx=null,chips=null,frame=0,animation=null,last=0,particles=[],strikeTimer=null;
  let confirmRun=null,shownHits=0;
- const target=[.635,.54],dustColor=['205,181,207','176,157,145'];
+ const target=[.615,.765],dustColor=['205,181,207','176,157,145'];
  function focused(){return !!s?.mineRun&&activeScreen==='dungeon'&&screenTab==='mine'}
  function cleanup(){
   cancelAnimationFrame(frame);clearTimeout(strikeTimer);animation?.cancel();frame=0;animation=null;strikeTimer=null;last=0;particles=[];field=canvas=ctx=null;

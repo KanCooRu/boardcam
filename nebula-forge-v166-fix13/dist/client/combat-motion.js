@@ -137,6 +137,8 @@ const warriorMotion=(()=>{
   const {x,y}=self?combatEffects.casterPoint(follow):feet?rangedCombat.hitPoint(follow,true):g;
   combatEffects.emit(host,{id:skillId,job,echo,ordinal,secondary,x,y,size,follow,feet,self,group:combatSerial,anchor:follow,
    duration:secondary?PIERCE_RIPPLE_FILM[2]:combatEffects.duration(skillId,job,echo,factor),heading:(skillId===18?rangedCombat.piercingHeading(combatSerial,ordinal):null)??Math.atan2(y-g.sourceY,x-g.sourceX)});
+  // Contact spark (presentation layer): makes each hit read as a hit, without shaking the screen.
+  if(!self&&!secondary&&typeof battlePresentation!=='undefined')battlePresentation.hitSpark($('fx'),x+'px',y+'px',{effect,skill:skillId>=0,big:big||finishing,echo});
   stats.effectUses++;
  }
  function number(d,crit){

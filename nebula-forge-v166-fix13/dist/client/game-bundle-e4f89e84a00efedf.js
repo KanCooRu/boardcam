@@ -1888,6 +1888,7 @@ const worldBoss = (() => {
    const fx=dialog.querySelector('.wb-fx'),drift=(hit.at+Math.floor(hit.hit))%19-9;
    // The same damage number as the stage (battle-presentation.js); the old text is the fallback.
    if(typeof battlePresentation!=='undefined')battlePresentation.damageNumber(fx,hit.hit,hit.crit,{drift:drift*1.4,className:'wb-damage'});
+   if(typeof battlePresentation!=='undefined')battlePresentation.hitSpark?.(fx,`calc(var(--wb-target-x) + ${drift*2}px)`,`calc(100% - var(--wb-target-bottom) - .2 * var(--wb-boss-size))`,{skill:hit.skill>=0,crit:!!hit.crit,effect:hit.skill>=0&&typeof SKILL_RULES!=='undefined'?SKILL_RULES[hit.skill]?.effect||'':''});
    else{
     const text=document.createElement('b');
     text.className='wb-damage'+(hit.crit?' wb-critical':'');
@@ -3584,7 +3585,7 @@ gearArt=function(g,cls=''){
 const mineScene=(()=>{
  let field=null,canvas=null,ctx=null,chips=null,frame=0,animation=null,last=0,particles=[],strikeTimer=null;
  let confirmRun=null,shownHits=0;
- const target=[.635,.54],dustColor=['205,181,207','176,157,145'];
+ const target=[.615,.765],dustColor=['205,181,207','176,157,145'];
  function focused(){return !!s?.mineRun&&activeScreen==='dungeon'&&screenTab==='mine'}
  function cleanup(){
   cancelAnimationFrame(frame);clearTimeout(strikeTimer);animation?.cancel();frame=0;animation=null;strikeTimer=null;last=0;particles=[];field=canvas=ctx=null;
@@ -4744,11 +4745,15 @@ const MINE_ART=true;
 const BOSS_INTRO_ART=true;
 const UI_KIT_ART=true;
 const UI_EXTRA_ART=true;
+// fix13: painted miner (card M1: assets/star-mine/miner-body.webp + miner-arm.webp). Until then the drawn miner below is used.
+const MINER_ART=false;
 
 const battlePresentation=(()=>{
  const ART='./assets/battle-ui/',FX='./assets/combat-fx/';
  // A horned skull, symmetric about x=12 and centred in its 24-unit box, so it never looks tilted.
  const BOSS_GLYPH='<svg class="bp-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 9.2 2.4 3.6l4.9 2.9M18.8 9.2l2.8-5.6-4.9 2.9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 4.6c-4.2 0-7.4 2.9-7.4 6.8 0 2.2 1.1 4 2.8 5.1v3h2.3v-1.7h1.2v1.7h2.2v-1.7h1.2v1.7h2.3v-3c1.7-1.1 2.8-2.9 2.8-5.1 0-3.9-3.2-6.8-7.4-6.8Z" fill="currentColor"/><circle cx="9.1" cy="11.6" r="1.9" fill="#160d1c"/><circle cx="14.9" cy="11.6" r="1.9" fill="#160d1c"/><path d="M12 13.8 11 15.5h2Z" fill="#160d1c"/></svg>';
+ // fix13: a little star miner (drawn; MINER_ART swaps in painted layers on the same rig points).
+ const MINER_SVG='<svg class="bp-miner-svg" aria-hidden="true" viewBox="0 0 240 240"> <defs> <radialGradient id="mnSkin" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#ffe3c8"/><stop offset=".7" stop-color="#f3c39d"/><stop offset="1" stop-color="#d99a76"/></radialGradient> <linearGradient id="mnHelm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a6"/><stop offset=".45" stop-color="#e2ad52"/><stop offset="1" stop-color="#9a6526"/></linearGradient> <linearGradient id="mnSuit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6a9e"/><stop offset="1" stop-color="#4b3560"/></linearGradient> <linearGradient id="mnApron" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7764e"/><stop offset="1" stop-color="#6a4429"/></linearGradient> <linearGradient id="mnBoot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3a28"/><stop offset="1" stop-color="#2e1d14"/></linearGradient> <linearGradient id="mnWood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a4b28"/><stop offset=".5" stop-color="#b07a45"/><stop offset="1" stop-color="#6d4022"/></linearGradient> <linearGradient id="mnIron" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9eef5"/><stop offset=".45" stop-color="#9aa6b6"/><stop offset="1" stop-color="#4c5566"/></linearGradient> <radialGradient id="mnGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8" stop-opacity=".95"/><stop offset=".35" stop-color="#ffd36a" stop-opacity=".5"/><stop offset="1" stop-color="#ffb43a" stop-opacity="0"/></radialGradient> </defs> <ellipse class="mn-shadow" cx="82" cy="229" rx="44" ry="8" fill="#000" opacity=".38"/> <g class="mn-body"> <path class="mn-scarf-tail" d="M66 158c-14 2-24 10-30 22 9-3 17-4 25-2-4 4-6 9-6 14 8-8 16-14 24-18z" fill="#7d4fc0"/> <path d="M58 212h20v10c0 5-3 8-9 8H52c-5 0-7-3-6-6 1-6 5-9 12-9z" fill="url(#mnBoot)"/> <path d="M88 212h20v10c0 5-3 8-9 8H86c-4 0-6-3-5-6 1-6 3-9 7-9z" fill="url(#mnBoot)"/> <path d="M50 186c0-22 14-36 32-36s32 14 32 36c0 16-8 28-32 28s-32-12-32-28z" fill="url(#mnSuit)"/> <path d="M60 178h44v22c0 9-9 15-22 15s-22-6-22-15z" fill="url(#mnApron)"/> <rect x="56" y="190" width="52" height="7" rx="3" fill="#3a2418"/> <rect x="77" y="189" width="10" height="9" rx="2" fill="#e6b85c"/> <circle cx="70" cy="182" r="2.2" fill="#e6b85c"/><circle cx="96" cy="182" r="2.2" fill="#e6b85c"/> <path d="M58 156c8 6 40 6 50 0 2 5 1 9-2 11-12 6-36 6-46 0-3-2-4-7-2-11z" fill="#8c5ad6"/> <path d="M60 158c10 5 36 5 46 0" stroke="#b78cf0" stroke-width="2" fill="none" stroke-linecap="round"/> <g class="mn-head"> <path d="M46 112c-6 6-6 18 0 24 4-8 6-14 6-20z" fill="#6b4430"/> <circle cx="84" cy="118" r="38" fill="url(#mnSkin)"/> <path d="M50 104c-6 8-6 22 2 30 0-10 2-18 8-24z" fill="#6b4430"/> <ellipse cx="54" cy="124" rx="7" ry="9" fill="#f0bb93"/> <g class="mn-eyes"> <ellipse cx="94" cy="122" rx="5.2" ry="7.2" fill="#2a1826"/> <ellipse cx="114" cy="121" rx="4.6" ry="6.8" fill="#2a1826"/> <circle cx="96" cy="118.5" r="2" fill="#fff"/><circle cx="115.6" cy="117.8" r="1.8" fill="#fff"/> <circle cx="92.6" cy="125" r=".9" fill="#fff" opacity=".8"/> </g> <ellipse cx="86" cy="136" rx="7" ry="4" fill="#ff8a9a" opacity=".45"/> <ellipse cx="118" cy="134" rx="5" ry="3.4" fill="#ff8a9a" opacity=".45"/> <path d="M101 136c2.5 3 6.5 3 9 0" stroke="#7a3a3a" stroke-width="2" fill="none" stroke-linecap="round"/> <path d="M44 110c0-26 18-42 42-42s40 16 40 40c0 3-2 5-5 5H49c-3 0-5-1-5-3z" fill="url(#mnHelm)"/> <path d="M40 110c0-3 2-5 5-5h80c4 0 6 2 6 5s-2 6-6 6H45c-3 0-5-3-5-6z" fill="#b57a33"/> <path d="M52 92c6-12 18-18 30-18" stroke="#fff3cf" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/> <path d="M84 70v34" stroke="#9a6526" stroke-width="3" opacity=".6"/> <circle class="mn-glow" cx="114" cy="92" r="30" fill="url(#mnGlow)"/> <circle cx="114" cy="92" r="10" fill="#6a4320"/> <circle cx="114" cy="92" r="7.5" fill="#fff4c4"/> <path d="M114 85.5l1.9 4.2 4.6.5-3.4 3.1 1 4.5-4.1-2.4-4.1 2.4 1-4.5-3.4-3.1 4.6-.5z" fill="#ffc94a"/> </g> </g> <g class="mn-arm"> <path d="M86 160c14 4 30 8 42 10" stroke="#5b4072" stroke-width="12" stroke-linecap="round" fill="none"/> <path d="M124 176 L198 146" stroke="url(#mnWood)" stroke-width="8" stroke-linecap="round"/> <path d="M124 176 L198 146" stroke="#3b2414" stroke-width="8" stroke-linecap="round" fill="none" opacity=".25" stroke-dasharray="2 14"/> <path d="M178 116c14 6 26 18 30 32 4 13 6 26 6 38-6-10-11-20-18-28-6-8-14-13-24-17z" fill="url(#mnIron)" stroke="#3a4250" stroke-width="1.5"/> <path d="M184 112c-6 0-10 4-11 9l14 6c2-5 1-11-3-15z" fill="#7f8a9a" stroke="#3a4250" stroke-width="1.2"/> <rect x="188" y="136" width="16" height="18" rx="3" transform="rotate(-22 196 145)" fill="#c08a3e" stroke="#5a3a1a" stroke-width="1.2"/> <path d="M190 141l10-4" stroke="#ffe3a0" stroke-width="1.6" stroke-linecap="round"/> <path d="M84 166c16 4 32 6 46 6" stroke="#6f5288" stroke-width="13" stroke-linecap="round" fill="none"/> <circle cx="134" cy="172" r="9" fill="#7a4a2c"/> <circle cx="120" cy="178" r="8.5" fill="#6a3f25"/> <path d="M128 167c3 0 6 2 7 5" stroke="#a8724a" stroke-width="2" fill="none" stroke-linecap="round"/> </g> </svg>';
  const LAYER_COLORS=['#d9485a','#e07a3c','#d6ad3f','#6fb35a','#3f9cc4','#8a63d9'];
  const ELEMENT_COLORS={fire:'#ff8a3d',ember:'#ff8a3d',frost:'#7fd3ff',ice:'#7fd3ff',holy:'#ffe08a',storm:'#b99bff',lightning:'#b99bff',shade:'#c28bff',venom:'#8ee07a',earth:'#d9b37a',blade:'#f2e6d0'};
  const motion=()=>typeof motionAllowed!=='function'||motionAllowed();
@@ -4775,12 +4780,12 @@ const battlePresentation=(()=>{
  function ensureHud(){
   const field=battle();if(!field)return null;
   if(hud?.isConnected)return hud;
-  hud=document.createElement('section');hud.id='bpBossHud';hud.className='bp-boss-hud'+(BATTLE_UI_ART?' painted':'');hud.hidden=true;
+  // fix13: a slim bar that takes the route's place (the framed panel covered the boss and the field).
+  hud=document.createElement('section');hud.id='bpBossHud';hud.className='bp-boss-hud slim';hud.hidden=true;
   hud.setAttribute('aria-label','보스 체력');
-  hud.innerHTML=`<div class="bp-medal">${BATTLE_UI_ART?`<img src="${ART}boss-medal.webp" alt="" draggable="false">`:''}${BOSS_GLYPH}</div>
-   <div class="bp-body"><div class="bp-title"><em data-tag></em><b data-name></b><small data-meta></small></div>
-   <div class="bp-bar"><i class="bp-under"></i><i class="bp-trail"></i><i class="bp-fill"></i><span class="bp-ticks"></span><b class="bp-layers" data-layers></b></div>
-   <div class="bp-foot"><span data-hp></span><span class="bp-clock" data-clock></span><b data-pct></b></div></div>`;
+  hud.innerHTML=`<div class="bp-title">${BOSS_GLYPH}<b data-name></b><span class="bp-right"><span class="bp-clock" data-clock></span><b class="bp-layers" data-layers></b></span></div>
+   <div class="bp-track"><div class="bp-bar"><i class="bp-under"></i><i class="bp-trail"></i><i class="bp-fill"></i><span class="bp-ticks"></span></div></div>
+   <span class="bp-sr" data-hp></span><span class="bp-sr" data-pct></span><span class="bp-sr" data-tag></span><span class="bp-sr" data-meta></span>`;
   field.appendChild(hud);return hud;
  }
  function hudState(){
@@ -4812,7 +4817,7 @@ const battlePresentation=(()=>{
   el.querySelector('[data-meta]').textContent=st.meta;
   el.querySelector('[data-hp]').textContent=compact(hp)+' / '+compact(max);
   el.querySelector('[data-pct]').textContent=(hp/max*100).toFixed(hp/max<.1?1:0)+'%';
-  const clock=el.querySelector('[data-clock]');clock.textContent=st.clock?'⏱ '+st.clock:'';
+  const clock=el.querySelector('[data-clock]');clock.textContent=st.clock||'';
   clock.classList.toggle('urgent',/^\D*([0-9]|10)초?$/.test(st.clock)&&!!st.clock);
   el.querySelector('[data-layers]').textContent=layer>1?'×'+layer:'';
   const fill=el.querySelector('.bp-fill'),trail=el.querySelector('.bp-trail'),under=el.querySelector('.bp-under');
@@ -4823,7 +4828,33 @@ const battlePresentation=(()=>{
   requestAnimationFrame(()=>{trail.style.width=within+'%'});
   if(lastHp!==null&&hp<lastHp&&motion()){el.classList.remove('struck');void el.offsetWidth;el.classList.add('struck')}
   if(fresh&&motion()){el.classList.remove('arrive');void el.offsetWidth;el.classList.add('arrive')}
+  if(fresh&&st.key[0]==='s'&&motion())bossWalkIn();
   lastHp=hp;lastLayer=layer;lastKey=st.key;
+ }
+
+ /* ---------- fix13: the stage boss walks in like the waves do (it used to pop into place) ---------- */
+ let walkKey='';
+ function bossWalkIn(){
+  const field=battle(),mob=document.getElementById('mobActor'),a=s?.stageBossAttempt;
+  if(!field||!mob?.animate||document.hidden||!a||Date.now()-a.started>1500)return;
+  const key=a.stage+':'+a.started;if(walkKey===key)return;walkKey=key;
+  // The hero takes the same few steps forward that it takes between waves.
+  try{if(typeof actorMotion!=='undefined')actorMotion.advanceWave?.({boss:true})}catch(e){}
+  const width=field.clientWidth,distance=width-mob.offsetLeft+mob.offsetWidth*.08,duration=1250/Math.max(1,s.speed||1);
+  const steps=3,frames=Array.from({length:40},(_,i)=>{
+   const t=i/39,tail=1-t,travel=tail*tail*(1+.6*t);
+   const step=Math.abs(Math.sin(steps*Math.PI*t))*tail;
+   return {offset:t,translate:`${(distance*travel).toFixed(1)}px ${(-5*step).toFixed(1)}px`,rotate:`${(1.4*Math.sin(2*steps*Math.PI*t)*tail).toFixed(2)}deg`,opacity:Math.min(1,t/.12)};
+  });
+  mob.animate(frames,{duration,easing:'linear',fill:'none'});
+  // A puff of dust where each heavy foot lands.
+  const feetY=mob.offsetTop+mob.offsetHeight*.94,feetX=mob.offsetLeft+mob.offsetWidth*.5;
+  for(let k=1;k<=steps;k++){
+   const t=k/steps-.02,tail=1-t,travel=tail*tail*(1+.6*t);
+   const puff=document.createElement('i');puff.className='bp-dust';puff.setAttribute('aria-hidden','true');
+   puff.style.left=(feetX+distance*travel)+'px';puff.style.top=feetY+'px';puff.style.animationDelay=(t*duration)+'ms';
+   puff.addEventListener('animationend',()=>puff.remove(),{once:true});field.appendChild(puff);
+  }
  }
 
  /* ---------- Boss entrance card ---------- */
@@ -4852,6 +4883,39 @@ const battlePresentation=(()=>{
   if(!node||!motion())return;
   // A short brightening of the struck body; the browser ends it, so no timer is left behind.
   node.animate?.(strong?[{filter:'brightness(1.75) saturate(.8)'},{filter:'brightness(1)'}]:[{filter:'brightness(1.4)'},{filter:'brightness(1)'}],{duration:strong?140:90,easing:'ease-out'});
+ }
+ /* fix13: hit spark at the point of contact for every basic attack and skill hit.
+    A white-hot core, a shock ring, flying streaks and (for skills) a slash arc, all compositor
+    animations that remove themselves; the screen itself barely moves. */
+ let sparkCount=0;
+ function hitSpark(host,left,top,{effect='',skill=false,big=false,echo=false,crit=false}={}){
+  if(!host||!motion()||document.hidden)return null;
+  if(sparkCount>14)return null;
+  // Battle sparks go on their own layer above the monsters (the number layer sits under the actors' bodies).
+  if(host.id==='fx'){const field=battle();let layer=document.getElementById('bpSparks');if(field&&!layer?.isConnected){layer=document.createElement('div');layer.id='bpSparks';layer.setAttribute('aria-hidden','true');field.appendChild(layer)}if(layer)host=layer}
+  const color=ELEMENT_COLORS[effect]||(skill?'#ffd98a':'#fff1c9');
+  const size=Math.round((echo?40:skill?84:60)*(big?1.3:1)*(crit?1.25:1));
+  const box=document.createElement('span');box.className='bp-spark';box.setAttribute('aria-hidden','true');
+  box.style.cssText=`left:${left};top:${top};width:${size}px;height:${size}px;--c:${color}`;
+  const parts=[];
+  const make=(cls,css='')=>{const i=document.createElement('i');i.className=cls;if(css)i.style.cssText=css;box.appendChild(i);return i};
+  const core=make('core'),ring=make('ring');
+  parts.push([core,[{transform:'scale(.25)',opacity:1},{offset:.3,transform:'scale(1)',opacity:1},{transform:'scale(1.25)',opacity:0}],230]);
+  parts.push([ring,[{transform:'scale(.3)',opacity:.95,borderWidth:'3px'},{transform:'scale(1.7)',opacity:0,borderWidth:'1px'}],echo?240:340]);
+  const rays=echo?4:skill||crit?8:6,turn=Math.random()*360;
+  for(let k=0;k<rays;k++){
+   const a=turn+k*360/rays+(Math.random()*18-9),len=size*(.32+Math.random()*.22);
+   const ray=make('ray',`height:${len.toFixed(1)}px;rotate:${a.toFixed(1)}deg`);
+   parts.push([ray,[{transform:`translate(-50%,${(-size*.08).toFixed(1)}px) scaleY(1)`,opacity:1},{transform:`translate(-50%,${(-size*.62).toFixed(1)}px) scaleY(.15)`,opacity:0}],260+Math.random()*100]);
+  }
+  if(skill&&!echo){
+   const slash=make('slash',`rotate:${(-38+Math.random()*30).toFixed(1)}deg`);
+   parts.push([slash,[{transform:'scale(.55,.4)',opacity:0},{offset:.25,transform:'scale(1,.9)',opacity:1},{transform:'scale(1.3,1)',opacity:0}],300]);
+  }
+  host.appendChild(box);sparkCount++;
+  let left2=parts.length;const done=()=>{if(--left2<=0){box.remove();sparkCount--}};
+  for(const [node,frames,ms] of parts){const an=node.animate?.(frames,{duration:ms,easing:'cubic-bezier(.2,.7,.3,1)',fill:'forwards'});if(an)an.onfinish=done;else done()}
+  return box;
  }
  function critBurst(){
   if(!motion())return;
@@ -4907,7 +4971,8 @@ const battlePresentation=(()=>{
   if(!layer){
    layer=document.createElement('div');layer.className='bp-mine'+(MINE_ART?' painted':'');layer.setAttribute('aria-hidden','true');
    const ore=MINE_ART?`<img class="bp-ore-art" src="./assets/star-mine/ore-node-0.webp" alt="" draggable="false">`:`<img class="bp-ore-art" src="./assets/minigames/ore-large.webp" alt="" draggable="false">`;
-   layer.innerHTML=`<i class="bp-lantern"></i><div class="bp-ore">${ore}<svg class="bp-cracks" viewBox="0 0 100 100"><path class="c1" d="M50 50 38 34M50 50 64 38"/><path class="c2" d="M50 50 41 66M50 50 70 58M38 34 30 30"/><path class="c3" d="M50 50 52 24M50 50 26 54M64 38 75 30M41 66 36 78"/></svg></div><b class="bp-combo"></b>`;
+   const miner=MINER_ART?`<div class="bp-miner painted"><img class="mn-body" src="./assets/star-mine/miner-body.webp" alt="" draggable="false"><img class="mn-arm" src="./assets/star-mine/miner-arm.webp" alt="" draggable="false"></div>`:`<div class="bp-miner">${MINER_SVG}</div>`;
+   layer.innerHTML=`<i class="bp-lantern"></i>${miner}<div class="bp-ore">${ore}<svg class="bp-cracks" viewBox="0 0 100 100"><path class="c1" d="M50 50 38 34M50 50 64 38"/><path class="c2" d="M50 50 41 66M50 50 70 58M38 34 30 30"/><path class="c3" d="M50 50 52 24M50 50 26 54M64 38 75 30M41 66 36 78"/></svg></div><b class="bp-combo"></b>`;
    // With the A15 art the floating pickaxe becomes a gloved hand gripping it (same anchor points).
    if(MINE_ART){const pick=field.querySelector('.mine-pick');if(pick)pick.src='./assets/star-mine/pick-hand.webp'}
    field.appendChild(layer);
@@ -4917,8 +4982,21 @@ const battlePresentation=(()=>{
   // The ore node sits on the pick's target point.
   const st=getComputedStyle(field),tool=parseFloat(field.style.getPropertyValue('--mine-tool'))||parseFloat(st.getPropertyValue('--mine-tool'))||180;
   const left=parseFloat(field.style.getPropertyValue('--mine-left'))||0,top=parseFloat(field.style.getPropertyValue('--mine-top'))||0;
-  layer.style.setProperty('--ore-x',(left+.988*tool)+'px');layer.style.setProperty('--ore-y',(top+.40*tool)+'px');
+  const cx=left+.988*tool,cy=top+.40*tool;
+  layer.style.setProperty('--ore-x',cx+'px');layer.style.setProperty('--ore-y',cy+'px');
+  // The miner's pick tip (214,186 of its 240 box) lands on the contact point; the ore sits just past it.
+  const w=field.clientWidth,h=field.clientHeight,size=Math.min(w*.62,h*.36,260),k=size/240,ore=Math.min(w*.36,h*.2,190);
+  layer.style.setProperty('--miner-size',size+'px');layer.style.setProperty('--miner-x',(cx-214*k)+'px');layer.style.setProperty('--miner-y',(cy-186*k)+'px');
+  layer.style.setProperty('--ore-size',ore+'px');layer.style.setProperty('--ore-cx',(cx+ore*.30)+'px');layer.style.setProperty('--ore-cy',(cy-ore*.12)+'px');
   return layer;
+ }
+ function minerSwing(auto){
+  const miner=document.querySelector('#mineField .bp-miner');if(!miner||!motion())return;
+  const arm=miner.querySelector('.mn-arm'),body=miner.querySelector('.mn-body');
+  // Same clock as the star-mine strike: windup, contact at `hit`, a little follow-through, back to ready.
+  const duration=auto?450:285,hit=auto?.40:.25;
+  arm?.animate?.([{rotate:'-115deg'},{offset:hit*.5,rotate:'-128deg'},{offset:hit,rotate:'0deg'},{offset:Math.min(.9,hit+.12),rotate:'8deg'},{rotate:'-115deg'}],{duration,easing:'linear'});
+  body?.animate?.([{rotate:'0deg',translate:'0 0'},{offset:hit*.5,rotate:'-3deg',translate:'-2px 0'},{offset:hit,rotate:'5deg',translate:'4px 1px'},{rotate:'0deg',translate:'0 0'}],{duration:duration*1.15,easing:'ease-out'});
  }
  function paintMineTime(){
   const r=s?.mineRun,bar=document.querySelector('#mineView .bp-mine-time i');if(!r||!bar)return;
@@ -4993,7 +5071,9 @@ const battlePresentation=(()=>{
   if(typeof mineScene!=='undefined'&&mineScene.strike){
    const strike=mineScene.strike;
    mineScene.strike=function(auto=false){
+    const pick=document.querySelector('#mineField .mine-pick'),was=pick?.getAnimations?.()[0];
     const before=s?.mineRun?.hits;strike.call(this,auto);
+    const now=pick?.getAnimations?.()[0];if(now&&now!==was)minerSwing(auto);
     if(!s?.mineRun||!mineScene.focused())return;
     mineLayer();setTimeout(()=>{if(s?.mineRun&&mineScene.focused())mineContact(auto)},motion()?(auto?180:72):0);
    };
@@ -5034,7 +5114,7 @@ const battlePresentation=(()=>{
   }
  }
  install();
- return {paintRoute,paintHud,castBanner,mineResult,routeMarkup,damageNumber};
+ return {paintRoute,paintHud,castBanner,mineResult,routeMarkup,damageNumber,hitSpark};
 })();
 
 ;
