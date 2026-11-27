@@ -100,7 +100,7 @@ HUD와 글씨는 모바일에서 한눈에 읽힐 크기로 배치하고 부연 
 
 그림은 `dist/client/assets/minigames/`, 소리는 그 아래 `sfx/`에 둔다. 파일 이름과 크기는 `GPT-미니게임-그림·UI·소리-상세.md`에 있다. 카드·버튼 틀은 모서리 24픽셀을 고정하고 늘려 쓰며(`border-image`), 게이지 틀은 가운데가 뚫린 테를 막대 위에 덮는다. 소리는 `miniSound(게임, 이름)` 한 곳에서 재생하고, 스위치가 켜진 미니게임 화면이 열려 있는 동안에는 그 게임의 배경 음악(`mini-furnace`, `mini-board`)이 난다.
 
-전투 연출 층(`dist/client/battle-presentation.js`·`.css`)은 보기만 바꾼다. 스테이지 경로, 보스 체력 창, 맞는 쪽 번쩍임, 스킬 이름 띠, 보스 등장 경고, 보스 크기, 광산의 광석·콤보·시간 막대·결과 창을 그린다. 피해·보상·시간 규칙과 저장은 건드리지 않고, 서버 규칙 시뮬레이션은 이 파일을 읽지 않는다(`tools/rank-simulation/build.cjs`의 presentation 목록). 그림 스위치 네 개가 파일 맨 위에 있고 기본은 모두 꺼짐이며, 꺼져 있으면 코드로 그린 모습을 쓴다.
+전투 연출 층(`dist/client/battle-presentation.js`·`.css`)은 보기만 바꾼다. 스테이지 경로, 보스 체력 창, 맞는 쪽 번쩍임, 스킬 이름 띠, 보스 등장 경고, 보스 크기, 광산의 광석·콤보·시간 막대·결과 창, 그리고 스테이지·월드보스·레이드 공통 데미지 숫자(`battlePresentation.damageNumber`)를 그린다. 버튼·스위치·팝업·하단 메뉴의 입체감은 `ui-kit.css`에 있다. 피해·보상·시간 규칙과 저장은 건드리지 않고, 서버 규칙 시뮬레이션은 이 파일을 읽지 않는다(`tools/rank-simulation/build.cjs`의 presentation 목록). 그림 스위치 다섯 개가 파일 맨 위에 있고 기본은 모두 꺼짐이며, 꺼져 있으면 코드로 그린 모습을 쓴다.
 
 | 스위치 | 켜면 쓰는 파일 | 지시서 카드 |
 |---|---|---|
@@ -108,6 +108,7 @@ HUD와 글씨는 모바일에서 한눈에 읽힐 크기로 배치하고 부연 
 | `COMBAT_FX_ART` | `assets/combat-fx/crit-burst.webp` | A14 |
 | `MINE_ART` | `assets/star-mine/` pick-hand·ore-node-0~3·gem 6장 | A15 |
 | `BOSS_INTRO_ART` | `assets/battle-ui/boss-warning.webp` | A16 |
+| `UI_KIT_ART` | `assets/ui-kit/` btn-gold·btn-purple·panel-frame·divider·nav-glow 5장 (`ui-kit.css`) | A17~A19 |
 
 스킬 효과 필름은 `tools/bake-skill-effects-smooth.py`가 만든 36장(6×6) `assets/skill-casts/<이름>.s36.avif|webp`를 쓴다. `skill-films.js` 여섯째 칸이 36이면 이 파일을 읽고, 원래 16장 시트는 선택형 Unity 렌더러용으로 남겨 둔다. 원본 그림이나 조합을 바꾸면 두 도구를 차례로 다시 돌린다.
 

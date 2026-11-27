@@ -2528,6 +2528,72 @@ body:is(.low-motion,.power-saving) :is(#battle.impact-shake,#battle.bp-boss-shak
 #battle.bp-boss-on .bp-cast{top:186px}
 body.dungeon-combat #battle .bp-cast{top:calc(max(15px,env(safe-area-inset-top)) + 146px)}
 
+/* ---------- One damage number look for stage, world boss and raid ---------- */
+.bp-num{position:absolute;z-index:7;pointer-events:none;white-space:nowrap;line-height:1;font-variant-numeric:tabular-nums;will-change:transform,opacity;
+ font-size:clamp(17px,4.8cqw,27px);font-weight:900;letter-spacing:-.02em;color:#fff7e6;-webkit-text-stroke:0;animation:none;
+ text-shadow:0 2px 0 #3a1d12,1px 0 0 #3a1d12,-1px 0 0 #3a1d12,0 -1px 0 #3a1d12,0 0 8px #000a}
+.bp-num.critical{font-size:clamp(30px,9cqw,49px);font-weight:1000;font-style:italic;letter-spacing:-.055em;color:#ffd45c;
+ text-shadow:0 2px 0 #6a1408,1px 0 0 #6a1408,-1px 0 0 #6a1408,0 -1px 0 #6a1408,0 0 14px #ff6a2a}
+.bp-num.critical::before{content:"";position:absolute;left:-.46em;top:.06em;width:.48em;height:.48em;background:#fff1a3;
+ clip-path:polygon(49% 0,61% 36%,100% 48%,63% 61%,49% 100%,38% 61%,0 48%,38% 36%);filter:drop-shadow(0 0 2px #f99927)}
+.bp-num.critical::after{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;
+ background:url('./assets/critical-hit.webp') center/contain no-repeat;mix-blend-mode:screen;opacity:.85;animation:bp-crit .5s ease-out forwards}
+body.bp-fx-art .bp-num.critical::after{background-image:url('./assets/combat-fx/crit-burst.webp')}
+/* World boss: keep its anchor over the dragon, drop its own type and motion. */
+.wb-fx .wb-damage.bp-num{animation:none;-webkit-text-stroke:0;paint-order:normal}
+.party-field .raid-number{z-index:4}
+
+
+/* ui-kit.css */
+/* UI polish (v166 fix10). Code-drawn by default; with UI_KIT_ART (battle-presentation.js, cards A17-A19)
+   the same controls take the painted frames from assets/ui-kit/. Disabled controls keep their own look. */
+
+/* ---------- Buttons: depth, rim light and a press ---------- */
+body.ui-renewal .gold-button:not(:disabled):not(.purple){
+ background:linear-gradient(180deg,#fbe8b8 0%,#ebc87f 46%,#cf9b52 100%);border:1px solid #f6d999;color:#2b1b0d;
+ text-shadow:0 1px 0 #fff3cf99;box-shadow:inset 0 1px 0 #fffbe9cc,inset 0 -2px 0 #9c6a2e66,0 2px 6px #0b061299,0 0 0 1px #4a2f1a66;
+ transition:transform .08s ease,filter .08s ease}
+/* The purple variant of the gold button (prices, secondary actions) keeps its colour with the same depth. */
+body.ui-renewal .gold-button.purple:not(:disabled){
+ background:linear-gradient(180deg,#a47ac4 0%,#714c96 50%,#4f3368 100%);border:1px solid #c3a2da;color:#fbf3ff;text-shadow:0 1px 0 #2e1f3a;
+ box-shadow:inset 0 1px 0 #e7cdf699,inset 0 -2px 0 #2a1a3a80,0 2px 6px #0b061299;transition:transform .08s ease,filter .08s ease}
+body.ui-renewal .muted-button:not(:disabled){
+ background:linear-gradient(180deg,#3b2e4a,#271f33);border:1px solid #b197c64d;color:#e7dcef;
+ box-shadow:inset 0 1px 0 #ffffff1a,inset 0 -2px 0 #0000004d,0 2px 5px #0b061266;transition:transform .08s ease,filter .08s ease}
+body.ui-renewal :is(.gold-button,.muted-button):not(:disabled):active{transform:translateY(1px) scale(.985);filter:brightness(.93)}
+body.ui-renewal :is(.gold-button,.muted-button):focus-visible{outline:2px solid #ffe3a3;outline-offset:2px}
+
+/* ---------- Switches: OFF reads as off (slate), ON as lit (jade with glow) ---------- */
+body.ui-renewal .switch-face.is-off,body.ui-renewal .pref-sheet .switch-face.is-off,
+body.ui-renewal :is(#screenContent,#content) .setting-row .switch-face.is-off{background:linear-gradient(180deg,#2b2433,#3a3145);border-color:#5a4d66}
+body.ui-renewal .switch-face.is-off .switch-word{color:#a99bb3!important}
+body.ui-renewal .switch-face.is-on,body.ui-renewal .pref-sheet .switch-face.is-on,
+body.ui-renewal :is(#screenContent,#content) .setting-row .switch-face.is-on{background:linear-gradient(180deg,#2f7a52,#4b9a69);border-color:#7fd3a0;box-shadow:inset 0 2px 4px #0005,0 0 8px #5fd39a55}
+
+/* ---------- Popups: a lit frame and a gold divider under the title ---------- */
+body.ui-renewal #overlay .dialog{box-shadow:inset 0 0 0 1px #59485866,inset 0 1px 0 #ffffff14,0 0 0 1px #0008,0 14px 40px #0b0613cc,0 0 22px #e9c37b1f}
+body.ui-renewal #overlay .dialoghead{position:relative}
+body.ui-renewal #overlay .dialoghead::after{content:'';position:absolute;left:12%;right:12%;bottom:-1px;height:1px;pointer-events:none;
+ background:linear-gradient(90deg,transparent,#e9c37b99 30%,#fff0c8 50%,#e9c37b99 70%,transparent)}
+
+/* ---------- Shortcut row: the right edge fades to show there is more ---------- */
+body.ui-renewal #sideNav{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent)}
+
+/* ---------- Bottom menu: the open tab is lit from above ---------- */
+body.ui-renewal #bottomNav button.active{position:relative}
+body.ui-renewal #bottomNav button.active::before{content:'';position:absolute;left:22%;right:22%;top:0;height:2px;border-radius:2px;pointer-events:none;
+ background:linear-gradient(90deg,transparent,#ffe3a3,transparent);box-shadow:0 0 10px #ffd27a}
+body.ui-renewal #bottomNav button.active .catalog-icon{filter:drop-shadow(0 0 6px #ffd27a88);transform:translateY(-1px)}
+
+/* ---------- Painted UI kit (A17-A19) ----------
+   The frame is drawn wider than the 1-2px border (border-image-width), so turning the art on never
+   changes any button's or popup's size. */
+body.ui-kit-art.ui-renewal .gold-button:not(:disabled):not(.purple){background:none;border:1px solid transparent;border-image:url('./assets/ui-kit/btn-gold.webp') 24 fill/12px stretch;box-shadow:none}
+body.ui-kit-art.ui-renewal :is(.muted-button,.gold-button.purple):not(:disabled){background:none;border:1px solid transparent;border-image:url('./assets/ui-kit/btn-purple.webp') 24 fill/12px stretch;box-shadow:none}
+body.ui-kit-art.ui-renewal #overlay .dialog{border:2px solid transparent;border-image:url('./assets/ui-kit/panel-frame.webp') 48 fill/24px stretch}
+body.ui-kit-art.ui-renewal #overlay .dialoghead::after{left:6%;right:6%;height:12px;bottom:-6px;background:url('./assets/ui-kit/divider.webp') center/100% 100% no-repeat;box-shadow:none}
+body.ui-kit-art.ui-renewal #bottomNav button.active::before{left:8%;right:8%;top:-2px;height:22px;background:url('./assets/ui-kit/nav-glow.webp') center/100% 100% no-repeat;box-shadow:none}
+
 /* page */
 /* Keep the top controls outside the entire notification area, including long reward lists. */
 #notificationArea{position:absolute;inset:var(--hud-top,94px) 0 calc(var(--nav-height,68px) + 36px + env(safe-area-inset-bottom));z-index:10000;overflow:hidden;pointer-events:none}

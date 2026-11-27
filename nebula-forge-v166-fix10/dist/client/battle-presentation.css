@@ -162,3 +162,19 @@ body:is(.low-motion,.power-saving) :is(#battle.impact-shake,#battle.bp-boss-shak
 @media(prefers-reduced-motion:reduce){#battle .bp-boss-intro,#battle .bp-cast,#fx .bp-crit-burst{display:none}#route.bp-route :is(.bp-node.now,.bp-crest.now){animation:none}}
 #battle.bp-boss-on .bp-cast{top:186px}
 body.dungeon-combat #battle .bp-cast{top:calc(max(15px,env(safe-area-inset-top)) + 146px)}
+
+/* ---------- One damage number look for stage, world boss and raid ---------- */
+.bp-num{position:absolute;z-index:7;pointer-events:none;white-space:nowrap;line-height:1;font-variant-numeric:tabular-nums;will-change:transform,opacity;
+ font-size:clamp(17px,4.8cqw,27px);font-weight:900;letter-spacing:-.02em;color:#fff7e6;-webkit-text-stroke:0;animation:none;
+ text-shadow:0 2px 0 #3a1d12,1px 0 0 #3a1d12,-1px 0 0 #3a1d12,0 -1px 0 #3a1d12,0 0 8px #000a}
+.bp-num.critical{font-size:clamp(30px,9cqw,49px);font-weight:1000;font-style:italic;letter-spacing:-.055em;color:#ffd45c;
+ text-shadow:0 2px 0 #6a1408,1px 0 0 #6a1408,-1px 0 0 #6a1408,0 -1px 0 #6a1408,0 0 14px #ff6a2a}
+.bp-num.critical::before{content:"";position:absolute;left:-.46em;top:.06em;width:.48em;height:.48em;background:#fff1a3;
+ clip-path:polygon(49% 0,61% 36%,100% 48%,63% 61%,49% 100%,38% 61%,0 48%,38% 36%);filter:drop-shadow(0 0 2px #f99927)}
+.bp-num.critical::after{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;
+ background:url('./assets/critical-hit.webp') center/contain no-repeat;mix-blend-mode:screen;opacity:.85;animation:bp-crit .5s ease-out forwards}
+body.bp-fx-art .bp-num.critical::after{background-image:url('./assets/combat-fx/crit-burst.webp')}
+/* World boss: keep its anchor over the dragon, drop its own type and motion. */
+.wb-fx .wb-damage.bp-num{animation:none;-webkit-text-stroke:0;paint-order:normal}
+.party-field .raid-number{z-index:4}
+

@@ -1,0 +1,2 @@
+이 폴더에 A17~A19 그림을 넣습니다: btn-gold.webp, btn-purple.webp, panel-frame.webp, divider.webp, nav-glow.webp
+자세한 내용: GPT-전투연출-그림·UI·효과-상세.md

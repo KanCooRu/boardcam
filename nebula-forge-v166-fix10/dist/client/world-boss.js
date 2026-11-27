@@ -315,11 +315,16 @@ const worldBoss = (() => {
  function impact(hit,delay=0) {
   if(document.hidden||panel!=='fight')return;
   if(motionAllowed()){
-   const fx=dialog.querySelector('.wb-fx'), text=document.createElement('b');
-   text.className='wb-damage'+(hit.crit?' wb-critical':'');
-   text.textContent=(hit.crit?'치명타 ':'')+num(hit.hit);
-   text.style.setProperty('--wb-drift',((hit.at+Math.floor(hit.hit))%19-9)+'px');
-   fx.appendChild(text);setTimeout(()=>text.remove(),740);
+   const fx=dialog.querySelector('.wb-fx'),drift=(hit.at+Math.floor(hit.hit))%19-9;
+   // The same damage number as the stage (battle-presentation.js); the old text is the fallback.
+   if(typeof battlePresentation!=='undefined')battlePresentation.damageNumber(fx,hit.hit,hit.crit,{drift:drift*1.4,className:'wb-damage'});
+   else{
+    const text=document.createElement('b');
+    text.className='wb-damage'+(hit.crit?' wb-critical':'');
+    text.textContent=(hit.crit?'치명타 ':'')+num(hit.hit);
+    text.style.setProperty('--wb-drift',drift+'px');
+    fx.appendChild(text);setTimeout(()=>text.remove(),740);
+   }
    const strong=hit.crit||hit.skill>=0,finishing=finishingHits.has(hit);
    raidContactGlint(dialog.querySelector('.wb-stage'),'var(--wb-target-x)','calc(100% - var(--wb-target-bottom))',strong);
    if(finishing||strong)motion?.hitStop(finishing?190:95);

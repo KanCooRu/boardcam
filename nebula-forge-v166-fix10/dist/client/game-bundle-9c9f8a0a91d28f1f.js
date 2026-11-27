@@ -1885,11 +1885,16 @@ const worldBoss = (() => {
  function impact(hit,delay=0) {
   if(document.hidden||panel!=='fight')return;
   if(motionAllowed()){
-   const fx=dialog.querySelector('.wb-fx'), text=document.createElement('b');
-   text.className='wb-damage'+(hit.crit?' wb-critical':'');
-   text.textContent=(hit.crit?'치명타 ':'')+num(hit.hit);
-   text.style.setProperty('--wb-drift',((hit.at+Math.floor(hit.hit))%19-9)+'px');
-   fx.appendChild(text);setTimeout(()=>text.remove(),740);
+   const fx=dialog.querySelector('.wb-fx'),drift=(hit.at+Math.floor(hit.hit))%19-9;
+   // The same damage number as the stage (battle-presentation.js); the old text is the fallback.
+   if(typeof battlePresentation!=='undefined')battlePresentation.damageNumber(fx,hit.hit,hit.crit,{drift:drift*1.4,className:'wb-damage'});
+   else{
+    const text=document.createElement('b');
+    text.className='wb-damage'+(hit.crit?' wb-critical':'');
+    text.textContent=(hit.crit?'치명타 ':'')+num(hit.hit);
+    text.style.setProperty('--wb-drift',drift+'px');
+    fx.appendChild(text);setTimeout(()=>text.remove(),740);
+   }
    const strong=hit.crit||hit.skill>=0,finishing=finishingHits.has(hit);
    raidContactGlint(dialog.querySelector('.wb-stage'),'var(--wb-target-x)','calc(100% - var(--wb-target-bottom))',strong);
    if(finishing||strong)motion?.hitStop(finishing?190:95);
@@ -3912,6 +3917,8 @@ const partyRaid=(()=>{
     if(hit.m.self&&r===run&&!r.catchingUp&&!document.hidden&&motionAllowed()){
      const strong=hit.critical||hit.skill;
      raidContactGlint(dialog.querySelector('.party-field'),bossPoint[0]*100+'%',bossPoint[1]*100+'%',strong);
+     if(typeof battlePresentation!=='undefined')battlePresentation.damageNumber(dialog.querySelector('.party-field'),amount,!!hit.critical,
+      {left:bossPoint[0]*100+'%',top:(bossPoint[1]-.34)*100+'%',drift:(r.index*7+hit.ordinal*5)%19-9,className:'raid-number'});
      if(strong)r.poseClock.hold(60,r.time);
     }
    }
@@ -4725,11 +4732,13 @@ syncAccountNickname=async function(){await nameSyncBeforeRankings();rankBoard.sc
      BATTLE_UI_ART  A13  assets/battle-ui/   route + boss HP frame pictures
      COMBAT_FX_ART  A14  assets/combat-fx/   hit spark, crit burst, slash sheets
      MINE_ART       A15  assets/star-mine/   gloved hand with pickaxe, ore node crack stages, gem
-     BOSS_INTRO_ART A16  assets/battle-ui/   boss warning banner                                   */
+     BOSS_INTRO_ART A16  assets/battle-ui/   boss warning banner
+     UI_KIT_ART     A17-A19 assets/ui-kit/   button, popup frame, divider, bottom-menu glow (ui-kit.css) */
 const BATTLE_UI_ART=false;
 const COMBAT_FX_ART=false;
 const MINE_ART=false;
 const BOSS_INTRO_ART=false;
+const UI_KIT_ART=false;
 
 const battlePresentation=(()=>{
  const ART='./assets/battle-ui/',FX='./assets/combat-fx/';
@@ -4859,6 +4868,29 @@ const battlePresentation=(()=>{
   field.classList.remove('bp-casting');void field.offsetWidth;field.classList.add('bp-casting');
  }
 
+ /* ---------- One damage number for every battle (stage, world boss, raid) ---------- */
+ // Same text, size, colours and motion as the stage's warriorMotion.number: '−' + compact amount,
+ // pop then rise 48px; a critical is larger gold italic with the star and the crit burst behind it.
+ function damageNumber(host,amount,crit,{left,top,drift=0,className=''}={}){
+  if(!host||!motion())return null;
+  const node=document.createElement('b');
+  node.className='bp-num'+(crit?' critical':'')+(className?' '+className:'');
+  node.textContent='−'+compact(Math.max(0,Math.round(amount)));
+  if(left!=null)node.style.left=left;if(top!=null)node.style.top=top;
+  host.appendChild(node);
+  const duration=crit?870:680,pop=crit?1.45:1.12,end=()=>node.remove();
+  if(!node.animate){setTimeout(end,duration);return node}
+  if(crit)node.animate([{color:'#fff'},{color:'#fff'}],{duration:80});
+  const motionAnim=node.animate([
+   {offset:0,transform:'translate(-50%,5px) scale(.72)',opacity:0},
+   {offset:.14,transform:`translate(-50%,-5px) scale(${pop})`,opacity:1},
+   {offset:.58,transform:`translate(calc(-50% + ${drift*.6}px),-26px) scale(1)`,opacity:1},
+   {offset:1,transform:`translate(calc(-50% + ${drift}px),-48px) scale(1)`,opacity:0}],{duration,easing:'ease-out',fill:'forwards'});
+  motionAnim.onfinish=end;
+  if(crit)buzz(12);
+  return node;
+ }
+
  /* ---------- Star mine: ore node, combo, floating ore, timer bar, result ---------- */
  const ORE_HITS=12;
  let combo=0,comboAt=0,nodeHits=0;
@@ -4927,6 +4959,8 @@ const battlePresentation=(()=>{
 
  /* ---------- Wiring ---------- */
  function install(){
+  document.body?.classList?.toggle('bp-fx-art',COMBAT_FX_ART);
+  document.body?.classList?.toggle('ui-kit-art',UI_KIT_ART);
   if(typeof paintBattle==='function'){
    const before=paintBattle;
    paintBattle=function(...args){const out=before.apply(this,args);try{paintRoute();paintHud();bossIntro()}catch(e){}return out};
@@ -4987,7 +5021,7 @@ const battlePresentation=(()=>{
   }
  }
  install();
- return {paintRoute,paintHud,castBanner,mineResult,routeMarkup};
+ return {paintRoute,paintHud,castBanner,mineResult,routeMarkup,damageNumber};
 })();
 
 ;

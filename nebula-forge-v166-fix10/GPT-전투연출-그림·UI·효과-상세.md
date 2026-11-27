@@ -1,9 +1,9 @@
-# 성운의 모루 · 전투 연출 검수 보고서와 GPT 작업 지시서 (v166-fix8)
+# 성운의 모루 · 전투 연출·UI 검수 보고서와 GPT 작업 지시서 (v166-fix10)
 
 이 문서는 두 부분입니다.
 
 - **1부 · 검수 보고서**: Claude가 게임을 화면마다 직접 띄워 찾은 문제와, 코드로 이미 고친 것.
-- **2부 · GPT 작업 카드 A13~A16**: GPT가 그릴 그림 목록. 그림만 정해진 자리에 넣고 스위치 한 줄만 바꾸면 게임에 바로 나오도록 코드가 미리 연결되어 있습니다.
+- **2부 · GPT 작업 카드 A13~A19**: GPT가 그릴 그림 목록. 그림만 정해진 자리에 넣고 스위치 한 줄만 바꾸면 게임에 바로 나오도록 코드가 미리 연결되어 있습니다.
 
 > **GPT에게:** 2부만 따라 하면 됩니다. 2부에 적힌 파일 말고는 어떤 코드도 고치지 마세요. 끝나면 3부의 "넘길 때"대로 돌려주세요.
 
@@ -116,7 +116,36 @@
   - 광석 → 금 간 단계별 광석 그림
   - 튀는 보석 → 전용 보석
 
-## 6. 이번에 손대지 않은 것(2단계 제안)
+## 6. 데미지 숫자 통일 (수정본 10)
+
+**찾은 문제**
+- **스테이지**: `−12.5K`처럼 표시됩니다. 굵은 흰 글씨이고, 치명타는 금빛 기울임체에 별과 폭발이 붙습니다.
+- **월드보스**: `치명타 334,448`처럼 '치명타'라는 글자와 전체 자릿수를 씁니다. 글꼴·크기·움직임도 스테이지와 달랐습니다.
+- **레이드**: 데미지 숫자가 아예 없었습니다.
+
+**고친 것(코드)**
+- 세 곳 모두 같은 숫자를 씁니다. 텍스트, 크기, 색, 튀어 오르는 움직임, 치명타 별과 폭발까지 같습니다(`battlePresentation.damageNumber`).
+- 레이드는 내 공격에만 숫자를 띄웁니다. 대원 숫자까지 띄우면 화면이 어지러워집니다.
+
+## 7. UI 전반 검수 (수정본 10)
+
+화면 12곳(모험, 성장, 장비, 스킬, 상점, 모루, 설정, 우편함, 임무, 출석, 월드보스, 레이드)을 띄워 보고 기준에 맞지 않는 부분을 골랐습니다. 기준은 "화려하지만 과하지 않은, 요즘 게임의 세련된 느낌, 남보라·금테 판타지"입니다.
+
+| 부분 | 문제 | 이번 처리 |
+|---|---|---|
+| 금색 버튼 | 밋밋한 베이지 그라데이션이라 '누르는 물건'처럼 보이지 않음 | **코드로 고침**: 위는 밝고 아래는 어둡게, 금테 1px, 안쪽 빛 반사, 누르면 살짝 눌림. 그림 카드는 A17 |
+| 보라 버튼(가격·보조) | 같은 문제 | **코드로 고침**: 같은 입체감과 누름. 그림 카드는 A17 |
+| 켜기/끄기 스위치 | 꺼짐(OFF)이 진한 주황빨강이라 켜진 것처럼 보임 | **코드로 고침**: OFF는 어두운 회보라, ON은 은은하게 빛나는 비취색 |
+| 팝업 창 | 테두리 한 줄뿐이라 화면과 구분이 약함 | **코드로 고침**: 바깥 금빛 후광, 제목 아래 금빛 구분선. 그림 카드는 A18 |
+| 상단 바로가기 줄 | 오른쪽 끝 아이콘이 잘려 보임 | **코드로 고침**: 오른쪽 끝이 흐려지며 넘길 수 있다는 표시 |
+| 하단 메뉴 | 지금 탭 표시가 약함 | **코드로 고침**: 위쪽에 금빛 선과 아이콘 빛. 그림 카드는 A19 |
+
+다음 단계로 권하는 것(이번에 손대지 않음):
+- **상단 재화 칸(골드·다이아·성운석)**: 아이콘이 칸 안에 갇혀 작아 보입니다. 아이콘을 칸 왼쪽 밖으로 조금 걸치게 크게 두는 요즘 방식이 어울립니다. 상단 구조를 바꾸는 일이라 화면 전체를 다시 확인해야 합니다.
+- **카드형 칸(상점·우편)**: 모두 같은 어두운 상자라 중요도가 구분되지 않습니다. 무료·한정 상품에 리본이나 띠를 붙이는 일을 다음에 권합니다.
+- **잠금 표시 "STAGE 40"**: 하단 메뉴 글자 밑에 붙어 답답합니다. 아이콘 위 작은 자물쇠 배지로 옮기는 편이 깔끔합니다.
+
+## 8. 이번에 손대지 않은 것(2단계 제안)
 
 - **몬스터 동작 그림**: 몬스터는 그림 한 장을 통째로 움직이는 방식이라 맞는 동작, 쓰러지는 동작 그림이 없습니다. 보스 10종에 '맞는 자세' 그림 4장씩을 그리는 일이 다음으로 효과가 큽니다. 코드도 그에 맞게 고쳐야 해서 따로 진행하는 것을 권합니다.
 - **스킬 효과 그림**: (수정본 9에서 처리) 60종 모두 16장 → 36장으로 늘리고, 원본 그림 사이를 섞어 중간 장면을 만들었습니다. 재생 시간도 1.4배(0.6~1.1초)로 늘렸습니다. 도구: `tools/bake-skill-effects-smooth.py`. 그림을 새로 그릴 필요는 없습니다.
@@ -141,12 +170,13 @@
    - 가운데(글씨·막대가 들어가는 자리)는 비웁니다.
    - 네온 같은 형광색, 두꺼운 만화 외곽선, 글자는 넣지 않습니다.
 6. **글자를 그림에 넣지 않습니다.** 글씨는 게임이 따로 씁니다. 예외는 카드에 따로 적습니다.
-7. **바꿀 코드는 단 한 곳**: `dist/client/battle-presentation.js` 맨 위의 스위치 4줄뿐입니다.
+7. **바꿀 코드는 단 한 곳**: `dist/client/battle-presentation.js` 맨 위의 스위치 5줄뿐입니다.
    ```js
    const BATTLE_UI_ART=false;   // A13
    const COMBAT_FX_ART=false;   // A14
    const MINE_ART=false;        // A15
    const BOSS_INTRO_ART=false;  // A16
+   const UI_KIT_ART=false;      // A17~A19
    ```
    카드의 그림을 **전부** 넣은 뒤에만 그 카드의 줄을 `true`로 바꿉니다. 하나라도 빠졌으면 `false`로 둡니다.
 8. **스위치를 바꾼 뒤 반드시 실행할 명령**(게임 폴더에서):
@@ -259,12 +289,57 @@
 
 **A16 완료 후**: `const BOSS_INTRO_ART=true;` → 빌드 명령 2줄.
 
+## A17~A19 · UI 그림 (스위치 `UI_KIT_ART`)
+
+폴더: `dist/client/assets/ui-kit/` (이미 만들어 둠)
+
+**공통**
+- 버튼과 팝업 테두리는 **9조각 늘림 그림**입니다. 게임이 모서리 일정 픽셀만 그대로 두고 나머지를 늘립니다.
+- 모서리 안에만 장식을 넣고, 변(가장자리)은 어디를 잘라도 같은 무늬로, 가운데는 고르게 칠합니다.
+- 버튼·팝업의 크기는 게임이 정하므로, 그림 크기가 달라도 칸 크기는 바뀌지 않습니다.
+
+### A17-1 `btn-gold.webp` — 금색 버튼
+- **크기**: 192 × 72, 투명 배경. 게임은 **모서리 24px**을 고정하고 늘려 씁니다.
+- **그릴 것**: 둥근 모서리(반지름 약 18px)의 금속 금빛 판입니다.
+  - 위쪽 1/3은 밝은 크림 금빛(#FBE8B8), 아래로 갈수록 진한 호박 금빛(#C8934A)입니다.
+  - 위 가장자리에 가는 흰 반사광 한 줄, 아래 가장자리에 진한 그림자 한 줄을 넣습니다.
+  - 테두리는 1~2px의 밝은 금선입니다.
+  - 네 모서리에 아주 작은 꺾쇠 장식을 넣습니다(24px 안).
+  - 가운데는 무늬 없이 그라데이션만 둡니다(글씨 자리).
+- **프롬프트**: `9-slice mobile game button, rounded gold metal plate, light cream gold top fading to deep amber bottom, thin bright gold rim, subtle white highlight line along the top edge, soft dark line along the bottom edge, tiny ornate corner brackets only inside the corners, plain center, semi-realistic fantasy RPG UI, transparent background, no text`
+
+### A17-2 `btn-purple.webp` — 보라 버튼(가격·보조)
+- **크기**: 192 × 72, 모서리 24px. A17-1과 **같은 모양**에 색만 바꿉니다.
+  - 밝은 자수정(#A47AC4)에서 짙은 보라(#4F3368)로 갑니다.
+  - 테두리는 은은한 연보라 금속(#C3A2DA)입니다.
+- **프롬프트**: A17-1 프롬프트의 `gold`를 `amethyst purple`로, `cream gold top fading to deep amber`를 `light amethyst top fading to deep violet`으로 바꿉니다.
+
+### A18-1 `panel-frame.webp` — 팝업 창 테두리
+- **크기**: 256 × 256, 투명 배경. 게임은 **모서리 48px**을 고정하고 늘려 씁니다(화면에서 24px).
+- **그릴 것**: 짙은 자주 판(#1D1528, 불투명도 95%)에 얇은 금테 2줄을 두릅니다.
+  - 네 모서리(48px 안)에 금빛 덩굴 장식과 작은 자수정 보석을 넣습니다.
+  - 변은 금테 2줄만 반복합니다.
+  - 가운데는 고르게 칠하고 무늬를 넣지 않습니다.
+- **프롬프트**: `9-slice fantasy popup window frame, dark plum translucent panel, double thin gold border lines, ornate gold filigree with tiny amethyst gems only in the four corners, plain repeating edges, flat uniform center, elegant semi-realistic mobile RPG UI, transparent background, no text`
+
+### A18-2 `divider.webp` — 팝업 제목 아래 구분선
+- **크기**: 512 × 48, 투명 배경. 화면에서는 가로로 늘어나 높이 12px로 보입니다.
+- **그릴 것**: 가운데 작은 마름모 보석(금빛 테에 자수정)에서 좌우로 가늘게 뻗는 금선입니다. 양 끝은 투명하게 사라집니다. **좌우 대칭**으로 그립니다.
+- **프롬프트**: `ornamental horizontal divider, small diamond gem with gold setting in the center, thin gold lines extending left and right and fading to transparent, perfectly symmetrical, fantasy RPG UI, transparent background, no text`
+
+### A19-1 `nav-glow.webp` — 하단 메뉴 '지금 탭' 빛
+- **크기**: 160 × 48, 투명 배경. 지금 열린 하단 메뉴 탭의 위쪽에 깔립니다.
+- **그릴 것**: 위쪽 가운데에서 아래로 퍼지는 부드러운 금빛 빛무리입니다. 맨 위에 가는 밝은 선 하나를 두고, 아래로 갈수록 투명해집니다. 좌우 대칭입니다.
+- **프롬프트**: `soft golden light glow for an active tab indicator, bright thin line at the top center spreading down into a fading warm glow, symmetrical, transparent background, no text`
+
+**A17~A19 완료 후**: 다섯 파일(`btn-gold`, `btn-purple`, `panel-frame`, `divider`, `nav-glow`)이 모두 들어갔으면 `const UI_KIT_ART=true;` → 빌드 명령 2줄.
+
 ---
 
 # 3부 · 넘길 때와 검수
 
 ## GPT → 사용자 → Claude로 넘길 것
-1. 게임 폴더 전체(또는 바뀐 파일만): `dist/client/assets/battle-ui/`, `dist/client/assets/combat-fx/`, `dist/client/assets/star-mine/`의 새 그림과 `dist/client/battle-presentation.js`, 빌드로 바뀐 `dist/client/index.html`과 `dist/client/game-bundle-*.js`.
+1. 게임 폴더 전체(또는 바뀐 파일만): `dist/client/assets/battle-ui/`, `dist/client/assets/combat-fx/`, `dist/client/assets/star-mine/`, `dist/client/assets/ui-kit/`의 새 그림과 `dist/client/battle-presentation.js`, 빌드로 바뀐 `dist/client/index.html`과 `dist/client/game-bundle-*.js`.
 2. 어느 카드를 끝냈는지, 어느 스위치를 `true`로 바꿨는지 한 줄 메모.
 
 ## Claude가 검수할 것
@@ -276,7 +351,7 @@
 - 문제가 있으면 Claude가 위치·크기를 코드로 보정하거나, 다시 그릴 부분을 구체적으로 적어 드립니다.
 
 ## GPT가 하면 안 되는 것
-- `battle-presentation.js`의 스위치 4줄 말고 다른 코드를 고치는 것.
+- `battle-presentation.js`의 스위치 5줄 말고 다른 코드를 고치는 것.
 - 기존 그림 파일을 덮어쓰거나 지우는 것. 특히 `pick.webp`, `vein.webp`, `chips.webp`, `critical-hit.webp`.
 - 그림 안에 글자를 넣는 것.
 - 파일 이름을 바꾸는 것. 예: `boss_frame.webp`, `bossFrame.webp`는 안 됩니다.
