@@ -3681,7 +3681,7 @@ captureCampaignDefeat = function captureCampaignDefeat(){
  const e=encounterFor(s.stage,null),target=$('mobActor');
  e.fallAt=adventureFx.deathAnchor(target);
  e.actorWave=target.dataset.wave;
- if(e.boss&&warriorMotion.visible())actorMotion.hitStop(120,target);
+ if(e.boss&&warriorMotion.visible())actorMotion.hitStop(190,target);
  return e;
 };
 normalizeBenefits = function normalizeBenefits(a){a.vipLifetimeSpent=Math.floor(bounded(Math.max(a.vipLifetimeSpent||0,a.season?.spent||0)));a.vipRewards=recordMap(a.vipRewards);a.vipRewards.gifts=recordMap(a.vipRewards.gifts);a.vipRewards.daily=typeof a.vipRewards.daily==='string'?a.vipRewards.daily:'';return a};
@@ -6649,7 +6649,7 @@ tacticalImpact = function tacticalImpact(d,crit,e,token,effect,big,k=-1,echo=fal
    paintAdventureImpact(target,effect,k,hitSurface,crit,big,echo);
    if(crit||big){
     shakeImpactStage($('battle'));
-    if(!(lethal&&creature?.boss))actorMotion.hitStop(60,target);
+    if(!(lethal&&creature?.boss))actorMotion.hitStop(95,target);
    }
   }
   spawnClassFx(effect,big,'impact',k,echo,factor,lethal&&k<0,ordinal,k===18&&i!==focus);
@@ -8559,7 +8559,7 @@ const worldBoss = (() => {
    fx.appendChild(text);setTimeout(()=>text.remove(),740);
    const strong=hit.crit||hit.skill>=0,finishing=finishingHits.has(hit);
    raidContactGlint(dialog.querySelector('.wb-stage'),'var(--wb-target-x)','calc(100% - var(--wb-target-bottom))',strong);
-   if(finishing||strong)motion?.hitStop(finishing?120:60);
+   if(finishing||strong)motion?.hitStop(finishing?190:95);
   }
   if(!hit.periodic){
    const factor=Math.min(1,Math.max(.48,1.4/attackSpeed()));
@@ -10350,7 +10350,7 @@ const partyRaid=(()=>{
 EXTRA_POPUPS.partyRaidHelp=['월식 레이드 안내',()=>'<p>내 레벨 ±10인 기사 기록 중 최대 4명을 무작위 모집합니다. 오프라인 기사도 참여합니다.</p><p>60초간 장착 스킬 4개가 자동 발동합니다. 도끼·빙창은 회피하고, 월식 개문은 공격 스킬로 끊어 4초간 피해를 높이세요.</p>'];
 
 ;
-// game script 93
+// game script 94
 termButton = function termButton(term,label=''){
  return `<button type="button" class="term-help" aria-label="${term} 설명" onclick="openMenu('termHelp','${term}')">${label}<i aria-hidden="true"><ui-mark data-shape=bang aria-hidden=true></ui-mark></i></button>`;
 };
@@ -10676,7 +10676,7 @@ document.addEventListener('pointerdown',event=>{lastDiamondPointer={x:event.clie
 
 
 ;
-// game script 94
+// game script 95
 trialPeakFloors = function trialPeakFloors(state=s){return Math.max(0,Math.floor(Number(state?.trialPeak)||0))};
 trialFloorPaid = function trialFloorPaid(floor,state=s){return !!state.economyClaims?.paid?.['trialFloor/'+floor]};
 trialMod = function trialMod(key){
@@ -10782,7 +10782,7 @@ const TRIAL_WEEKLY_PRIZES=[
 
 
 ;
-// game script 95
+// game script 96
 dailyTrialWallet = function dailyTrialWallet(state,{source,id},now){
  const today=trialDayInfo(now);
  const match=typeof id==='string'&&/^(\d{4}-\d{2}-\d{2})\/([1-3])(?:\/(0|[1-9]\d*))?$/.exec(id);
@@ -10961,7 +10961,7 @@ document.addEventListener?.('visibilitychange',()=>{
 
 
 ;
-// game script 96
+// game script 97
 trialCombatPaused = function trialCombatPaused(run=dungeonRun){
  return run?.mode==='trial'&&(run.choosing===true||run.exitPending===true||!!run.floorTransition||!!run.endReason);
 };
@@ -11104,7 +11104,7 @@ const TRIAL_FLOOR_TRANSITION_SECONDS=1.2;
 
 
 ;
-// game script 97
+// game script 98
 trialRankButton = function trialRankButton(){
  return '<button type="button" class="muted-button trial-rank-link" data-feature="trial" onclick="openMenu(\'trialRanking\',\'current\')">주간 순위</button>';
 };
@@ -11252,7 +11252,7 @@ EXTRA_POPUPS.trialRanking=['오늘의 탑 주간 순위',trialRankingUI.board];
 EXTRA_POPUPS.trialWeekReward=['지난주 순위 보상',trialRankingUI.reward];
 
 ;
-// game script 98
+// game script 99
 constellationCore = function constellationCore(f){return CONSTELLATION_ART?'<img src="./assets/constellation/node-'+f+'.webp" width="40" height="40" alt="">':'<ui-mark data-shape=spark aria-hidden=true></ui-mark>'};
 constellationPadlock = function constellationPadlock(){return lockMark()};
 constellationLevel = function constellationLevel(state=s){return Math.floor(bounded(Math.max(Number(state?.constellation)||0,Number(state?.anvilAwakening)||0),0,CONSTELLATION.max))};
@@ -11437,7 +11437,7 @@ const characterScreenBeforeConstellation=characterScreen;
 characterScreen=function(){return screenTab==='constellation'?constellationScreen():characterScreenBeforeConstellation()};
 
 ;
-// game script 99
+// game script 100
 minigameArt = function minigameArt(on,name,cls,width,height){return on?'<img class="'+cls+'" src="./assets/minigames/'+name+'.webp" width="'+width+'" height="'+height+'" alt="">':''};
 minigameOpen = function minigameOpen(key,state=s){return state.maxStage>MINIGAME_GATES[key]};
 minigameLockText = function minigameLockText(key){return stageText(MINIGAME_GATES[key])+'을 클리어하면 열립니다.'};

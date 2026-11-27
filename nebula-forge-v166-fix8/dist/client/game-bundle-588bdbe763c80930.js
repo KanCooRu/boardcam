@@ -1972,7 +1972,7 @@ function tacticalImpact(d,crit,e,token,effect,big,k=-1,echo=false,factor=1,ordin
    paintAdventureImpact(target,effect,k,hitSurface,crit,big,echo);
    if(crit||big){
     shakeImpactStage($('battle'));
-    if(!(lethal&&creature?.boss))actorMotion.hitStop(60,target);
+    if(!(lethal&&creature?.boss))actorMotion.hitStop(95,target);
    }
   }
   spawnClassFx(effect,big,'impact',k,echo,factor,lethal&&k<0,ordinal,k===18&&i!==focus);

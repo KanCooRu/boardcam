@@ -1,0 +1,2 @@
+이 폴더에 A13·A16 그림을 넣습니다: route-boss.webp, boss-medal.webp, boss-frame.webp, boss-warning.webp
+자세한 내용: GPT-전투연출-그림·UI·효과-상세.md
