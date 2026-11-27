@@ -186,6 +186,103 @@
    ```
    두 번째 명령이 오류 없이 끝나야 합니다.
 
+## 0-2. 만드는 방법 (순서 · 변환 · 자가 검사 · 화면 확인)
+
+### 하는 순서
+**한 번에 한 카드씩** 진행합니다. 카드 하나를 끝내고 검사를 통과하면 스위치를 켜고 다음 카드로 넘어갑니다. 화면에 잘 보이는 것부터 하면 됩니다.
+
+1. A13 전투 UI(보스 체력 창, 경로 보스 문장)
+2. A17~A19 UI(버튼, 팝업, 구분선, 탭 빛)
+3. A16 보스 경고 띠
+4. A15 광산
+5. A14 치명타 폭발
+
+### 기준 그림(안내도) — 그리기 전에 반드시 보기
+`art/gpt-guides/` 폴더에 카드별 안내도가 있습니다. 이미지를 만들 때 참고 그림으로 함께 넣으세요.
+
+| 안내도 | 무엇을 알려 주나 |
+|---|---|
+| `A13-1_route-boss_안내.png` | 원 바깥 한계(여백 4%)와 좌우 대칭 축 |
+| `A13-2_boss-medal_안내.png` | 고리 바깥 한계와, 완전히 투명하게 비울 안쪽 원(70%) |
+| `A13-3_boss-frame_안내.png` | 빨강=모서리 28px(장식은 여기만), 파랑=변(같은 무늬 반복), 초록=가운데(고르게) |
+| `A15-1_pick-hand_기준점.png` | 기존 곡괭이 위에 날 끝 (375,152)과 손잡이 축 (53,334) 표시 |
+| `A16-1_boss-warning_안내.png` | 글씨가 들어갈 가운데 60% |
+| `A17_button_안내.png` | 버튼 모서리 24px 규칙(빨강·파랑·초록) |
+| `A18-1_panel-frame_안내.png` | 팝업 모서리 48px 규칙 |
+
+화풍 참고 그림으로 게임의 기존 그림도 함께 넣으면 톤이 맞습니다.
+- `dist/client/assets/boss-challenge.webp`: 보스 도전 버튼
+- `dist/client/assets/critical-hit.webp`: 기존 치명타
+- `dist/client/assets/weapon-forge/smith-strike.webp`: 장갑 낀 손
+- `dist/client/assets/star-mine/vein.webp`: 광산 배경
+- `dist/client/assets/ui-regalia/small-home.webp`: 하단 메뉴 아이콘
+
+### 이미지 만들기 → webp로 바꾸기
+이미지 생성 도구는 보통 PNG를 줍니다. 아래 파이썬 코드로 **정확한 크기의 투명 webp**로 바꿉니다. 파일 이름과 크기만 바꿔서 쓰면 됩니다.
+
+```python
+from PIL import Image
+src = Image.open('만든그림.png').convert('RGBA')          # 생성된 그림
+W, H = 128, 128                                              # 카드에 적힌 크기
+src.thumbnail((W, H), Image.Resampling.LANCZOS)              # 비율 유지하며 줄이기
+out = Image.new('RGBA', (W, H), (0, 0, 0, 0))                # 투명한 판
+out.paste(src, ((W - src.width) // 2, (H - src.height) // 2), src)   # 가운데 놓기
+out.save('dist/client/assets/battle-ui/route-boss.webp', 'WEBP', quality=92)
+```
+
+- **9조각 그림(버튼, 팝업, 보스 창 테두리)**: 비율을 유지하지 말고 `src.resize((W, H), Image.Resampling.LANCZOS)`로 정확히 맞춥니다.
+- **곡괭이(`pick-hand.webp`)**: 줄이거나 옮기지 않습니다. 380×380으로 그려서 기준점이 맞아야 합니다.
+
+### 투명 배경이 안 나올 때
+이미지 도구가 투명 배경을 못 만들면, **아주 진한 초록 단색 배경(#00FF00)** 위에 그려 달라고 한 뒤 초록을 지웁니다. 그림에 초록색이 많으면 배경을 진한 분홍(#FF00FF)으로 하고, 코드의 조건을 분홍에 맞게 바꿉니다.
+
+```python
+from PIL import Image
+im = Image.open('초록배경그림.png').convert('RGBA')
+px = im.load()
+for y in range(im.height):
+    for x in range(im.width):
+        r, g, b, a = px[x, y]
+        if g > 180 and r < 120 and b < 120:      # 초록 배경 → 투명
+            px[x, y] = (0, 0, 0, 0)
+im.save('투명해진그림.png')
+```
+
+### 자가 검사 (반드시)
+그림을 넣은 뒤 게임 폴더에서 실행합니다.
+
+```sh
+python3 tools/check-gpt-art.py          # 전체
+python3 tools/check-gpt-art.py A13      # 카드 하나
+```
+
+- 파일마다 `통과` 또는 `고칠것 → 이유`가 나옵니다. 이유를 읽고 고친 뒤 다시 돌립니다.
+- 검사하는 것
+  - 크기와 투명 배경
+  - 대칭
+  - 9조각 규칙: 변에 장식이 있는지, 가운데에 무늬가 있는지
+  - 메달 가운데가 비었는지
+  - 곡괭이 기준점
+  - 광석 4단계가 같은 자리에 있는지
+- 마지막 줄 **"켜도 되는 스위치"**에 나온 스위치만 `true`로 바꿉니다.
+
+### 화면에서 확인
+스위치를 켜고 빌드 명령 2줄을 실행한 뒤, 게임 폴더에서 아래를 실행합니다.
+
+```sh
+node tools/preview.mjs --port 4173
+```
+
+브라우저로 `http://127.0.0.1:4173/`을 엽니다. 메뉴 → 설정 → 테스트 → GM을 켜면 모든 콘텐츠가 열립니다.
+
+| 카드 | 어디서 보나 |
+|---|---|
+| A13 | 스테이지 10·20·30… (보스 단계)로 이동하면 상단 보스 체력 창과 경로 끝 문장 |
+| A14 | 아무 전투에서 치명타가 뜰 때 |
+| A15 | 던전 → 별의 광산 → 채굴 시작 |
+| A16 | 보스 단계로 이동하는 순간 |
+| A17~A19 | 상점(버튼), 설정·우편함(팝업), 하단 메뉴 |
+
 ## A13 · 전투 UI 그림 (스위치 `BATTLE_UI_ART`)
 
 폴더: `dist/client/assets/battle-ui/` (이미 만들어 둠)
@@ -339,6 +436,7 @@
 # 3부 · 넘길 때와 검수
 
 ## GPT → 사용자 → Claude로 넘길 것
+0. `python3 tools/check-gpt-art.py` 결과 전체(복사해서 붙여 넣기).
 1. 게임 폴더 전체(또는 바뀐 파일만): `dist/client/assets/battle-ui/`, `dist/client/assets/combat-fx/`, `dist/client/assets/star-mine/`, `dist/client/assets/ui-kit/`의 새 그림과 `dist/client/battle-presentation.js`, 빌드로 바뀐 `dist/client/index.html`과 `dist/client/game-bundle-*.js`.
 2. 어느 카드를 끝냈는지, 어느 스위치를 `true`로 바꿨는지 한 줄 메모.
 
@@ -354,4 +452,6 @@
 - `battle-presentation.js`의 스위치 5줄 말고 다른 코드를 고치는 것.
 - 기존 그림 파일을 덮어쓰거나 지우는 것. 특히 `pick.webp`, `vein.webp`, `chips.webp`, `critical-hit.webp`.
 - 그림 안에 글자를 넣는 것.
+- 자가 검사에서 `고칠것`이 남은 카드의 스위치를 켜는 것.
+- `art/gpt-guides/` 안내도를 게임 그림 폴더(`dist/client/assets/`)에 넣는 것(안내도는 참고용입니다).
 - 파일 이름을 바꾸는 것. 예: `boss_frame.webp`, `bossFrame.webp`는 안 됩니다.
