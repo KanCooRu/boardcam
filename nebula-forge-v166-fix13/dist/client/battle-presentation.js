@@ -55,9 +55,13 @@ const battlePresentation=(()=>{
   // fix13: a slim bar that takes the route's place (the framed panel covered the boss and the field).
   hud=document.createElement('section');hud.id='bpBossHud';hud.className='bp-boss-hud slim';hud.hidden=true;
   hud.setAttribute('aria-label','보스 체력');
-  hud.innerHTML=`<div class="bp-title">${BOSS_GLYPH}<b data-name></b><span class="bp-right"><span class="bp-clock" data-clock></span><b class="bp-layers" data-layers></b></span></div>
-   <div class="bp-track"><div class="bp-bar"><i class="bp-under"></i><i class="bp-trail"></i><i class="bp-fill"></i><span class="bp-ticks"></span></div></div>
-   <span class="bp-sr" data-hp></span><span class="bp-sr" data-pct></span><span class="bp-sr" data-tag></span><span class="bp-sr" data-meta></span>`;
+  // fix13b: the reference layout - name above, crest on the left, a red bar with the % inside, a gold time line under it.
+  const crest=BATTLE_UI_ART?`<img src="${ART}route-boss.webp" alt="" draggable="false">`:BOSS_GLYPH;
+  hud.innerHTML=`<b class="bp-name" data-name></b>
+   <div class="bp-gauge"><span class="bp-emblem">${crest}</span>
+    <div class="bp-bar"><i class="bp-trail"></i><i class="bp-fill"></i><b class="bp-pct" data-pct></b></div>
+    <div class="bp-time"><i></i><span class="bp-clockicon" aria-hidden="true"></span></div></div>
+   <span class="bp-sr" data-hp></span><span class="bp-sr" data-clock></span><span class="bp-sr" data-layers></span><span class="bp-sr" data-tag></span><span class="bp-sr" data-meta></span>`;
   field.appendChild(hud);return hud;
  }
  function hudState(){
@@ -70,7 +74,9 @@ const battlePresentation=(()=>{
   }
   if(typeof stageBossActive==='function'&&stageBossActive()){
    const left=document.getElementById('stageBossSeconds')?.textContent||'';
-   return {hp:s.enemyHp,max:maxHp(),layers:5,tag:'지역 보스',meta:typeof stageText==='function'?stageText():'STAGE '+s.stage,clock:left?left+(String(left).includes('초')?'':'초'):'',key:'s'+s.stage};
+   const a=s.stageBossAttempt,limit=typeof STAGE_BOSS_LIMIT_MS==='number'?STAGE_BOSS_LIMIT_MS:30000;
+   const time=a&&a.stage===s.stage?Math.max(0,a.deadline-Date.now())*(a.speed===2?2:1)/limit:null;
+   return {time,hp:s.enemyHp,max:maxHp(),layers:5,tag:'지역 보스',meta:typeof stageText==='function'?stageText():'STAGE '+s.stage,clock:left?left+(String(left).includes('초')?'':'초'):'',key:'s'+s.stage};
   }
   return null;
  }
@@ -88,16 +94,19 @@ const battlePresentation=(()=>{
   el.querySelector('[data-name]').textContent=name;
   el.querySelector('[data-meta]').textContent=st.meta;
   el.querySelector('[data-hp]').textContent=compact(hp)+' / '+compact(max);
-  el.querySelector('[data-pct]').textContent=(hp/max*100).toFixed(hp/max<.1?1:0)+'%';
+  el.querySelector('[data-pct]').textContent=Math.max(hp>0?1:0,Math.ceil(hp/max*100))+'%';
   const clock=el.querySelector('[data-clock]');clock.textContent=st.clock||'';
   clock.classList.toggle('urgent',/^\D*([0-9]|10)초?$/.test(st.clock)&&!!st.clock);
   el.querySelector('[data-layers]').textContent=layer>1?'×'+layer:'';
-  const fill=el.querySelector('.bp-fill'),trail=el.querySelector('.bp-trail'),under=el.querySelector('.bp-under');
+  const fill=el.querySelector('.bp-fill'),trail=el.querySelector('.bp-trail');
   const color=LAYER_COLORS[(layer-1)%LAYER_COLORS.length],below=layer>1?LAYER_COLORS[(layer-2)%LAYER_COLORS.length]:'transparent';
   el.style.setProperty('--bp-color',color);el.style.setProperty('--bp-under',below);
-  if(fresh||layer!==lastLayer){trail.style.transition='none';trail.style.width=(layer!==lastLayer&&!fresh?100:within)+'%';void trail.offsetWidth;trail.style.transition=''}
-  fill.style.width=within+'%';under.style.width='100%';
-  requestAnimationFrame(()=>{trail.style.width=within+'%'});
+  const share=hp/max*100;
+  if(fresh){trail.style.transition='none';trail.style.width=share+'%';void trail.offsetWidth;trail.style.transition=''}
+  fill.style.width=share+'%';
+  requestAnimationFrame(()=>{trail.style.width=share+'%'});
+  const time=el.querySelector('.bp-time');time.hidden=st.time==null;
+  if(st.time!=null)time.firstElementChild.style.width=(Math.max(0,Math.min(1,st.time))*100)+'%';
   if(lastHp!==null&&hp<lastHp&&motion()){el.classList.remove('struck');void el.offsetWidth;el.classList.add('struck')}
   if(fresh&&motion()){el.classList.remove('arrive');void el.offsetWidth;el.classList.add('arrive')}
   if(fresh&&st.key[0]==='s'&&motion())bossWalkIn();

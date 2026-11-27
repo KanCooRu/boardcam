@@ -3,8 +3,8 @@
 :root{--bp-gold:#e9c37b;--bp-gold-deep:#a8793a;--bp-ink:#140d1c;--bp-plate:#1d1528;--bp-ease:cubic-bezier(.2,.8,.25,1)}
 
 /* ---------- Stage route (fix13): a fine gold thread with cut-diamond wave markers ---------- */
-body.ui-renewal #battle #route.bp-route{display:grid;grid-template-columns:repeat(9,12px) 24px;justify-content:space-between;align-items:center;
- width:196px;height:24px;left:50%;margin-left:-98px;transform:none;gap:0;opacity:1;z-index:5;transition:opacity .25s ease}
+body.ui-renewal #battle #route.bp-route{display:grid;grid-template-columns:repeat(9,12px) 26px;justify-content:space-between;align-items:center;
+ width:198px;height:26px;left:50%;margin-left:-99px;transform:none;gap:0;opacity:1;z-index:5;transition:opacity .25s ease}
 body.ui-renewal #battle #route.bp-route::before{content:none}
 #route.bp-route .bp-line{position:absolute;left:6px;right:12px;top:50%;height:1px;margin-top:-.5px;background:linear-gradient(90deg,#e9c37b00,#e9c37b55 8%,#e9c37b55 92%,#e9c37b00)}
 #route.bp-route .bp-line>b{display:block;height:100%;background:linear-gradient(90deg,#e9c37b00,#ffe2a0 30%,#fff3d1);box-shadow:0 0 4px #ffcf6e;transition:width .6s var(--bp-ease)}
@@ -13,42 +13,44 @@ body.ui-renewal #battle #route.bp-route::before{content:none}
 #route.bp-route .bp-node.now{width:11px;height:11px;border:1.5px solid #fff;background:linear-gradient(135deg,#fffaf0,#ffd98a 60%,#d39a44);box-shadow:0 0 0 1px #0008,0 0 10px #ffd98acc}
 #route.bp-route .bp-node.now::after{content:'';position:absolute;inset:-5px;border:1px solid #ffe2a0;opacity:0;animation:bp-now 1.6s ease-out infinite}
 @keyframes bp-now{0%{opacity:.9;scale:.55}100%{opacity:0;scale:1.25}}
-#route.bp-route .bp-crest{position:relative;z-index:1;display:grid;place-items:center;width:24px;height:24px;color:#f1b7a3;filter:drop-shadow(0 1px 2px #000c)}
+#route.bp-route .bp-crest{position:relative;z-index:1;display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:50%;background:none;box-shadow:none;color:#f1b7a3;filter:drop-shadow(0 1px 2px #000c)}
 #route.bp-route .bp-crest .bp-glyph{width:18px;height:18px;display:block}
-#route.bp-route.painted .bp-crest img{width:26px;height:26px;object-fit:contain}
+#route.bp-route.painted .bp-crest img{width:100%;height:100%;display:block;object-fit:contain}
 /* The boss bar takes the route's place while a boss is up. */
 body.bp-boss-on #battle #route.bp-route{opacity:0;visibility:hidden}
 
-/* ---------- Boss HP (fix13): one slim line in the route's place, nothing framed over the field ---------- */
-#battle .bp-boss-hud{position:absolute;z-index:18;left:50%;top:78px;width:min(300px,76%);transform:translateX(-50%);display:grid;gap:4px;pointer-events:none;color:#fff;
- padding:0;background:none;border:0;box-shadow:none;filter:drop-shadow(0 1px 3px #000d)}
+/* ---------- Boss HP (fix13b): name above, crest on the left, a red bar with the % inside, a gold time line ---------- */
+#battle .bp-boss-hud{position:absolute;z-index:18;left:50%;top:66px;width:min(330px,86%);transform:translateX(-50%);display:grid;justify-items:center;gap:3px;pointer-events:none;color:#fff;
+ padding:0;background:none;border:0;box-shadow:none}
 #battle .bp-boss-hud[hidden]{display:none}
-body.dungeon-combat #battle .bp-boss-hud{top:calc(max(15px,env(safe-area-inset-top)) + 60px)}
+body.dungeon-combat #battle .bp-boss-hud{top:calc(max(15px,env(safe-area-inset-top)) + 54px)}
 .bp-boss-hud .bp-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-.bp-boss-hud .bp-title{display:flex;align-items:center;gap:5px;min-width:0;white-space:nowrap;height:16px}
-.bp-boss-hud .bp-title .bp-glyph{flex:none;width:14px;height:14px;color:#ff8f7a}
-.bp-boss-hud .bp-title>b{font-size:13px;font-weight:800;letter-spacing:.02em;color:#fff3e0;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000,0 0 6px #0009}
-.bp-boss-hud .bp-right{margin-left:auto;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
-.bp-boss-hud .bp-clock{font-size:12px;font-weight:800;color:#ffe2a6;text-shadow:0 1px 2px #000}
-.bp-boss-hud .bp-clock:not(:empty)::before{content:'';display:inline-block;width:9px;height:9px;margin-right:3px;vertical-align:-1px;border:1.5px solid currentColor;border-radius:50%;box-sizing:border-box;
- background:linear-gradient(currentColor,currentColor) 50% 1px/1.5px 3.5px no-repeat}
-.bp-boss-hud .bp-clock.urgent{color:#ff7a7a;animation:bp-blink .6s steps(2) infinite}
-@keyframes bp-blink{50%{opacity:.45}}
-.bp-boss-hud .bp-layers{font-size:11px;font-weight:900;color:#fff;padding:0 5px;line-height:15px;border-radius:4px;background:var(--bp-color,#d9485a);box-shadow:inset 0 0 0 1px #fff4,0 0 6px color-mix(in srgb,var(--bp-color,#d9485a) 60%,transparent)}
-.bp-boss-hud .bp-layers:empty{display:none}
-.bp-boss-hud .bp-track{position:relative;padding:0 7px}
-.bp-boss-hud .bp-track::before,.bp-boss-hud .bp-track::after{content:'';position:absolute;top:50%;width:7px;height:7px;margin-top:-3.5px;rotate:45deg;box-sizing:border-box;border:1px solid #fff0c8;background:linear-gradient(135deg,#fff6dc,#d9a24f);box-shadow:0 0 0 1px #000a}
-.bp-boss-hud .bp-track::before{left:1px}.bp-boss-hud .bp-track::after{right:1px}
-.bp-boss-hud .bp-bar{position:relative;height:7px;border-radius:1px;overflow:hidden;background:#0a0710d9;box-shadow:0 0 0 1px #e9c37b66,0 0 0 2px #0009}
-.bp-boss-hud .bp-bar>i{position:absolute;left:0;top:0;bottom:0;display:block}
-.bp-boss-hud .bp-under{background:var(--bp-under,transparent);opacity:.55}
-.bp-boss-hud .bp-trail{background:#fff4dc;transition:width .55s cubic-bezier(.4,0,.2,1) .28s}
-.bp-boss-hud .bp-fill{background:linear-gradient(180deg,#ffffff66,#ffffff00 50%,#0000002a),var(--bp-color,#d9485a);transition:width .12s linear;box-shadow:2px 0 6px color-mix(in srgb,var(--bp-color,#d9485a) 70%,#fff)}
-.bp-boss-hud .bp-ticks{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(20% - 1px),#0007 calc(20% - 1px) 20%)}
+.bp-boss-hud .bp-name{max-width:100%;font-size:17px;font-weight:900;letter-spacing:.02em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ text-shadow:0 0 3px #000,0 2px 2px #000,0 0 10px #000c}
+.bp-boss-hud .bp-gauge{position:relative;width:100%;padding-left:26px;box-sizing:border-box}
+.bp-boss-hud .bp-emblem{position:absolute;left:0;top:50%;z-index:2;width:46px;height:46px;margin-top:-23px;display:grid;place-items:center;border-radius:50%;color:#f1b7a3;
+ filter:drop-shadow(0 2px 3px #000c)}
+.bp-boss-hud .bp-emblem img{width:100%;height:100%;display:block;object-fit:contain}
+.bp-boss-hud .bp-emblem .bp-glyph{width:28px;height:28px}
+.bp-boss-hud .bp-emblem:not(:has(img)){background:radial-gradient(circle at 50% 35%,#8a2a2f,#2a0e18 72%);box-shadow:inset 0 0 0 2px #d9a95c}
+.bp-boss-hud .bp-bar{position:relative;height:19px;margin-left:12px;border-radius:10px;overflow:hidden;background:linear-gradient(#2a0a0e,#3d1016);
+ box-shadow:inset 0 0 0 1.5px #12040699,0 0 0 1.5px #0009,inset 0 2px 3px #000a}
+.bp-boss-hud .bp-bar>i{position:absolute;left:0;top:0;bottom:0;display:block;border-radius:inherit}
+.bp-boss-hud .bp-trail{background:#ffd9c9;opacity:.85;transition:width .55s cubic-bezier(.4,0,.2,1) .28s}
+.bp-boss-hud .bp-fill{background:linear-gradient(180deg,#ff8a7e 0%,#ef3b3b 28%,#c81d27 70%,#9e1219 100%);box-shadow:inset 0 1px 0 #ffffff59,inset 0 -2px 0 #0003;transition:width .15s linear}
+.bp-boss-hud .bp-pct{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff;letter-spacing:.02em;line-height:1;font-variant-numeric:tabular-nums;
+ text-shadow:1px 0 0 #3a0508,-1px 0 0 #3a0508,0 1px 0 #3a0508,0 -1px 0 #3a0508,0 0 4px #000a}
+.bp-boss-hud .bp-time{position:relative;height:6px;margin:5px 14px 0 18px;border-radius:3px;background:#1a1208cc;box-shadow:0 0 0 1px #000a}
+.bp-boss-hud .bp-time[hidden]{display:none}
+.bp-boss-hud .bp-time>i{display:block;height:100%;border-radius:inherit;background:linear-gradient(180deg,#fff1a8,#f2c230 45%,#c68d17);transition:width .3s linear}
+.bp-boss-hud .bp-clockicon{position:absolute;right:-14px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;box-sizing:border-box;
+ background:radial-gradient(circle,#2a1d0c 58%,transparent 60%),linear-gradient(#fff1a8,#d39a1e);box-shadow:0 0 0 1px #000a}
+.bp-boss-hud .bp-clockicon::before{content:'';position:absolute;left:50%;top:50%;width:2px;height:5px;margin:-5px 0 0 -1px;border-radius:1px;background:#f6c842;transform-origin:50% 100%}
+.bp-boss-hud .bp-clockicon::after{content:'';position:absolute;left:50%;top:50%;width:4px;height:2px;margin:-1px 0 0 0;border-radius:1px;background:#f6c842}
 .bp-boss-hud.struck .bp-bar{animation:bp-struck .16s ease-out}
-@keyframes bp-struck{40%{filter:brightness(1.7)}}
-.bp-boss-hud.arrive{animation:bp-arrive .6s var(--bp-ease)}
-@keyframes bp-arrive{from{opacity:0;transform:translateX(-50%) scaleX(.6)}}
+@keyframes bp-struck{40%{filter:brightness(1.5)}}
+.bp-boss-hud.arrive{animation:bp-arrive .5s var(--bp-ease)}
+@keyframes bp-arrive{from{opacity:0;transform:translateX(-50%) translateY(-8px)}}
 /* The boss bar replaces the small bars it stands for. */
 #battle.bp-boss-on .enemy-status,body.bp-boss-on #stageBossClock,body.bp-boss-on .stage-boss-clock{display:none!important}
 
@@ -101,7 +103,7 @@ body #battle.campaign-boss #mobActor{width:55%;right:2%}
 body #battle .fallen-creature.fallen-boss{width:55%}
 body.dungeon-combat #battle:not(.duo-battle) #mobActor{width:55%;right:3%}
 /* fix13: big but standing back - the dragon keeps its distance from the hero and its tail runs off the right edge. */
-body .wb-stage{--wb-boss-size:min(82cqw,106cqh);--wb-boss-ground:21%;--wb-boss-right:-21%;
+body .wb-stage{--wb-boss-size:min(108cqw,136cqh);--wb-boss-ground:19%;--wb-boss-right:-34%;
  --wb-target-x:calc(100% - var(--wb-boss-right) - .72 * var(--wb-boss-size));--wb-target-bottom:calc(var(--wb-boss-ground) + .247 * var(--wb-boss-size))}
 body .wb-dragon{right:var(--wb-boss-right)}
 
