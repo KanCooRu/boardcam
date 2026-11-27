@@ -172,7 +172,7 @@ const partyRaid=(()=>{
      const strong=hit.critical||hit.skill;
      raidContactGlint(dialog.querySelector('.party-field'),bossPoint[0]*100+'%',bossPoint[1]*100+'%',strong);
      if(typeof battlePresentation!=='undefined')battlePresentation.damageNumber(dialog.querySelector('.party-field'),amount,!!hit.critical,
-      {left:bossPoint[0]*100+'%',top:(bossPoint[1]-.34)*100+'%',drift:(r.index*7+hit.ordinal*5)%19-9,className:'raid-number'});
+      {left:bossPoint[0]*100+'%',top:(bossPoint[1]-.08)*100+'%',drift:(r.index*7+hit.ordinal*5)%19-9,className:'raid-number'});
      if(strong)r.poseClock.hold(60,r.time);
     }
    }
