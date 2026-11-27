@@ -2392,26 +2392,41 @@ body.dungeon-combat #battle .bp-boss-hud{top:calc(max(15px,env(safe-area-inset-t
 .bp-boss-hud .bp-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 .bp-boss-hud .bp-name{max-width:100%;font-size:17px;font-weight:900;letter-spacing:.02em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
  text-shadow:0 0 3px #000,0 2px 2px #000,0 0 10px #000c}
-.bp-boss-hud .bp-gauge{position:relative;width:100%;padding-left:26px;box-sizing:border-box}
+.bp-boss-hud .bp-gauge{position:relative;width:100%;padding-left:26px;padding-right:6px;box-sizing:border-box}
 .bp-boss-hud .bp-emblem{position:absolute;left:0;top:50%;z-index:2;width:46px;height:46px;margin-top:-23px;display:grid;place-items:center;border-radius:50%;color:#f1b7a3;
  filter:drop-shadow(0 2px 3px #000c)}
 .bp-boss-hud .bp-emblem img{width:100%;height:100%;display:block;object-fit:contain}
 .bp-boss-hud .bp-emblem .bp-glyph{width:28px;height:28px}
 .bp-boss-hud .bp-emblem:not(:has(img)){background:radial-gradient(circle at 50% 35%,#8a2a2f,#2a0e18 72%);box-shadow:inset 0 0 0 2px #d9a95c}
-.bp-boss-hud .bp-bar{position:relative;height:19px;margin-left:12px;border-radius:10px;overflow:hidden;background:linear-gradient(#2a0a0e,#3d1016);
- box-shadow:inset 0 0 0 1.5px #12040699,0 0 0 1.5px #0009,inset 0 2px 3px #000a}
-.bp-boss-hud .bp-bar>i{position:absolute;left:0;top:0;bottom:0;display:block;border-radius:inherit}
-.bp-boss-hud .bp-trail{background:#ffd9c9;opacity:.85;transition:width .55s cubic-bezier(.4,0,.2,1) .28s}
-.bp-boss-hud .bp-fill{background:linear-gradient(180deg,#ff8a7e 0%,#ef3b3b 28%,#c81d27 70%,#9e1219 100%);box-shadow:inset 0 1px 0 #ffffff59,inset 0 -2px 0 #0003;transition:width .15s linear}
-.bp-boss-hud .bp-pct{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff;letter-spacing:.02em;line-height:1;font-variant-numeric:tabular-nums;
- text-shadow:1px 0 0 #3a0508,-1px 0 0 #3a0508,0 1px 0 #3a0508,0 -1px 0 #3a0508,0 0 4px #000a}
-.bp-boss-hud .bp-time{position:relative;height:6px;margin:5px 14px 0 18px;border-radius:3px;background:#1a1208cc;box-shadow:0 0 0 1px #000a}
+/* HP bar: crimson fill with a faint sheen, inside a thin antique-gold rim with spear-tip end caps. */
+.bp-boss-hud .bp-barbox{position:relative;margin-left:14px}
+.bp-boss-hud .bp-bar{position:relative;height:19px;border-radius:3px;overflow:hidden;background:linear-gradient(#1c0609,#320c11);box-shadow:inset 0 2px 4px #000c}
+.bp-boss-hud .bp-bar>i{position:absolute;left:0;top:0;bottom:0;display:block}
+.bp-boss-hud .bp-trail{background:linear-gradient(#ffe6d6,#e9b7a4);opacity:.85;transition:width .55s cubic-bezier(.4,0,.2,1) .28s}
+.bp-boss-hud .bp-fill{transition:width .15s linear;
+ background:linear-gradient(180deg,#ffb19e33 0,#ffffff00 40%,#0000 60%,#00000040 100%),repeating-linear-gradient(115deg,#ffffff0d 0 5px,#0000 5px 11px),linear-gradient(90deg,#8e0f19,#d22a2f 55%,#ef4a3d);
+ box-shadow:inset 0 1px 0 #ffc2b066,inset 0 -1px 0 #0005,2px 0 4px #ff5a4a66}
+.bp-boss-hud .bp-pct{position:absolute;inset:0;z-index:2;display:grid;place-items:center;font-size:13px;font-weight:900;color:#fff8ee;letter-spacing:.04em;line-height:1;font-variant-numeric:tabular-nums;
+ text-shadow:1px 0 0 #2a0406,-1px 0 0 #2a0406,0 1px 0 #2a0406,0 -1px 0 #2a0406,0 0 5px #000b}
+.bp-boss-hud .bp-frame{position:absolute;inset:-3px;border-radius:5px;pointer-events:none;
+ box-shadow:0 0 0 1px #1a0f06,inset 0 0 0 1px #1a0f06,0 0 0 2px #e2bd73,0 0 0 3px #7a5420,0 3px 6px 2px #0009}
+.bp-boss-hud .bp-frame::before,.bp-boss-hud .bp-frame::after{content:'';position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;rotate:45deg;box-sizing:border-box;
+ background:linear-gradient(135deg,#fff0c2,#d9a24f 55%,#7a5420);box-shadow:0 0 0 1px #1a0f06}
+.bp-boss-hud .bp-frame::after{right:-7px}.bp-boss-hud .bp-frame::before{left:-7px;display:none}
+/* Time line: thin amber thread in a dark bronze groove, a brass hourglass at the end. */
+.bp-boss-hud .bp-time{position:relative;height:6px;margin:6px 16px 0 22px;border-radius:3px;background:#120c05e6;box-shadow:inset 0 1px 2px #000}
 .bp-boss-hud .bp-time[hidden]{display:none}
-.bp-boss-hud .bp-time>i{display:block;height:100%;border-radius:inherit;background:linear-gradient(180deg,#fff1a8,#f2c230 45%,#c68d17);transition:width .3s linear}
-.bp-boss-hud .bp-clockicon{position:absolute;right:-14px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;box-sizing:border-box;
- background:radial-gradient(circle,#2a1d0c 58%,transparent 60%),linear-gradient(#fff1a8,#d39a1e);box-shadow:0 0 0 1px #000a}
-.bp-boss-hud .bp-clockicon::before{content:'';position:absolute;left:50%;top:50%;width:2px;height:5px;margin:-5px 0 0 -1px;border-radius:1px;background:#f6c842;transform-origin:50% 100%}
-.bp-boss-hud .bp-clockicon::after{content:'';position:absolute;left:50%;top:50%;width:4px;height:2px;margin:-1px 0 0 0;border-radius:1px;background:#f6c842}
+.bp-boss-hud .bp-tfill{display:block;height:100%;border-radius:inherit;background:linear-gradient(180deg,#fff3b8,#f0bf3a 45%,#b77a12);box-shadow:0 0 4px #f0bf3a88;transition:width .3s linear}
+.bp-boss-hud .bp-tframe{position:absolute;inset:-1px;border-radius:4px;box-shadow:0 0 0 1px #6b4a1c,0 0 0 2px #1a0f06;pointer-events:none}
+.bp-boss-hud .bp-clockicon{position:absolute;right:-17px;top:50%;width:20px;height:20px;margin-top:-10px;filter:drop-shadow(0 1px 2px #000c)}
+.bp-boss-hud .bp-clockicon :is(svg,img){display:block;width:100%;height:100%}
+/* Painted gauge (card G1). Frames are 9-slice pictures drawn over the bars; the windows stay transparent. */
+.bp-boss-hud.gauge-art .bp-frame{inset:-7px -21px;border:solid transparent;border-width:7px 21px;border-radius:0;box-shadow:none;border-image:url('./assets/battle-ui/gauge-frame.webp') 12 36/7px 21px stretch}
+.bp-boss-hud.gauge-art .bp-frame::before,.bp-boss-hud.gauge-art .bp-frame::after{content:none}
+.bp-boss-hud.gauge-art .bp-fill{background:url('./assets/battle-ui/gauge-fill.webp') repeat-x 0 0/auto 100%;box-shadow:2px 0 4px #ff5a4a66}
+.bp-boss-hud.gauge-art .bp-tframe{inset:-6px -9px;border:solid transparent;border-width:6px 9px;border-radius:0;box-shadow:none;border-image:url('./assets/battle-ui/time-frame.webp') 8 12/6px 9px stretch}
+.bp-boss-hud.gauge-art .bp-tfill{background:url('./assets/battle-ui/time-fill.webp') repeat-x 0 0/auto 100%}
+.bp-boss-hud.gauge-art .bp-clockicon{width:24px;height:24px;margin-top:-12px;right:-19px}
 .bp-boss-hud.struck .bp-bar{animation:bp-struck .16s ease-out}
 @keyframes bp-struck{40%{filter:brightness(1.5)}}
 .bp-boss-hud.arrive{animation:bp-arrive .5s var(--bp-ease)}

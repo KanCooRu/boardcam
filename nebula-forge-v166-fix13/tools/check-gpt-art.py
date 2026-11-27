@@ -38,6 +38,12 @@ CARDS = {
    ('ui-kit/panel-frame.webp', (256,256), ['alpha','slice48']),
    ('ui-kit/divider.webp', (512,48), ['alpha','symmetric_loose']),
    ('ui-kit/nav-glow.webp', (160,48), ['alpha','symmetric_loose'])]),
+ 'G1': ('BOSS_GAUGE_ART', [
+   ('battle-ui/gauge-frame.webp', (640,56), ['alpha','window:36,12,604,44','edges:36,12']),
+   ('battle-ui/gauge-fill.webp', (256,32), ['opaque','tile_x']),
+   ('battle-ui/time-frame.webp', (384,24), ['alpha','window:12,8,372,16','edges:12,8']),
+   ('battle-ui/time-fill.webp', (128,8), ['opaque','tile_x']),
+   ('battle-ui/time-icon.webp', (64,64), ['alpha','round','symmetric'])]),
  'M1': ('MINER_ART', [
    ('star-mine/miner-body.webp', (480,480), ['alpha','miner_feet']),
    ('star-mine/miner-arm.webp', (480,480), ['alpha','miner_arm'])]),
@@ -74,7 +80,9 @@ def check(path, size, rules):
     im = Image.open(f)
     if f.suffix != '.webp': out.append('webp가 아님')
     if im.size != size: out.append(f'크기 {im.size[0]}×{im.size[1]} (필요 {size[0]}×{size[1]})')
-    if im.mode not in ('RGBA', 'LA'): out.append('투명 채널(알파)이 없음 - 배경이 투명하지 않습니다'); return out
+    if im.mode not in ('RGBA', 'LA'):
+        if 'opaque' not in rules: out.append('투명 채널(알파)이 없음 - 배경이 투명하지 않습니다'); return out
+        im = im.convert('RGBA')
     a = alpha(im); w, h = im.size
     for rule in rules:
         if rule == 'alpha':
@@ -117,6 +125,19 @@ def check(path, size, rules):
             grip = max(a.getpixel((x, y)) for x in range(44, 63) for y in range(325, 344))
             if tip < 120: out.append('곡괭이 날 끝이 (375,152)에 없음')
             if grip < 120: out.append('손잡이(손)가 (53,334)에 없음')
+        elif rule.startswith('window:'):
+            x0, y0, x1, y1 = map(int, rule[7:].split(','))
+            if ImageStat.Stat(a.crop((x0 + 2, y0 + 2, x1 - 2, y1 - 2))).mean[0] > 6: out.append('막대 창(가운데)이 투명하지 않음 - 창 안은 완전히 비워 주세요')
+            if ImageStat.Stat(a.crop((x0, 0, x1, y0))).mean[0] < 60: out.append('위쪽 테두리가 비어 있음')
+        elif rule.startswith('edges:'):
+            kx, ky = map(int, rule[6:].split(','))
+            top = band_uniform(im, (kx, 0, w - kx, ky), 'x'); bottom = band_uniform(im, (kx, h - ky, w - kx, h), 'x')
+            if max(top, bottom) > 0.10: out.append(f'위·아래 테두리가 고르지 않음(변화 {max(top, bottom):.2f}) - 장식은 양 끝 {kx}px 안에만')
+        elif rule == 'opaque':
+            if ImageStat.Stat(a).mean[0] < 245: out.append('투명한 부분이 있음 - 채움 그림은 꽉 채워 주세요')
+        elif rule == 'tile_x':
+            rgb = im.convert('RGB'); left = rgb.crop((0, 0, 1, h)); right = rgb.crop((w - 1, 0, w, h))
+            if ImageStat.Stat(ImageChops.difference(left, right)).mean[0] > 18: out.append('왼쪽 끝과 오른쪽 끝 색이 달라 이음매가 보임 - 가로로 이어지게')
         elif rule == 'miner_feet':
             feet = max(a.getpixel((x, y)) for x in range(140, 190) for y in range(440, 468))
             if feet < 120: out.append('발(부츠)이 (164,456) 근처에 없음')

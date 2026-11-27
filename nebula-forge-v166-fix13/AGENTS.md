@@ -111,6 +111,7 @@ HUD와 글씨는 모바일에서 한눈에 읽힐 크기로 배치하고 부연 
 | `UI_KIT_ART` | `assets/ui-kit/` btn-gold·btn-purple·panel-frame·divider·nav-glow 5장 (`ui-kit.css`) | A17~A19 |
 | `UI_EXTRA_ART` | `assets/ui-kit/` wallet-frame·plus-badge·ribbon-red·ribbon-gold·lock-badge 5장 (`ui-kit.css`) | A20~A22 |
 | `MINER_ART` | `assets/star-mine/` miner-body·miner-arm 2장 (꼬마 광부, 안내도 `art/gpt-guides/M1_miner_기준점.png`) | M1 |
+| `BOSS_GAUGE_ART` | `assets/battle-ui/` gauge-frame·gauge-fill·time-frame·time-fill·time-icon 5장 (안내도 `art/gpt-guides/G1_boss-gauge_안내.png`) | G1 |
 
 스킬 효과 필름은 `tools/bake-skill-effects-smooth.py`가 만든 36장(6×6) `assets/skill-casts/<이름>.s36.avif|webp`를 쓴다. `skill-films.js` 여섯째 칸이 36이면 이 파일을 읽고, 원래 16장 시트는 선택형 Unity 렌더러용으로 남겨 둔다. 원본 그림이나 조합을 바꾸면 두 도구를 차례로 다시 돌린다.
 
