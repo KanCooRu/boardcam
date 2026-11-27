@@ -29,10 +29,10 @@ services:
       dockerfile: server/Dockerfile
       args:
         BASE_NAME: NebulaForge-Web-v166
-        BASE_URL: https://github.com/KanCooRu/boardcam/releases/download/test1/NebulaForge-Web-v166.zip
-        BASE_SHA256: 3968f0eb1d00d791bc6aa76569e588d72870a688eef8f1d706bf2aecded7c8d5
-        OVERLAY: nebula-forge-v166-fix11
-        DELETE: dist/client/game-bundle-56d1e0794cafd907.js dist/client/game-bundle-7dd8aed63d5e9261.css dist/client/game-bundle-83b2e25a8e91be8c.css dist/client/game-bundle-9982f981ea041b80.js
+        BASE_URL: https://github.com/KanCooRu/boardcam/releases/download/test1/NebulaForge-Web-v166-fix11-A13-A22.zip
+        BASE_SHA256: 87375f5a744f5275a0a58d2467b524c56588999e1cd7e44f6ea73d6f523a1f48
+        OVERLAY: nebula-forge-v166-fix12
+        DELETE: dist/client/game-bundle-6375a4a22394ac27.js dist/client/game-bundle-b27041d9a874c8e4.js dist/client/game-bundle-e13eea32a2657f1c.css
     image: nebula-api:local
     restart: always
     env_file: .env
