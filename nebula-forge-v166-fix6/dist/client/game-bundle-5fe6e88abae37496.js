@@ -4327,7 +4327,8 @@ function chatSheetGeometry(){
  const viewport=window.visualViewport,visible=viewport?viewport.height:window.innerHeight;
  const lower=viewport?viewport.height+viewport.offsetTop:window.innerHeight;
  const keyboard=window.innerHeight-lower>90;
- const bottom=keyboard?lower:Math.min(lower,nav.top);
+ // Dungeons, the tower and the mine hide the bottom menu; the sheet then rests on the screen's bottom edge.
+ const bottom=keyboard||nav.height<=0?lower:Math.min(lower,nav.top);
  const height=Math.max(120,Math.min(keyboard?visible-8:game.height*.62,bottom-(viewport?.offsetTop||0)-4));
  const el=$('chatSheet');
  el.style.setProperty('--chat-left',game.left+'px');el.style.setProperty('--chat-width',game.width+'px');
