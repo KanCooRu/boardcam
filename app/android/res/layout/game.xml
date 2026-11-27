@@ -1,0 +1,17 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#13121d">
+    <WebView android:id="@+id/game" android:layout_width="match_parent" android:layout_height="match_parent"/>
+    <FrameLayout android:id="@+id/splash" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#13121d" android:clickable="true" android:focusable="true">
+        <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="centerCrop" android:src="@drawable/forge_splash" android:importantForAccessibility="no"/>
+        <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/splash_shade"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|center_horizontal" android:layout_marginTop="70dp" android:text="성운의 모루" android:fontFamily="serif" android:textStyle="bold" android:letterSpacing="0.07" android:textColor="#f8e6bf" android:textSize="30sp" android:shadowColor="#e0000000" android:shadowRadius="6"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="bottom" android:layout_marginBottom="48dp" android:orientation="vertical" android:gravity="center_horizontal" android:paddingLeft="32dp" android:paddingRight="32dp">
+            <TextView android:id="@+id/loadingLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="9dp" android:gravity="center" android:text="게임 불러오는 중" android:textColor="#f8e6bf" android:textSize="14sp"/>
+            <FrameLayout android:layout_width="match_parent" android:layout_height="19dp">
+                <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="match_parent" android:progressDrawable="@drawable/progress_track" android:max="100"/>
+                <TextView android:id="@+id/percent" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:includeFontPadding="false" android:text="0%" android:textColor="#ffffff" android:shadowColor="#e0000000" android:shadowRadius="3" android:textSize="12sp"/>
+            </FrameLayout>
+            <Button android:id="@+id/retry" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:minHeight="48dp" android:text="다시 불러오기" android:visibility="gone"/>
+            <Button android:id="@+id/address" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="서버 주소 바꾸기" android:visibility="gone"/>
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

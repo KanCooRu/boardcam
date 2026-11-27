@@ -1,0 +1,6 @@
+<resources>
+    <!-- The game server this app opens. build.py writes it from its url option.
+         Left empty, the app asks for an address on first start (test builds only). -->
+    <string name="server_url" translatable="false"></string>
+    <bool name="allow_http">false</bool>
+</resources>

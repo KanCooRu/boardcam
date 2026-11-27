@@ -1,0 +1,83 @@
+# Nebula Forge game server. Same file on every server.
+#   One test server:        docker compose --profile localdb up -d
+#   api-1 (production):     docker compose up -d
+#   api-2 (production):     docker compose up -d            (identical; both talk to the managed database)
+# Which game version runs is set in the "args" block of the api service, and nowhere else.
+name: nebula
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "20m", max-file: "5" }
+
+services:
+  caddy:
+    image: caddy:2
+    restart: always
+    ports: ["80:80", "443:443"]
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [api]
+    logging: *logging
+
+  api:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+      args:
+        BASE_NAME: NebulaForge-Web-v166
+        BASE_URL: https://github.com/KanCooRu/boardcam/releases/download/test1/NebulaForge-Web-v166-fix11-A13-A22.zip
+        BASE_SHA256: 87375f5a744f5275a0a58d2467b524c56588999e1cd7e44f6ea73d6f523a1f48
+        OVERLAY: nebula-forge-v166-fix13
+        DELETE: dist/client/game-bundle-6375a4a22394ac27.js dist/client/game-bundle-b27041d9a874c8e4.js dist/client/game-bundle-e13eea32a2657f1c.css
+    image: nebula-api:local
+    restart: always
+    env_file: .env
+    expose: ["3000"]
+    stop_grace_period: 15s
+    deploy: { resources: { limits: { memory: 2g } } }
+    logging: *logging
+
+  # A database in a container, for a test server only. Production uses the managed database in .env.
+  postgres:
+    profiles: ["localdb"]
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: game_app
+      POSTGRES_PASSWORD: ${LOCAL_DB_PASSWORD:-change-me}
+      POSTGRES_DB: game
+      POSTGRES_INITDB_ARGS: "--locale=C --encoding=UTF8"
+    volumes: ["pg_data:/var/lib/postgresql/data"]
+    deploy: { resources: { limits: { memory: 1g } } }
+    logging: *logging
+
+  # Reserved for rankings cache, sessions and queues (the plan's Redis). The game does not use it yet,
+  # so it only starts when asked for:  docker compose --profile redis up -d
+  redis:
+    profiles: ["redis"]
+    image: redis:7
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "1gb", "--maxmemory-policy", "allkeys-lru", "--requirepass", "${REDIS_PASSWORD:-change-me}"]
+    volumes: ["redis_data:/data"]
+    logging: *logging
+
+  # The two existing Discord bots can live here, each in its own container with its own .env and a memory cap.
+  # Put each bot's code under server/bots/<name>/ with a Dockerfile, then remove the leading "# ".
+  # bot-arma-status:
+  #   build: ./bots/arma-status
+  #   env_file: .env.bot1
+  #   restart: always
+  #   deploy: { resources: { limits: { memory: 512m } } }
+  #   logging: *logging
+  # bot-helper:
+  #   build: ./bots/helper
+  #   env_file: .env.bot2
+  #   restart: always
+  #   deploy: { resources: { limits: { memory: 512m } } }
+  #   logging: *logging
+
+volumes: { caddy_data: {}, caddy_config: {}, pg_data: {}, redis_data: {} }

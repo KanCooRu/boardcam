@@ -1,0 +1,248 @@
+/* Battle presentation layer (v166 fix8). Pictures listed in battle-presentation.js are optional:
+   every rule here draws a finished look without them; `.painted` rules swap in the art. */
+:root{--bp-gold:#e9c37b;--bp-gold-deep:#a8793a;--bp-ink:#140d1c;--bp-plate:#1d1528;--bp-ease:cubic-bezier(.2,.8,.25,1)}
+
+/* ---------- Stage route (fix13): a fine gold thread with cut-diamond wave markers ---------- */
+body.ui-renewal #battle #route.bp-route{display:grid;grid-template-columns:repeat(9,12px) 26px;justify-content:space-between;align-items:center;
+ width:198px;height:26px;left:50%;margin-left:-99px;transform:none;gap:0;opacity:1;z-index:5;transition:opacity .25s ease}
+body.ui-renewal #battle #route.bp-route::before{content:none}
+#route.bp-route .bp-line{position:absolute;left:6px;right:12px;top:50%;height:1px;margin-top:-.5px;background:linear-gradient(90deg,#e9c37b00,#e9c37b55 8%,#e9c37b55 92%,#e9c37b00)}
+#route.bp-route .bp-line>b{display:block;height:100%;background:linear-gradient(90deg,#e9c37b00,#ffe2a0 30%,#fff3d1);box-shadow:0 0 4px #ffcf6e;transition:width .6s var(--bp-ease)}
+#route.bp-route .bp-node{position:relative;z-index:1;justify-self:center;width:7px;height:7px;box-sizing:border-box;rotate:45deg;border-radius:1px;border:1px solid #e9c37b88;background:#120c19;box-shadow:0 0 0 1px #0007}
+#route.bp-route .bp-node.done{border-color:#fff0c8;background:linear-gradient(135deg,#fff6dc,#f0c063 55%,#a8732c);box-shadow:0 0 0 1px #0006,0 0 5px #ffcf6e66}
+#route.bp-route .bp-node.now{width:11px;height:11px;border:1.5px solid #fff;background:linear-gradient(135deg,#fffaf0,#ffd98a 60%,#d39a44);box-shadow:0 0 0 1px #0008,0 0 10px #ffd98acc}
+#route.bp-route .bp-node.now::after{content:'';position:absolute;inset:-5px;border:1px solid #ffe2a0;opacity:0;animation:bp-now 1.6s ease-out infinite}
+@keyframes bp-now{0%{opacity:.9;scale:.55}100%{opacity:0;scale:1.25}}
+#route.bp-route .bp-crest{position:relative;z-index:1;display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:50%;background:none;box-shadow:none;color:#f1b7a3;filter:drop-shadow(0 1px 2px #000c)}
+#route.bp-route .bp-crest .bp-glyph{width:18px;height:18px;display:block}
+#route.bp-route.painted .bp-crest img{width:100%;height:100%;display:block;object-fit:contain}
+/* The boss bar takes the route's place while a boss is up. */
+body.bp-boss-on #battle #route.bp-route{opacity:0;visibility:hidden}
+
+/* ---------- Boss HP (fix13b): name above, crest on the left, a red bar with the % inside, a gold time line ---------- */
+#battle .bp-boss-hud{position:absolute;z-index:18;left:50%;top:66px;width:min(330px,86%);transform:translateX(-50%);display:grid;justify-items:center;gap:3px;pointer-events:none;color:#fff;
+ padding:0;background:none;border:0;box-shadow:none}
+#battle .bp-boss-hud[hidden]{display:none}
+body.dungeon-combat #battle .bp-boss-hud{top:calc(max(15px,env(safe-area-inset-top)) + 54px)}
+.bp-boss-hud .bp-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.bp-boss-hud .bp-name{max-width:100%;font-size:17px;font-weight:900;letter-spacing:.02em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ text-shadow:0 0 3px #000,0 2px 2px #000,0 0 10px #000c}
+.bp-boss-hud .bp-gauge{position:relative;width:100%;padding-left:26px;padding-right:6px;box-sizing:border-box}
+.bp-boss-hud .bp-emblem{position:absolute;left:0;top:50%;z-index:2;width:46px;height:46px;margin-top:-23px;display:grid;place-items:center;border-radius:50%;color:#f1b7a3;
+ filter:drop-shadow(0 2px 3px #000c)}
+.bp-boss-hud .bp-emblem img{width:100%;height:100%;display:block;object-fit:contain}
+.bp-boss-hud .bp-emblem .bp-glyph{width:28px;height:28px}
+.bp-boss-hud .bp-emblem:not(:has(img)){background:radial-gradient(circle at 50% 35%,#8a2a2f,#2a0e18 72%);box-shadow:inset 0 0 0 2px #d9a95c}
+/* HP bar: crimson fill with a faint sheen, inside a thin antique-gold rim with spear-tip end caps. */
+.bp-boss-hud .bp-barbox{position:relative;margin-left:14px}
+.bp-boss-hud .bp-bar{position:relative;height:19px;border-radius:3px;overflow:hidden;background:linear-gradient(#1c0609,#320c11);box-shadow:inset 0 2px 4px #000c}
+.bp-boss-hud .bp-bar>i{position:absolute;left:0;top:0;bottom:0;display:block}
+.bp-boss-hud .bp-trail{background:linear-gradient(#ffe6d6,#e9b7a4);opacity:.85;transition:width .55s cubic-bezier(.4,0,.2,1) .28s}
+.bp-boss-hud .bp-fill{transition:width .15s linear;
+ background:linear-gradient(180deg,#ffb19e33 0,#ffffff00 40%,#0000 60%,#00000040 100%),repeating-linear-gradient(115deg,#ffffff0d 0 5px,#0000 5px 11px),linear-gradient(90deg,#8e0f19,#d22a2f 55%,#ef4a3d);
+ box-shadow:inset 0 1px 0 #ffc2b066,inset 0 -1px 0 #0005,2px 0 4px #ff5a4a66}
+.bp-boss-hud .bp-pct{position:absolute;inset:0;z-index:2;display:grid;place-items:center;font-size:13px;font-weight:900;color:#fff8ee;letter-spacing:.04em;line-height:1;font-variant-numeric:tabular-nums;
+ text-shadow:1px 0 0 #2a0406,-1px 0 0 #2a0406,0 1px 0 #2a0406,0 -1px 0 #2a0406,0 0 5px #000b}
+.bp-boss-hud .bp-frame{position:absolute;inset:-3px;border-radius:5px;pointer-events:none;
+ box-shadow:0 0 0 1px #1a0f06,inset 0 0 0 1px #1a0f06,0 0 0 2px #e2bd73,0 0 0 3px #7a5420,0 3px 6px 2px #0009}
+.bp-boss-hud .bp-frame::before,.bp-boss-hud .bp-frame::after{content:'';position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;rotate:45deg;box-sizing:border-box;
+ background:linear-gradient(135deg,#fff0c2,#d9a24f 55%,#7a5420);box-shadow:0 0 0 1px #1a0f06}
+.bp-boss-hud .bp-frame::after{right:-7px}.bp-boss-hud .bp-frame::before{left:-7px;display:none}
+/* Time line: thin amber thread in a dark bronze groove, a brass hourglass at the end. */
+.bp-boss-hud .bp-time{position:relative;height:6px;margin:6px 16px 0 22px;border-radius:3px;background:#120c05e6;box-shadow:inset 0 1px 2px #000}
+.bp-boss-hud .bp-time[hidden]{display:none}
+.bp-boss-hud .bp-tfill{display:block;height:100%;border-radius:inherit;background:linear-gradient(180deg,#fff3b8,#f0bf3a 45%,#b77a12);box-shadow:0 0 4px #f0bf3a88;transition:width .3s linear}
+.bp-boss-hud .bp-tframe{position:absolute;inset:-1px;border-radius:4px;box-shadow:0 0 0 1px #6b4a1c,0 0 0 2px #1a0f06;pointer-events:none}
+.bp-boss-hud .bp-clockicon{position:absolute;right:-17px;top:50%;width:20px;height:20px;margin-top:-10px;filter:drop-shadow(0 1px 2px #000c)}
+.bp-boss-hud .bp-clockicon :is(svg,img){display:block;width:100%;height:100%}
+/* Painted gauge (card G1). Frames are 9-slice pictures drawn over the bars; the windows stay transparent. */
+.bp-boss-hud.gauge-art .bp-frame{inset:-7px -21px;border:solid transparent;border-width:7px 21px;border-radius:0;box-shadow:none;border-image:url('./assets/battle-ui/gauge-frame.webp') 12 36/7px 21px stretch}
+.bp-boss-hud.gauge-art .bp-frame::before,.bp-boss-hud.gauge-art .bp-frame::after{content:none}
+.bp-boss-hud.gauge-art .bp-fill{background:url('./assets/battle-ui/gauge-fill.webp') repeat-x 0 0/auto 100%;box-shadow:2px 0 4px #ff5a4a66}
+.bp-boss-hud.gauge-art .bp-tframe{inset:-6px -9px;border:solid transparent;border-width:6px 9px;border-radius:0;box-shadow:none;border-image:url('./assets/battle-ui/time-frame.webp') 8 12/6px 9px stretch}
+.bp-boss-hud.gauge-art .bp-tfill{background:url('./assets/battle-ui/time-fill.webp') repeat-x 0 0/auto 100%}
+.bp-boss-hud.gauge-art .bp-clockicon{width:24px;height:24px;margin-top:-12px;right:-19px}
+.bp-boss-hud.struck .bp-bar{animation:bp-struck .16s ease-out}
+@keyframes bp-struck{40%{filter:brightness(1.5)}}
+.bp-boss-hud.arrive{animation:bp-arrive .5s var(--bp-ease)}
+@keyframes bp-arrive{from{opacity:0;transform:translateX(-50%) translateY(-8px)}}
+/* The boss bar replaces the small bars it stands for. */
+#battle.bp-boss-on .enemy-status,body.bp-boss-on #stageBossClock,body.bp-boss-on .stage-boss-clock{display:none!important}
+
+/* ---------- Normal monsters: slim name plate and bar ---------- */
+#battle .foe-hud{font-size:10px}
+#battle .foe-hud b{display:block;font-size:10px;font-weight:700;color:#ffe9c2;text-shadow:0 1px 2px #000,0 0 3px #000}
+#battle .foe-hud>span{position:relative;height:7px;margin-top:2px;border:0;border-radius:4px;background:#0c0811e6;box-shadow:inset 0 0 0 1px #00000099,0 0 0 1px #e9c37b40}
+#battle .foe-hud>span>i{display:block;height:100%;border-radius:inherit;background:linear-gradient(180deg,#ffb3a1,#d9485a 60%,#a42c3d);transition:width .18s ease-out}
+#battle .foe-hud em{display:none}
+#battle .foe-hud.targeted>span{box-shadow:inset 0 0 0 1px #000,0 0 0 1px #ffd27a,0 0 6px #ffd27a88}
+#battle .foe-hud small{font-size:9px;min-height:12px;text-shadow:0 1px 2px #000}
+
+/* ---------- Damage numbers ---------- */
+#fx .combat-number{font-weight:900;letter-spacing:-.02em;color:#fff7e6;-webkit-text-stroke:0;paint-order:stroke fill;
+ text-shadow:0 2px 0 #3a1d12,1px 0 0 #3a1d12,-1px 0 0 #3a1d12,0 -1px 0 #3a1d12,0 0 8px #000a}
+#fx .combat-number.critical{color:#ffd45c;text-shadow:0 2px 0 #6a1408,1px 0 0 #6a1408,-1px 0 0 #6a1408,0 -1px 0 #6a1408,0 0 14px #ff6a2a}
+#fx .bp-crit-burst{position:absolute;width:76px;height:76px;margin:-44px 0 0 -38px;opacity:.85;pointer-events:none;z-index:1;mix-blend-mode:screen;animation:bp-crit .5s ease-out forwards}
+@keyframes bp-crit{from{opacity:.9;transform:scale(.5) rotate(-20deg)}50%{opacity:.6}to{opacity:0;transform:scale(1.2) rotate(15deg)}}
+
+/* ---------- Hit flash, shake, cast ---------- */
+#battle.impact-shake{animation:bp-impact .2s ease-out!important}
+@keyframes bp-impact{0%,100%{translate:0 0}20%{translate:-2px 1px}45%{translate:1.5px -1px}70%{translate:-1px 0}}
+#battle.bp-boss-shake{animation:bp-boss-shake .55s ease-out}
+@keyframes bp-boss-shake{0%,100%{translate:0 0}15%{translate:-3px 1px}35%{translate:2.5px -1px}60%{translate:-1.5px 0}}
+#battle .bp-cast{position:absolute;z-index:17;left:50%;top:136px;transform:translateX(-50%);pointer-events:none;opacity:0;white-space:nowrap}
+#battle .bp-cast b{display:block;font-size:17px;font-weight:900;color:#fff;letter-spacing:.02em;padding:3px 18px;
+ text-shadow:0 0 10px var(--bp-cast),0 2px 2px #000;background:linear-gradient(90deg,transparent,#0b0712cc 18%,#0b0712cc 82%,transparent);border-top:1px solid var(--bp-cast);border-bottom:1px solid var(--bp-cast)}
+#battle .bp-cast.show{animation:bp-cast .82s var(--bp-ease) forwards}
+@keyframes bp-cast{0%{opacity:0;transform:translate(-50%,6px) scaleX(.6)}18%{opacity:1;transform:translate(-50%,0) scaleX(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-6px)}}
+#battle.bp-casting::after{content:'';position:absolute;inset:0;z-index:16;pointer-events:none;background:radial-gradient(circle at 60% 55%,transparent 30%,color-mix(in srgb,var(--bp-cast) 22%,#000 40%) 100%);animation:bp-dim .82s ease-out forwards}
+@keyframes bp-dim{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+
+/* ---------- Boss entrance ---------- */
+#battle .bp-boss-intro{position:absolute;inset:0;z-index:19;pointer-events:none;display:grid;place-items:center;opacity:0}
+#battle .bp-boss-intro.show{animation:bp-intro 1.7s ease-out forwards}
+#battle .bp-boss-intro::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 35%,#5a0a14aa 100%)}
+#battle .bp-boss-intro .bp-warn{position:relative;display:grid;justify-items:center;gap:2px;width:100%;padding:10px 0 12px;
+ background:linear-gradient(90deg,transparent,#120810e6 15%,#120810e6 85%,transparent);border-top:1px solid #ff6a5a99;border-bottom:1px solid #ff6a5a99}
+#battle .bp-boss-intro small{font-size:11px;font-weight:900;letter-spacing:.5em;color:#ff7b6b;text-indent:.5em}
+#battle .bp-boss-intro em{font-style:normal;font-size:12px;color:#ffd7b0;font-weight:700}
+#battle .bp-boss-intro b{font-size:24px;font-weight:900;color:#fff2e0;text-shadow:0 0 14px #ff4a3a,0 2px 2px #000}
+#battle .bp-boss-intro.painted .bp-warn{background:none;border:0}
+#battle .bp-boss-intro.painted .bp-warn img{position:absolute;inset:-20% -4%;width:108%;height:140%;object-fit:fill;z-index:-1}
+@keyframes bp-intro{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
+#battle .bp-boss-intro.show .bp-warn{animation:bp-warn 1.7s var(--bp-ease) forwards}
+@keyframes bp-warn{0%{transform:scaleY(.1)}12%{transform:scaleY(1)}}
+
+/* ---------- Boss size: bosses tower over the hero ---------- */
+body #battle.campaign-boss #mobActor{width:55%;right:2%}
+body #battle .fallen-creature.fallen-boss{width:55%}
+body.dungeon-combat #battle:not(.duo-battle) #mobActor{width:55%;right:3%}
+/* fix13: big but standing back - the dragon keeps its distance from the hero and its tail runs off the right edge. */
+body .wb-stage{--wb-boss-size:min(108cqw,136cqh);--wb-boss-ground:19%;--wb-boss-right:-34%;
+ --wb-target-x:calc(100% - var(--wb-boss-right) - .72 * var(--wb-boss-size));--wb-target-bottom:calc(var(--wb-boss-ground) + .247 * var(--wb-boss-size))}
+body .wb-dragon{right:var(--wb-boss-right)}
+
+/* ---------- World boss and raid headers in the same style ---------- */
+.wb-battle-head .wb-track.wb-hp{position:relative;height:14px;border:0;border-radius:7px;background:#0b0710;box-shadow:inset 0 0 0 1px #e9c37b66,inset 0 2px 4px #000c}
+.wb-battle-head .wb-track.wb-hp>i{position:absolute;left:0;top:0;bottom:0;border-radius:inherit;background:linear-gradient(180deg,#ffffff55,#ffffff00 55%),linear-gradient(90deg,#a82d35,#e0574a 55%,#ff9a5a)}
+.wb-battle-head .wb-track.wb-hp>i.bp-trail{background:#fff1d6;transition:width .55s cubic-bezier(.4,0,.2,1) .28s}
+.party-top b{text-shadow:0 0 10px #8a6cff,0 2px 2px #000}
+
+/* ---------- Star mine ---------- */
+#mineField .bp-mine{position:absolute;inset:0;pointer-events:none;z-index:1}
+#mineField .bp-lantern{position:absolute;left:4%;top:18%;width:34%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#ffb35a55,#ffb35a00 70%);mix-blend-mode:screen;animation:bp-lantern 2.4s ease-in-out infinite}
+@keyframes bp-lantern{0%,100%{opacity:.8}40%{opacity:1}55%{opacity:.7}70%{opacity:.95}}
+#mineField .bp-ore{position:absolute;left:var(--ore-x,60%);top:var(--ore-y,50%);width:clamp(84px,30%,150px);aspect-ratio:1;transform:translate(-50%,-50%)}
+#mineField .bp-ore-art{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px #b98bff88) drop-shadow(0 6px 6px #000a)}
+#mineField .bp-ore::before{content:'';position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,#c9a2ff66,transparent 65%);mix-blend-mode:screen;animation:bp-glint 1.8s ease-in-out infinite}
+@keyframes bp-glint{50%{opacity:.35}}
+#mineField .bp-cracks{position:absolute;inset:14%;width:72%;height:72%;fill:none;stroke:#1b0d22;stroke-width:3;stroke-linecap:round;filter:drop-shadow(0 0 2px #e2c6ff)}
+#mineField .bp-cracks path{opacity:0;transition:opacity .15s}
+#mineField .bp-ore[data-crack="1"] .c1,#mineField .bp-ore[data-crack="2"] :is(.c1,.c2),#mineField .bp-ore[data-crack="3"] path{opacity:1}
+#mineField .bp-mine.painted .bp-cracks{display:none}
+#mineField .bp-ore.hit{animation:bp-ore-hit .16s ease-out}
+@keyframes bp-ore-hit{40%{transform:translate(-50%,-50%) scale(.93) rotate(-3deg);filter:brightness(1.5)}}
+#mineField .bp-ore.burst{animation:bp-ore-burst .45s var(--bp-ease)}
+@keyframes bp-ore-burst{0%{transform:translate(-50%,-50%) scale(1.25);filter:brightness(2.2)}40%{transform:translate(-50%,-50%) scale(.2);opacity:0}41%{transform:translate(-50%,-50%) scale(.2)}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+#mineField.bp-mine-shake{animation:bp-mine-shake .14s ease-out}
+@keyframes bp-mine-shake{40%{translate:-3px 2px}80%{translate:2px -1px}}
+#mineField .bp-gain{position:absolute;left:var(--ore-x,60%);top:var(--ore-y,50%);font-size:16px;font-weight:900;color:#f1ddff;text-shadow:0 0 8px #b07aff,0 2px 2px #000;
+ animation:bp-gain .76s ease-out forwards;white-space:nowrap}
+#mineField .bp-gain.big{font-size:22px;color:#ffe08a;text-shadow:0 0 12px #ffb03a,0 2px 2px #000;animation-duration:1.3s}
+#mineField .bp-gain.gem img{width:30px;height:30px;filter:drop-shadow(0 0 6px #c9a2ff)}
+#mineField .bp-gain.gem{animation:bp-gem .9s cubic-bezier(.3,.6,.4,1) forwards}
+@keyframes bp-gain{from{transform:translate(-50%,-30%) scale(.6);opacity:0}20%{transform:translate(calc(-50% + var(--dx)*.3),-90%) scale(1.15);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(var(--dy) - 40%)) scale(1);opacity:0}}
+@keyframes bp-gem{from{transform:translate(-50%,-50%) scale(.4)}35%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy)*.6)) scale(1.1)}to{transform:translate(-50%,280px) scale(.5);opacity:0}}
+#mineField .bp-combo{position:absolute;right:6%;top:10%;font-size:20px;font-weight:900;color:#fff;text-shadow:0 0 10px #8a6cff,0 2px 2px #000}
+#mineField .bp-combo.hot{color:#ffd45c;text-shadow:0 0 14px #ff8a2a,0 2px 2px #000}
+#mineField .bp-combo.pop{animation:bp-pop .2s ease-out}
+@keyframes bp-pop{50%{transform:scale(1.3)}}
+#mineView .bp-mine-time{position:absolute;z-index:3;left:14px;right:14px;top:calc(max(17px,env(safe-area-inset-top)) + 54px);height:6px;border-radius:3px;background:#0b0710cc;box-shadow:0 0 0 1px #e9c37b44}
+#mineView:not(.mining) .bp-mine-time{display:none}
+#mineView .bp-mine-time>i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8a63d9,#e2b7ff);transition:width .3s linear}
+#mineView .bp-mine-time.urgent>i{background:linear-gradient(90deg,#c9374a,#ff8a6a)}
+.bp-mine-result{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:#07040bb3;animation:bp-fade .25s ease-out}
+.bp-mine-result section{width:min(320px,86vw);padding:20px 18px 16px;border-radius:18px;text-align:center;background:linear-gradient(180deg,#2b1f38,#171020);box-shadow:inset 0 0 0 1px #e9c37b55,0 12px 40px #000c}
+.bp-mine-result h3{margin:0;font-size:22px;color:#ffe6b0}.bp-mine-result p{margin:4px 0 14px;color:#cdbbd6;font-size:13px}
+.bp-mine-rewards{display:flex;justify-content:center;gap:10px;margin-bottom:16px}
+.bp-mine-rewards>div{display:grid;justify-items:center;gap:2px;width:84px;padding:10px 0;border-radius:12px;background:#0e0914;box-shadow:inset 0 0 0 1px #ffffff14}
+.bp-mine-rewards .art{width:40px;height:40px}.bp-mine-rewards b{font-size:16px;color:#fff}.bp-mine-rewards small{font-size:11px;color:#bba9c6}
+.bp-mine-result .gold-button{width:100%;min-height:44px}
+@keyframes bp-fade{from{opacity:0}}
+
+/* Reduced motion and power saving keep the layouts but drop the movement. */
+body:is(.low-motion,.power-saving) :is(#battle.impact-shake,#battle.bp-boss-shake,#mineField.bp-mine-shake,.bp-boss-hud.struck .bp-bar){animation:none!important}
+@media(prefers-reduced-motion:reduce){#battle .bp-boss-intro,#battle .bp-cast,#fx .bp-crit-burst{display:none}#route.bp-route :is(.bp-node.now,.bp-crest.now){animation:none}}
+#battle.bp-boss-on .bp-cast{top:186px}
+body.dungeon-combat #battle .bp-cast{top:calc(max(15px,env(safe-area-inset-top)) + 146px)}
+
+/* ---------- One damage number look for stage, world boss and raid ---------- */
+.bp-num{position:absolute;z-index:7;pointer-events:none;white-space:nowrap;line-height:1;font-variant-numeric:tabular-nums;will-change:transform,opacity;
+ font-size:clamp(17px,4.8cqw,27px);font-weight:900;letter-spacing:-.02em;color:#fff7e6;-webkit-text-stroke:0;animation:none;
+ text-shadow:0 2px 0 #3a1d12,1px 0 0 #3a1d12,-1px 0 0 #3a1d12,0 -1px 0 #3a1d12,0 0 8px #000a}
+.bp-num.critical{font-size:clamp(30px,9cqw,49px);font-weight:1000;font-style:italic;letter-spacing:-.055em;color:#ffd45c;
+ text-shadow:0 2px 0 #6a1408,1px 0 0 #6a1408,-1px 0 0 #6a1408,0 -1px 0 #6a1408,0 0 14px #ff6a2a}
+.bp-num.critical::before{content:"";position:absolute;left:-.46em;top:.06em;width:.48em;height:.48em;background:#fff1a3;
+ clip-path:polygon(49% 0,61% 36%,100% 48%,63% 61%,49% 100%,38% 61%,0 48%,38% 36%);filter:drop-shadow(0 0 2px #f99927)}
+.bp-num.critical::after{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;
+ background:url('./assets/critical-hit.webp') center/contain no-repeat;mix-blend-mode:screen;opacity:.85;animation:bp-crit .5s ease-out forwards}
+body.bp-fx-art .bp-num.critical::after{background-image:url('./assets/combat-fx/crit-burst.webp')}
+/* World boss: keep its anchor over the dragon, drop its own type and motion. */
+.wb-fx .wb-damage.bp-num{animation:none;-webkit-text-stroke:0;paint-order:normal}
+.party-field .raid-number{z-index:4}
+
+
+/* ---------- fix12: review of the painted build ---------- */
+/* While the boss warning plays, numbers and skill names wait (they used to pile on the banner). */
+#battle.bp-intro-on :is(#fx,.bp-cast){visibility:hidden}
+/* Skill name sits above the hero instead of on the boss's head, where damage numbers rise. */
+#battle .bp-cast{top:auto;bottom:calc(36% + 8px);left:6px;transform:none;transform-origin:left center}
+#battle.bp-boss-on .bp-cast,body.dungeon-combat #battle .bp-cast{top:auto}
+#battle .bp-cast b{font-size:15px;padding:3px 16px 3px 10px;background:linear-gradient(90deg,#0b0712dd 70%,transparent);border-left:3px solid var(--bp-cast);border-top:0;border-bottom:0;border-radius:4px 0 0 4px}
+@keyframes bp-cast{0%{opacity:0;transform:translateX(-14px)}16%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+/* Mine: the vein fills the whole screen (it used to sit in a box with empty dark bands above and below). */
+#mineView.mining .mine-field{height:100%}
+#mineView.mining .mine-foot{padding:26px 14px 0;background:linear-gradient(transparent,#120d18d9 40%)}
+#mineView.mining .mine-foot p{font-size:14px;font-weight:700;color:#f3e6ff;text-shadow:0 1px 2px #000}
+#mineField .bp-ore{width:clamp(110px,40%,200px)}
+#mineField .bp-gain{font-size:20px}
+#mineField .bp-gain.big{font-size:26px}
+#mineField .bp-combo{top:calc(max(17px,env(safe-area-inset-top)) + 74px);font-size:24px}
+
+/* ---------- fix13: hit spark at the contact point ---------- */
+#fx .bp-spark,.bp-spark{position:absolute;z-index:3;transform:translate(-50%,-50%);pointer-events:none;mix-blend-mode:screen}
+.bp-spark>i{position:absolute;left:50%;top:50%;display:block;will-change:transform,opacity}
+.bp-spark .core{width:62%;height:62%;margin:-31% 0 0 -31%;border-radius:50%;background:radial-gradient(circle,#fff 0 22%,color-mix(in srgb,var(--c) 85%,#fff) 40%,color-mix(in srgb,var(--c) 40%,transparent) 62%,transparent 72%)}
+.bp-spark .ring{width:70%;height:70%;margin:-35% 0 0 -35%;border-radius:50%;border:3px solid color-mix(in srgb,var(--c) 70%,#fff);box-sizing:border-box;box-shadow:0 0 8px var(--c),inset 0 0 6px var(--c)}
+.bp-spark .ray{width:3px;margin-left:0;transform-origin:50% 100%;translate:0 -100%;border-radius:2px;background:linear-gradient(to top,transparent,var(--c) 45%,#fff)}
+.bp-spark .ray{left:50%;top:50%;transform-origin:50% 100%}
+.bp-spark .slash{width:120%;height:120%;margin:-60% 0 0 -60%;border-radius:50%;border-top:4px solid #fff;box-sizing:border-box;filter:drop-shadow(0 0 4px var(--c)) drop-shadow(0 0 8px var(--c))}
+body:is(.low-motion,.power-saving) .bp-spark{display:none}
+@media(prefers-reduced-motion:reduce){.bp-spark{display:none}}
+/* fix13: dust under the boss's footsteps as it walks in */
+#battle .bp-dust{position:absolute;z-index:4;width:90px;height:26px;margin:-18px 0 0 -45px;border-radius:50%;pointer-events:none;opacity:0;
+ background:radial-gradient(ellipse at center,#d8c7b0aa,#a8927a55 45%,transparent 70%);filter:blur(1px);animation:bp-dust .6s ease-out forwards}
+@keyframes bp-dust{0%{opacity:.9;transform:scale(.35,.5)}100%{opacity:0;transform:scale(1.5,1.1) translateY(-6px)}}
+#battle #bpSparks{position:absolute;inset:0;z-index:15;pointer-events:none;overflow:visible}
+
+/* ---------- fix13: star miner ---------- */
+#mineField:has(.bp-miner) .mine-pick{visibility:hidden}
+#mineField .bp-miner{position:absolute;left:var(--miner-x);top:var(--miner-y);width:var(--miner-size);height:var(--miner-size);z-index:2;filter:drop-shadow(0 4px 4px #0008)}
+#mineField .bp-miner svg{display:block;width:100%;height:100%;overflow:visible}
+#mineField .bp-miner :is(.mn-arm,.mn-body,.mn-head,.mn-eyes,.mn-glow){transform-box:view-box}
+#mineField .bp-miner .mn-arm{transform-origin:92px 162px;rotate:-115deg}
+#mineField .bp-miner .mn-body{transform-origin:82px 228px;animation:mn-breathe 2.4s ease-in-out infinite}
+#mineField .bp-miner .mn-eyes{transform-origin:104px 121px;animation:mn-blink 3.8s infinite}
+#mineField .bp-miner .mn-glow{transform-origin:114px 92px;animation:mn-glow 1.8s ease-in-out infinite}
+#mineField .bp-miner .mn-scarf-tail{transform-box:view-box;transform-origin:66px 160px;animation:mn-scarf 1.6s ease-in-out infinite}
+@keyframes mn-breathe{50%{scale:1 1.025}}
+@keyframes mn-blink{0%,92%,100%{scale:1 1}95%{scale:1 .1}}
+@keyframes mn-glow{50%{opacity:.6;scale:.9}}
+@keyframes mn-scarf{50%{rotate:-8deg}}
+/* Painted miner (MINER_ART): two 480x480 layers on the same rig points as the drawn one. */
+#mineField .bp-miner.painted img{position:absolute;inset:0;width:100%;height:100%}
+#mineField .bp-miner.painted .mn-arm{transform-origin:38.33% 67.5%}
+#mineField .bp-miner.painted .mn-body{transform-origin:34.17% 95%}
+/* Ore node: sits on the floor just past the contact point. */
+#mineField .bp-ore{left:var(--ore-cx,var(--ore-x));top:var(--ore-cy,var(--ore-y));width:var(--ore-size,150px)}
+body:is(.low-motion,.power-saving) #mineField .bp-miner *{animation:none!important}
