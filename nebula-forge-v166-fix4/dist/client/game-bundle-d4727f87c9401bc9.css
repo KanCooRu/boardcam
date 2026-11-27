@@ -1683,6 +1683,8 @@ body:is(.low-motion,.power-saving) .weapon-ritual.forge-destroyed::after{animati
 .forge-debris span{font-size:13px;line-height:1.4}.forge-debris b{color:#ffdeb0}
 .forge-debris small{display:block;color:#bbaac5;font-size:12px}
 .forge-debris button{min-height:44px;font-size:13px;white-space:nowrap}
+/* While the hammer result is on its way, the header buttons rest (closing is refused until it shows). */
+#overlay[data-forge-busy] .dialoghead>button{opacity:.35}
 
 /* weapon-appearance.css */
 /* Hide baked artwork before any portrait or replacement sheet has decoded. */

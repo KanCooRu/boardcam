@@ -51,11 +51,13 @@ function buildNavigation(){activeScreen='home';screenTab='equipment';popupStack=
   return `<button type="button"${attributes} onclick="${action}">${face}<small>${label}</small>${indicator}</button>`;
  }).join('');s.forgeBoosts=s.forgeBoosts||0;s.dungeonWins=s.dungeonWins||[0,0,0];selectedCostume=s.wear;hydrateArt()}
 function navTap(page){if(dungeonRun||mineScene.focused())return;if(activeScreen===page&&page!=='home'){navigate('home');return}navigate(page)}
-function navigate(page,sub){if(dungeonRun&&page!=='home'||mineScene.focused()&&(page!=='dungeon'||sub!=='mine'))return;if(page==='skills'&&sub==='summon')return openShopSummons('skill');if(!SCREEN_META[page])return;if(page==='forge'&&sub==='records')sub='craft';if(page==='content'&&!['town','online'].includes(sub))sub='town';if(page==='dungeon'&&['rebirth','tower'].includes(sub))sub='content';dismissPopup();activeScreen=page;screenTab=sub||SCREEN_TABS[page]?.[0]?.[0]||'';screenFilter='전체';inventoryPart=-1;$('featureScreen').hidden=page==='home';$('screenBackdrop').hidden=page==='home';setPopupInert(false);updateNav();if(page!=='home'){renderScreen(false);$('screenContent').scrollTop=0;}hydrateArt()}
+function forgeHammerLocked(){return typeof forgeStrikeLocked==='function'&&forgeStrikeLocked()}
+function navigate(page,sub){if(forgeHammerLocked())return;if(dungeonRun&&page!=='home'||mineScene.focused()&&(page!=='dungeon'||sub!=='mine'))return;if(page==='skills'&&sub==='summon')return openShopSummons('skill');if(!SCREEN_META[page])return;if(page==='forge'&&sub==='records')sub='craft';if(page==='content'&&!['town','online'].includes(sub))sub='town';if(page==='dungeon'&&['rebirth','tower'].includes(sub))sub='content';dismissPopup();activeScreen=page;screenTab=sub||SCREEN_TABS[page]?.[0]?.[0]||'';screenFilter='전체';inventoryPart=-1;$('featureScreen').hidden=page==='home';$('screenBackdrop').hidden=page==='home';setPopupInert(false);updateNav();if(page!=='home'){renderScreen(false);$('screenContent').scrollTop=0;}hydrateArt()}
 function updateNav(){document.querySelectorAll('#bottomNav button').forEach(b=>{const on=b.dataset.screen===activeScreen;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})}
 function switchScreenTab(t){if(mineScene.focused()&&t!=='mine')return;if(activeScreen==='skills'&&t==='summon')return openShopSummons('skill');if(activeScreen==='forge'&&t==='records')t='craft';if(activeScreen==='content'&&!['town','online'].includes(t))t='town';if(activeScreen==='dungeon'&&['rebirth','tower'].includes(t))t='content';screenTab=t;screenFilter='전체';renderScreen(false);$('screenContent').scrollTop=0}
 function setFilter(t){screenFilter=t;renderScreen()}
 function openMenu(kind,arg){
+ if(forgeHammerLocked()&&kind!==view)return false;
  if(kind==='towerRanking'||kind==='dungeonGuide'&&arg==='tower')return false;
  if(dungeonRun?.mode==='trial'&&dungeonRun.choosing&&!['trialChoice','dungeonExit'].includes(kind))return false;
  if(kind==='trialChoice'&&(!dungeonRun?.choosing||dungeonRun.mode!=='trial'))return false;
@@ -84,14 +86,15 @@ function keepTrialDialog(){
  if(view==='dungeonExit'&&dungeonExitTarget===dungeonRun){cancelTrialExit();return true}
  return view==='trialChoice'&&dungeonRun.choosing;
 }
-function dismissPopup(){if(keepTrialDialog())return false;setTrialChoiceHeader(false);const wasOpen=$('overlay').classList.contains('show');view='';tab='';popupStack=[];$('overlay').classList.remove('show');setPopupInert(false);if(wasOpen&&activeScreen!=='home'){// Recreate the scroll layer after inert: Chromium can retain its old hit-test state after a modal repaint.
+function forgeHoldsPopup(){return typeof refuseForgeClose==='function'&&refuseForgeClose()}
+function dismissPopup(){if(keepTrialDialog()||forgeHoldsPopup())return false;setTrialChoiceHeader(false);const wasOpen=$('overlay').classList.contains('show');view='';tab='';popupStack=[];$('overlay').classList.remove('show');setPopupInert(false);if(wasOpen&&activeScreen!=='home'){// Recreate the scroll layer after inert: Chromium can retain its old hit-test state after a modal repaint.
 const old=$('screenContent'),scroll=old.scrollTop,fresh=old.cloneNode(false);old.getAnimations?.().forEach(a=>a.cancel());old.replaceWith(fresh);renderScreen(false);fresh.scrollTop=scroll}}
 // A short note opened on top of another popup (a term, a rate table): X puts the reader back on the popup
 // underneath instead of closing everything. Opened by itself, X closes it as before.
 const NOTE_POPUPS=new Set(['termHelp','summonRates','petRates','royalRates','normalCostumeRates','royalSlot','normalSkin']);
 function closeFromX(){return NOTE_POPUPS.has(view)&&popupStack.length?closeMenu():dismissPopup()}
 function closeMenu(){
- if(keepTrialDialog())return false;
+ if(keepTrialDialog()||forgeHoldsPopup())return false;
  while(view&&popupStack.length){
   const prev=popupStack.pop();
   if(!featureOpen(featureForMenu(prev.view,prev.tab)))continue;

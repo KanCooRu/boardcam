@@ -1102,11 +1102,13 @@ function buildNavigation(){activeScreen='home';screenTab='equipment';popupStack=
   return `<button type="button"${attributes} onclick="${action}">${face}<small>${label}</small>${indicator}</button>`;
  }).join('');s.forgeBoosts=s.forgeBoosts||0;s.dungeonWins=s.dungeonWins||[0,0,0];selectedCostume=s.wear;hydrateArt()}
 function navTap(page){if(dungeonRun||mineScene.focused())return;if(activeScreen===page&&page!=='home'){navigate('home');return}navigate(page)}
-function navigate(page,sub){if(dungeonRun&&page!=='home'||mineScene.focused()&&(page!=='dungeon'||sub!=='mine'))return;if(page==='skills'&&sub==='summon')return openShopSummons('skill');if(!SCREEN_META[page])return;if(page==='forge'&&sub==='records')sub='craft';if(page==='content'&&!['town','online'].includes(sub))sub='town';if(page==='dungeon'&&['rebirth','tower'].includes(sub))sub='content';dismissPopup();activeScreen=page;screenTab=sub||SCREEN_TABS[page]?.[0]?.[0]||'';screenFilter='전체';inventoryPart=-1;$('featureScreen').hidden=page==='home';$('screenBackdrop').hidden=page==='home';setPopupInert(false);updateNav();if(page!=='home'){renderScreen(false);$('screenContent').scrollTop=0;}hydrateArt()}
+function forgeHammerLocked(){return typeof forgeStrikeLocked==='function'&&forgeStrikeLocked()}
+function navigate(page,sub){if(forgeHammerLocked())return;if(dungeonRun&&page!=='home'||mineScene.focused()&&(page!=='dungeon'||sub!=='mine'))return;if(page==='skills'&&sub==='summon')return openShopSummons('skill');if(!SCREEN_META[page])return;if(page==='forge'&&sub==='records')sub='craft';if(page==='content'&&!['town','online'].includes(sub))sub='town';if(page==='dungeon'&&['rebirth','tower'].includes(sub))sub='content';dismissPopup();activeScreen=page;screenTab=sub||SCREEN_TABS[page]?.[0]?.[0]||'';screenFilter='전체';inventoryPart=-1;$('featureScreen').hidden=page==='home';$('screenBackdrop').hidden=page==='home';setPopupInert(false);updateNav();if(page!=='home'){renderScreen(false);$('screenContent').scrollTop=0;}hydrateArt()}
 function updateNav(){document.querySelectorAll('#bottomNav button').forEach(b=>{const on=b.dataset.screen===activeScreen;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})}
 function switchScreenTab(t){if(mineScene.focused()&&t!=='mine')return;if(activeScreen==='skills'&&t==='summon')return openShopSummons('skill');if(activeScreen==='forge'&&t==='records')t='craft';if(activeScreen==='content'&&!['town','online'].includes(t))t='town';if(activeScreen==='dungeon'&&['rebirth','tower'].includes(t))t='content';screenTab=t;screenFilter='전체';renderScreen(false);$('screenContent').scrollTop=0}
 function setFilter(t){screenFilter=t;renderScreen()}
 function openMenu(kind,arg){
+ if(forgeHammerLocked()&&kind!==view)return false;
  if(kind==='towerRanking'||kind==='dungeonGuide'&&arg==='tower')return false;
  if(dungeonRun?.mode==='trial'&&dungeonRun.choosing&&!['trialChoice','dungeonExit'].includes(kind))return false;
  if(kind==='trialChoice'&&(!dungeonRun?.choosing||dungeonRun.mode!=='trial'))return false;
@@ -1135,14 +1137,15 @@ function keepTrialDialog(){
  if(view==='dungeonExit'&&dungeonExitTarget===dungeonRun){cancelTrialExit();return true}
  return view==='trialChoice'&&dungeonRun.choosing;
 }
-function dismissPopup(){if(keepTrialDialog())return false;setTrialChoiceHeader(false);const wasOpen=$('overlay').classList.contains('show');view='';tab='';popupStack=[];$('overlay').classList.remove('show');setPopupInert(false);if(wasOpen&&activeScreen!=='home'){// Recreate the scroll layer after inert: Chromium can retain its old hit-test state after a modal repaint.
+function forgeHoldsPopup(){return typeof refuseForgeClose==='function'&&refuseForgeClose()}
+function dismissPopup(){if(keepTrialDialog()||forgeHoldsPopup())return false;setTrialChoiceHeader(false);const wasOpen=$('overlay').classList.contains('show');view='';tab='';popupStack=[];$('overlay').classList.remove('show');setPopupInert(false);if(wasOpen&&activeScreen!=='home'){// Recreate the scroll layer after inert: Chromium can retain its old hit-test state after a modal repaint.
 const old=$('screenContent'),scroll=old.scrollTop,fresh=old.cloneNode(false);old.getAnimations?.().forEach(a=>a.cancel());old.replaceWith(fresh);renderScreen(false);fresh.scrollTop=scroll}}
 // A short note opened on top of another popup (a term, a rate table): X puts the reader back on the popup
 // underneath instead of closing everything. Opened by itself, X closes it as before.
 const NOTE_POPUPS=new Set(['termHelp','summonRates','petRates','royalRates','normalCostumeRates','royalSlot','normalSkin']);
 function closeFromX(){return NOTE_POPUPS.has(view)&&popupStack.length?closeMenu():dismissPopup()}
 function closeMenu(){
- if(keepTrialDialog())return false;
+ if(keepTrialDialog()||forgeHoldsPopup())return false;
  while(view&&popupStack.length){
   const prev=popupStack.pop();
   if(!featureOpen(featureForMenu(prev.view,prev.tab)))continue;
@@ -3613,16 +3616,37 @@ refreshRewardClocks=function(){discoveryClocks();if(!document.hidden)refreshRewa
 openMenu=function(kind,arg){if(kind==='inventory'&&view!=='inventory'){inventorySet=-1;bagSalvageSelection=null;}return discoveryOpen(kind,arg)};
 </script><script>/* Permanent VIP milestones and earned, selectable cosmetic titles. */
 'use strict';
-VIP_LEVELS[8].gift.stones=1200;
+// Gifts for every level are set from VIP_GIFTS below.
 VIP_LEVELS.push(
- {threshold:1000000,gift:{gems:3600,ore:650,rouletteCoins:20,stones:2500,summonTickets:20}},
- {threshold:1500000,gift:{gems:4200,ore:750,rouletteCoins:24,stones:3000,summonTickets:24}},
- {threshold:2000000,gift:{gems:4800,ore:900,rouletteCoins:28,stones:3600,summonTickets:28}},
- {threshold:3000000,gift:{gems:7200,ore:1400,rouletteCoins:40,stones:5400,summonTickets:40,relicShards:300}},
- {threshold:5000000,gift:{gems:12000,ore:2400,rouletteCoins:65,stones:9000,summonTickets:65,relicShards:500,shards:2000}},
- {threshold:7000000,gift:{gems:14000,ore:2800,rouletteCoins:80,stones:10500,summonTickets:75,relicShards:600,shards:2400}},
- {threshold:10000000,gift:{gems:21000,ore:4200,rouletteCoins:120,stones:15000,summonTickets:110,relicShards:900,shards:3600,passCoins:300,gold:5000000}}
+ {threshold:1000000,gift:{}},
+ {threshold:1500000,gift:{}},
+ {threshold:2000000,gift:{}},
+ {threshold:3000000,gift:{}},
+ {threshold:5000000,gift:{}},
+ {threshold:7000000,gift:{}},
+ {threshold:10000000,gift:{}}
 );
+// One gift per VIP level. About 20% (VIP 1) to 30% (VIP 16) of the diamonds bought in each step comes back as
+// diamonds, and the materials never fall below the previous level's.
+const VIP_GIFTS=[
+ {gems:25,ore:11,stones:15},
+ {gems:80,ore:22,stones:16,summonTickets:1},
+ {gems:145,ore:33,stones:30,summonTickets:2},
+ {gems:350,ore:55,stones:50,summonTickets:3},
+ {gems:420,ore:77,stones:60,summonTickets:3,relicShards:33},
+ {gems:880,ore:110,stones:120,summonTickets:5,petTickets:1,rouletteCoins:1,relicShards:33},
+ {gems:2000,ore:185,stones:280,summonTickets:12,petTickets:2,rouletteCoins:5,relicShards:33},
+ {gems:3100,ore:280,stones:420,summonTickets:19,petTickets:3,rouletteCoins:5,relicShards:33},
+ {gems:3400,ore:308,stones:1200,summonTickets:19,petTickets:3,rouletteCoins:10,relicShards:33},
+ {gems:10800,ore:720,stones:2500,summonTickets:55,petTickets:10,rouletteCoins:20,relicShards:95},
+ {gems:11900,ore:750,stones:3000,summonTickets:55,petTickets:10,rouletteCoins:24,relicShards:95},
+ {gems:13100,ore:900,stones:3600,summonTickets:55,petTickets:10,rouletteCoins:28,relicShards:100},
+ {gems:23500,ore:1400,stones:5400,summonTickets:90,petTickets:20,rouletteCoins:40,relicShards:300,shards:600},
+ {gems:48000,ore:2400,stones:9000,summonTickets:180,petTickets:40,rouletteCoins:65,relicShards:500,shards:2000},
+ {gems:53000,ore:2800,stones:10500,summonTickets:180,petTickets:40,rouletteCoins:80,relicShards:600,shards:2400},
+ {gems:75000,ore:4200,stones:15000,summonTickets:280,petTickets:65,rouletteCoins:120,relicShards:900,shards:3600,passCoins:300,gold:5000000}
+];
+VIP_GIFTS.forEach((gift,i)=>{VIP_LEVELS[i].gift=gift});
 const VIP_TITLE_NAMES=['별빛의 후원자','은하의 동반자','성좌의 귀빈','천공의 귀족','별의 군주','은하의 황제','천공의 영원'];
 const STAGE_TITLES=[
  [30,'초원의 개척자'],[60,'어둠숲의 등불'],[90,'황혼의 방랑자'],[120,'안개의 파수꾼'],
@@ -4691,7 +4715,7 @@ function exchangeHavenItem(id){return onlineAct('townExchange',{id})}
 function raidComingPopup(){return partyRaid.lobby()}
 EXTRA_POPUPS.havenShop=['성운의 상점',havenShopPopup];
 EXTRA_POPUPS.raidComing=['레이드',raidComingPopup];
-</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-1da0702311230902.css"><script src="./game-bundle-2dd1e15e1f340af4.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
+</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-d4727f87c9401bc9.css"><script src="./game-bundle-2dd1e15e1f340af4.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-0aac11894bc05fc9.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
 
 const ADVENTURE_TERMS={
  '공격력':'평타와 공격 스킬의 피해를 계산할 때 사용하는 기본 수치입니다.',
