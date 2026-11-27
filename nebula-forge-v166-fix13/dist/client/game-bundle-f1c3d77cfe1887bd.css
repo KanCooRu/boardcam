@@ -2373,7 +2373,7 @@ body.ui-renewal #battle #route.bp-route{display:grid;grid-template-columns:repea
 body.ui-renewal #battle #route.bp-route::before{content:none}
 #route.bp-route .bp-line{position:absolute;left:6px;right:12px;top:50%;height:1px;margin-top:-.5px;background:linear-gradient(90deg,#e9c37b00,#e9c37b55 8%,#e9c37b55 92%,#e9c37b00)}
 #route.bp-route .bp-line>b{display:block;height:100%;background:linear-gradient(90deg,#e9c37b00,#ffe2a0 30%,#fff3d1);box-shadow:0 0 4px #ffcf6e;transition:width .6s var(--bp-ease)}
-#route.bp-route .bp-node{position:relative;z-index:1;justify-self:center;width:7px;height:7px;box-sizing:border-box;rotate:45deg;border:1px solid #e9c37b88;background:#120c19;box-shadow:0 0 0 1px #0007}
+#route.bp-route .bp-node{position:relative;z-index:1;justify-self:center;width:7px;height:7px;box-sizing:border-box;rotate:45deg;border-radius:1px;border:1px solid #e9c37b88;background:#120c19;box-shadow:0 0 0 1px #0007}
 #route.bp-route .bp-node.done{border-color:#fff0c8;background:linear-gradient(135deg,#fff6dc,#f0c063 55%,#a8732c);box-shadow:0 0 0 1px #0006,0 0 5px #ffcf6e66}
 #route.bp-route .bp-node.now{width:11px;height:11px;border:1.5px solid #fff;background:linear-gradient(135deg,#fffaf0,#ffd98a 60%,#d39a44);box-shadow:0 0 0 1px #0008,0 0 10px #ffd98acc}
 #route.bp-route .bp-node.now::after{content:'';position:absolute;inset:-5px;border:1px solid #ffe2a0;opacity:0;animation:bp-now 1.6s ease-out infinite}
