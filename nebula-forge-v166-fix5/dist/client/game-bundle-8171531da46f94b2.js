@@ -4590,7 +4590,7 @@ const rankBoard=(()=>{
   const key=selected();
   const tabs='<nav class="rank-tabs" aria-label="랭킹 종류">'+Object.entries(boards).map(([id,[label]])=>
    '<button type="button" onclick="rankBoard.choose(\''+id+'\')" aria-pressed="'+(id===key)+'">'+label+'</button>').join('')+'</nav>';
-  return onlineGallery(key,boards[key][1],key==='guild'?'길드원의 검증 전투력 합계':'기본 장비 · 서버에서 강화한 능력 기준',tabs);
+  return onlineGallery(key,boards[key][1],key==='guild'?'길드원의 현재 전투력 합계':key==='stage'?'모험에서 클리어한 단계 · 1분마다 갱신':'모험 기록 기준 최고 전투력 · 1분마다 갱신',tabs);
  }
  function onlineGallery(key,title,subtitle,controls){
   ensurePlayer();
@@ -4605,11 +4605,6 @@ const rankBoard=(()=>{
    else if(!rows)status='랭킹을 불러오는 중…';
    else if(!rows.length)status={guild:'아직 참가한 길드가 없습니다.',stage:'아직 스테이지를 클리어한 기사가 없습니다.',power:'아직 기록된 기사가 없습니다.'}[key];
   }
-  if(key==='stage'&&usable()&&certifiedCombat.info()){
-   const target=certifiedCombat.info().stage+1;
-   subtitle='서버 검증 도전 · '+stageText(Math.min(1200,target));
-   if(target<=s.maxStage&&target<=1200&&s.stage!==target&&!dungeonRun)controls='<button type="button" class="gold-button" onclick="rankBoard.travelVerified()">검증 스테이지 · '+stageText(target)+'</button>'+controls;
-  }
   return gallery(key,title,subtitle,rows,status?'<p class="rank-message" role="status">'+status+'</p>':'',controls);
  }
  function trialGallery(data,subtitle,controls=''){
@@ -4621,10 +4616,9 @@ const rankBoard=(()=>{
  function worldTrials(rows,status){
   return gallery('worldboss','월드보스 인증 피해','인증 장비·스킬 기준 · 파수룡 Lv.1부터',rows,status);
  }
- function travelVerified(){const p=certifiedCombat.info();if(!p||dungeonRun||view!=='ranking'||p.stage>=1200||p.stage+1>s.maxStage)return;dismissPopup();navigate('home');travel(p.stage+1-s.stage)}
  function retry(){const item=cache.get(selected());if(item)item.until=0;render()}
  function invalidate(){cache.clear()}
- return {panel,worldTrials,trialGallery,travelVerified,choose,retry,schedule,invalidate};
+ return {panel,worldTrials,trialGallery,choose,retry,schedule,invalidate};
 })();
 
 EXTRA_POPUPS.ranking=['랭킹',rankingPopup];
@@ -4709,8 +4703,8 @@ const certifiedCombat=(()=>{
  }
  return {connect,noteAttack,finish,grow,info:()=>active()?profile:null};
 })();
-const rankedAttack=performClassAttack;
-performClassAttack=function(...args){const ok=rankedAttack(...args);if(ok)certifiedCombat.noteAttack();return ok};
+// The stage board follows the stored adventure (the server replays the top stage of each save), so ordinary
+// attacks no longer start a separate server-side stage proof.
 const rankedAdvance=advanceCampaign;
 advanceCampaign=function(target){const prior=s.stageKills,out=rankedAdvance(target);if(prior+1>=campaignKillsNeeded(target))certifiedCombat.finish('stage',target);return out};
 const rankedUpgrade=upgrade;
