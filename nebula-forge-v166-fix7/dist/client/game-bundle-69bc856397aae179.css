@@ -437,6 +437,14 @@ body:is(.low-motion,.power-saving) .adventure-fx-layer{visibility:hidden}
 .stage{height:69px;top:8px}.stage-map-button .difficulty-badge{display:block;font-size:12px!important;line-height:1.2;letter-spacing:1px;margin:0 0 3px;font-weight:700}.stage-map-button #stage{font-size:clamp(17px,5cqw,26px);line-height:1.2}.stage-map-button #region{font-size:10px;margin-top:4px}.stage-route{top:86px}
 .campaign-difficulty-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:0 0 13px}.campaign-difficulty-tabs button{font-size:var(--min-label,13px);padding:9px 2px;background:#2b2137;border:1px solid #6f5379;border-radius:8px;color:#c9b0d3}.campaign-difficulty-tabs button.active{background:linear-gradient(#805434,#483044);border-color:#d4ab6c;color:#ffdfaa}.campaign-difficulty-tabs small{font-size:var(--min-label,13px);display:block;margin-top:5px;color:#a88eb7}
 @media(max-height:740px){.stage{height:60px;top:6px}.stage-route{top:72px}.stage-map-button #stage{font-size:18px}.stage-map-button .difficulty-badge{font-size:12px!important}.stage-map-button #region{font-size:9px}}
+/* Auto battle and boss challenge stand one above the other at the left end of the skill row; the speed
+   switch sits at its right end, level with the skill icons. Each orb's label hangs about 11px below it. */
+body #game #battle .battle-controls{display:block;top:auto;bottom:12px;left:8px;right:8px;height:0}
+body #game #battle .battle-controls>:is(#auto,#autoBoss,#speed){position:absolute;margin:0}
+body #game #battle .battle-controls>#autoBoss{left:0;bottom:12px}
+body #game #battle .battle-controls>#auto{left:0;bottom:72px}
+body #game #battle .battle-controls>#speed{right:4px;bottom:15px}
+
 
 /* page */
 :root{--region_8:url('./assets/9ec363907f3de44bff49.webp');--region_9:url('./assets/f7a623381b55f143b14f.webp')}
