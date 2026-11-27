@@ -1,4 +1,4 @@
-"""GPT 그림 자가 검사 (A13~A19).
+"""GPT 그림 자가 검사 (A13~A22).
 
 사용법(게임 폴더에서):
     python3 tools/check-gpt-art.py            모든 카드 검사
@@ -38,6 +38,12 @@ CARDS = {
    ('ui-kit/panel-frame.webp', (256,256), ['alpha','slice48']),
    ('ui-kit/divider.webp', (512,48), ['alpha','symmetric_loose']),
    ('ui-kit/nav-glow.webp', (160,48), ['alpha','symmetric_loose'])]),
+ 'A20~A22': ('UI_EXTRA_ART', [
+   ('ui-kit/wallet-frame.webp', (200,56), ['alpha','slice24']),
+   ('ui-kit/plus-badge.webp', (64,64), ['alpha','round','symmetric']),
+   ('ui-kit/ribbon-red.webp', (160,40), ['alpha','plain_middle']),
+   ('ui-kit/ribbon-gold.webp', (160,40), ['alpha','plain_middle']),
+   ('ui-kit/lock-badge.webp', (64,64), ['alpha','round','symmetric'])]),
 }
 
 def alpha(im): return im.getchannel('A')
@@ -99,6 +105,10 @@ def check(path, size, rules):
             centre = im.convert('RGB').crop((k, k, w-k, h-k))
             if ImageStat.Stat(centre).stddev[0] > 28: out.append('가운데에 무늬가 있음 - 고르게 칠해 주세요')
             if ImageStat.Stat(alpha(im).crop((k, k, w-k, h-k))).mean[0] < 120: out.append('가운데가 너무 투명함 - 판을 채워 주세요')
+        elif rule == 'plain_middle':
+            c = im.convert('RGB').crop((int(w*.15), int(h*.25), int(w*.8), int(h*.75)))
+            if ImageStat.Stat(c).stddev[0] > 30: out.append('리본 가운데에 무늬가 있음 - 글씨 자리이므로 고르게 칠해 주세요')
+            if ImageStat.Stat(a.crop((int(w*.15), int(h*.25), int(w*.8), int(h*.75)))).mean[0] < 200: out.append('리본 가운데가 투명함 - 채워 주세요')
         elif rule == 'pick_anchor':
             tip = max(a.getpixel((x, y)) for x in range(368, 380) for y in range(146, 159))
             grip = max(a.getpixel((x, y)) for x in range(44, 63) for y in range(325, 344))

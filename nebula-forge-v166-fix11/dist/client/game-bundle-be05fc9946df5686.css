@@ -2545,7 +2545,7 @@ body.bp-fx-art .bp-num.critical::after{background-image:url('./assets/combat-fx/
 
 
 /* ui-kit.css */
-/* UI polish (v166 fix10). Code-drawn by default; with UI_KIT_ART (battle-presentation.js, cards A17-A19)
+/* UI polish (v166 fix10). Code-drawn by default; with UI_KIT_ART (cards A17-A19) and UI_EXTRA_ART (A20-A22) in battle-presentation.js
    the same controls take the painted frames from assets/ui-kit/. Disabled controls keep their own look. */
 
 /* ---------- Buttons: depth, rim light and a press ---------- */
@@ -2585,6 +2585,44 @@ body.ui-renewal #bottomNav button.active::before{content:'';position:absolute;le
  background:linear-gradient(90deg,transparent,#ffe3a3,transparent);box-shadow:0 0 10px #ffd27a}
 body.ui-renewal #bottomNav button.active .catalog-icon{filter:drop-shadow(0 0 6px #ffd27a88);transform:translateY(-1px)}
 
+/* ---------- Top currency chips: the icon sits large over the left edge (A20) ---------- */
+body.ui-renewal .wallet{gap:10px}
+body.ui-renewal .wallet>button{position:relative;overflow:visible;padding-left:30px;border:1px solid #e9c37b40;border-radius:22px;
+ background:linear-gradient(180deg,#2a2036f2,#160f20f2);box-shadow:inset 0 1px 0 #ffffff14,inset 0 -2px 0 #0006,0 2px 6px #0007}
+body.ui-renewal .wallet>button>.art{position:absolute;left:-8px;top:50%;width:36px;height:36px;margin:0;transform:translateY(-50%);
+ filter:drop-shadow(0 2px 3px #000c) drop-shadow(0 0 6px #ffd27a40)}
+body.ui-renewal .wallet>button>b{font-weight:800;letter-spacing:-.01em;text-shadow:0 1px 2px #000}
+body.ui-renewal .wallet>button>small{display:grid;place-items:center;width:22px;height:22px;margin-left:auto;margin-right:2px;border-radius:50%;
+ color:#2b1b0d;background:radial-gradient(circle at 50% 35%,#fff0c2,#e2b062 70%,#a8753a);box-shadow:inset 0 1px 0 #fff8,0 1px 3px #000a}
+body.ui-renewal .wallet>button>small ui-mark{width:12px;height:12px}
+body.ui-renewal .wallet>button:active{transform:scale(.97)}
+
+/* ---------- Shop and mail ribbons (A21) ---------- */
+body.ui-renewal :is(.offer-card.daily-gift,.package-section:nth-of-type(1) .package-card,.diamond-product.grand,.mail-list-row.unread,.mail-list-row:not(.mail-received):has(.mail-row-rewards .art)){position:relative}
+body.ui-renewal :is(.offer-card.daily-gift,.package-section:nth-of-type(1) .package-card,.diamond-product.grand)::before,
+body.ui-renewal .mail-list-row:not(.mail-received):has(.mail-row-rewards .art)::before{
+ position:absolute;z-index:2;left:-5px;top:8px;padding:2px 10px 2px 9px;border-radius:2px 8px 8px 2px;pointer-events:none;
+ font-size:11px;font-weight:900;letter-spacing:.04em;line-height:16px;color:#fff;text-shadow:0 1px 1px #0008;
+ background:linear-gradient(180deg,#e2556a,#a9263d);box-shadow:inset 0 1px 0 #ffffff55,0 2px 4px #0009,0 0 0 1px #ffb0a066}
+body.ui-renewal .offer-card.daily-gift::before{content:'무료'}
+body.ui-renewal .offer-card.daily-gift:has(button:disabled)::before{content:'수령 완료';background:linear-gradient(180deg,#5a5166,#3a3346);box-shadow:inset 0 1px 0 #ffffff22,0 2px 4px #0009}
+body.ui-renewal .package-section:nth-of-type(1) .package-card::before{content:'한정';color:#2b1b0d;text-shadow:0 1px 0 #fff6;background:linear-gradient(180deg,#ffe7ab,#d9a24f);box-shadow:inset 0 1px 0 #fff9,0 2px 4px #0009,0 0 0 1px #8a5a2a66}
+body.ui-renewal .diamond-product.grand.grand.grand::before{content:'최고 가치';color:#2b1b0d;text-shadow:0 1px 0 #fff6;background:linear-gradient(180deg,#ffe7ab,#d9a24f);box-shadow:inset 0 1px 0 #fff9,0 2px 4px #0009,0 0 0 1px #8a5a2a66}
+body.ui-renewal .mail-list-row:not(.mail-received):has(.mail-row-rewards .art)::before{content:'보상';top:-6px;left:10px;font-size:10px;line-height:14px;padding:1px 8px}
+body.ui-renewal .mail-list-row.unread::after{content:'';position:absolute;left:38px;top:10px;width:8px;height:8px;border-radius:50%;background:#ff5a6a;box-shadow:0 0 6px #ff5a6a}
+/* The fold under each ribbon. */
+body.ui-renewal :is(.offer-card.daily-gift,.package-section:nth-of-type(1) .package-card,.diamond-product.grand)::after{
+ content:'';position:absolute;z-index:1;left:-5px;top:28px;border-top:5px solid #5a1020;border-left:5px solid transparent;pointer-events:none}
+body.ui-renewal :is(.package-section:nth-of-type(1) .package-card,.diamond-product.grand)::after{border-top-color:#7a4a1a}
+
+/* ---------- Locked menu items: a small lock on the icon instead of a "STAGE 40" line (A22) ---------- */
+body.ui-renewal #game :is(#bottomNav,#battleShortcuts) button[data-feature-locked]{position:relative}
+body.ui-renewal #game :is(#bottomNav,#battleShortcuts) button[data-feature-locked]>:is(img,.art){filter:grayscale(.65) brightness(.75)}
+body.ui-renewal #game :is(#bottomNav,#battleShortcuts) button[data-feature-locked] .feature-lock-badge{
+ position:absolute;top:0;left:calc(50% + 6px);display:grid;place-items:center;width:20px;height:20px;padding:0;font-size:0;line-height:0;border-radius:50%;
+ background:radial-gradient(circle at 50% 35%,#4a3a58,#1c1424);box-shadow:inset 0 0 0 1px #e9c37b88,0 1px 3px #000c}
+body.ui-renewal #game :is(#bottomNav,#battleShortcuts) button[data-feature-locked] .feature-lock-badge :is(.lock-art,ui-mark){position:static!important;inset:auto!important;width:12px;height:12px;margin:0;transform:none;filter:drop-shadow(0 0 2px #ffd27a66)}
+
 /* ---------- Painted UI kit (A17-A19) ----------
    The frame is drawn wider than the 1-2px border (border-image-width), so turning the art on never
    changes any button's or popup's size. */
@@ -2593,6 +2631,15 @@ body.ui-kit-art.ui-renewal :is(.muted-button,.gold-button.purple):not(:disabled)
 body.ui-kit-art.ui-renewal #overlay .dialog{border:2px solid transparent;border-image:url('./assets/ui-kit/panel-frame.webp') 48 fill/24px stretch}
 body.ui-kit-art.ui-renewal #overlay .dialoghead::after{left:6%;right:6%;height:12px;bottom:-6px;background:url('./assets/ui-kit/divider.webp') center/100% 100% no-repeat;box-shadow:none}
 body.ui-kit-art.ui-renewal #bottomNav button.active::before{left:8%;right:8%;top:-2px;height:22px;background:url('./assets/ui-kit/nav-glow.webp') center/100% 100% no-repeat;box-shadow:none}
+body.ui-extra-art.ui-renewal .wallet>button{border:1px solid transparent;border-image:url('./assets/ui-kit/wallet-frame.webp') 24 fill/18px stretch;background:none;box-shadow:none}
+body.ui-extra-art.ui-renewal .wallet>button>small{background:url('./assets/ui-kit/plus-badge.webp') center/contain no-repeat;box-shadow:none}
+body.ui-extra-art.ui-renewal .wallet>button>small ui-mark{opacity:0}
+body.ui-extra-art.ui-renewal :is(.offer-card.daily-gift,.mail-list-row:not(.mail-received):has(.mail-row-rewards .art))::before{background:url('./assets/ui-kit/ribbon-red.webp') center/100% 100% no-repeat;box-shadow:none;border-radius:0}
+body.ui-extra-art.ui-renewal :is(.package-section:nth-of-type(1) .package-card,.diamond-product.grand.grand.grand)::before{background:url('./assets/ui-kit/ribbon-gold.webp') center/100% 100% no-repeat;box-shadow:none;border-radius:0}
+body.ui-extra-art.ui-renewal :is(.offer-card.daily-gift,.package-section:nth-of-type(1) .package-card,.diamond-product.grand)::after{display:none}
+body.ui-extra-art.ui-renewal #game :is(#bottomNav,#battleShortcuts) button[data-feature-locked] .feature-lock-badge{background:url('./assets/ui-kit/lock-badge.webp') center/contain no-repeat;box-shadow:none}
+body.ui-extra-art.ui-renewal #game :is(#bottomNav,#battleShortcuts) button[data-feature-locked] .feature-lock-badge :is(.lock-art,ui-mark){display:none}
+
 
 /* page */
 /* Keep the top controls outside the entire notification area, including long reward lists. */

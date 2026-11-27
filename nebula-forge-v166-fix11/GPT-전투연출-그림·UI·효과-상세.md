@@ -1,9 +1,9 @@
-# 성운의 모루 · 전투 연출·UI 검수 보고서와 GPT 작업 지시서 (v166-fix10)
+# 성운의 모루 · 전투 연출·UI 검수 보고서와 GPT 작업 지시서 (v166-fix11)
 
 이 문서는 두 부분입니다.
 
 - **1부 · 검수 보고서**: Claude가 게임을 화면마다 직접 띄워 찾은 문제와, 코드로 이미 고친 것.
-- **2부 · GPT 작업 카드 A13~A19**: GPT가 그릴 그림 목록. 그림만 정해진 자리에 넣고 스위치 한 줄만 바꾸면 게임에 바로 나오도록 코드가 미리 연결되어 있습니다.
+- **2부 · GPT 작업 카드 A13~A22**: GPT가 그릴 그림 목록. 그림만 정해진 자리에 넣고 스위치 한 줄만 바꾸면 게임에 바로 나오도록 코드가 미리 연결되어 있습니다.
 
 > **GPT에게:** 2부만 따라 하면 됩니다. 2부에 적힌 파일 말고는 어떤 코드도 고치지 마세요. 끝나면 3부의 "넘길 때"대로 돌려주세요.
 
@@ -140,10 +140,23 @@
 | 상단 바로가기 줄 | 오른쪽 끝 아이콘이 잘려 보임 | **코드로 고침**: 오른쪽 끝이 흐려지며 넘길 수 있다는 표시 |
 | 하단 메뉴 | 지금 탭 표시가 약함 | **코드로 고침**: 위쪽에 금빛 선과 아이콘 빛. 그림 카드는 A19 |
 
-다음 단계로 권하는 것(이번에 손대지 않음):
-- **상단 재화 칸(골드·다이아·성운석)**: 아이콘이 칸 안에 갇혀 작아 보입니다. 아이콘을 칸 왼쪽 밖으로 조금 걸치게 크게 두는 요즘 방식이 어울립니다. 상단 구조를 바꾸는 일이라 화면 전체를 다시 확인해야 합니다.
-- **카드형 칸(상점·우편)**: 모두 같은 어두운 상자라 중요도가 구분되지 않습니다. 무료·한정 상품에 리본이나 띠를 붙이는 일을 다음에 권합니다.
-- **잠금 표시 "STAGE 40"**: 하단 메뉴 글자 밑에 붙어 답답합니다. 아이콘 위 작은 자물쇠 배지로 옮기는 편이 깔끔합니다.
+이어서 처리한 세 가지(수정본 11):
+
+| 부분 | 문제 | 처리 |
+|---|---|---|
+| 상단 재화 칸(골드·다이아·성운석) | 22px 아이콘이 칸 안에 갇혀 작아 보임 | **코드로 고침**: 아이콘을 36px로 키워 칸 왼쪽 밖으로 걸치게 함. 칸은 둥근 캡슐에 금빛 테. `+`는 금빛 원 배지. 그림 카드는 A20 |
+| 상점·우편 카드 | 모두 같은 상자라 중요도가 안 보임 | **코드로 고침**: 리본을 붙임(그림 카드는 A21). 아래 표 참고 |
+| 하단 메뉴·바로가기의 잠금 | 이름 밑에 "STAGE 40" 줄과 자물쇠가 붙어 답답함 | **코드로 고침**: 아이콘 오른쪽 위 작은 자물쇠 배지만 남기고, 잠긴 아이콘은 흐리게 함. 누르면 "STAGE 40 클리어 시 열립니다"가 뜸. 그림 카드는 A22 |
+
+리본이 붙는 곳:
+
+| 위치 | 리본 | 색 |
+|---|---|---|
+| 상점 · 일일 선물 | `무료` (받은 뒤에는 `수령 완료`) | 빨강 (받은 뒤 회색) |
+| 상점 · 패키지 · 한정 구성 | `한정` | 금색 |
+| 상점 · 다이아 · 가장 큰 상품 | `최고 가치` | 금색 |
+| 우편 · 보상이 있는 편지 | `보상` | 빨강 |
+| 우편 · 안 읽은 편지 | 봉투 옆 빨간 점 | 빨강 |
 
 ## 8. 이번에 손대지 않은 것(2단계 제안)
 
@@ -170,13 +183,14 @@
    - 가운데(글씨·막대가 들어가는 자리)는 비웁니다.
    - 네온 같은 형광색, 두꺼운 만화 외곽선, 글자는 넣지 않습니다.
 6. **글자를 그림에 넣지 않습니다.** 글씨는 게임이 따로 씁니다. 예외는 카드에 따로 적습니다.
-7. **바꿀 코드는 단 한 곳**: `dist/client/battle-presentation.js` 맨 위의 스위치 5줄뿐입니다.
+7. **바꿀 코드는 단 한 곳**: `dist/client/battle-presentation.js` 맨 위의 스위치 6줄뿐입니다.
    ```js
    const BATTLE_UI_ART=false;   // A13
    const COMBAT_FX_ART=false;   // A14
    const MINE_ART=false;        // A15
    const BOSS_INTRO_ART=false;  // A16
    const UI_KIT_ART=false;      // A17~A19
+   const UI_EXTRA_ART=false;    // A20~A22
    ```
    카드의 그림을 **전부** 넣은 뒤에만 그 카드의 줄을 `true`로 바꿉니다. 하나라도 빠졌으면 `false`로 둡니다.
 8. **스위치를 바꾼 뒤 반드시 실행할 명령**(게임 폴더에서):
@@ -196,6 +210,7 @@
 3. A16 보스 경고 띠
 4. A15 광산
 5. A14 치명타 폭발
+6. A20~A22 재화 칸, 리본, 잠금 배지
 
 ### 기준 그림(안내도) — 그리기 전에 반드시 보기
 `art/gpt-guides/` 폴더에 카드별 안내도가 있습니다. 이미지를 만들 때 참고 그림으로 함께 넣으세요.
@@ -209,6 +224,8 @@
 | `A16-1_boss-warning_안내.png` | 글씨가 들어갈 가운데 60% |
 | `A17_button_안내.png` | 버튼 모서리 24px 규칙(빨강·파랑·초록) |
 | `A18-1_panel-frame_안내.png` | 팝업 모서리 48px 규칙 |
+| `A20-1_wallet-frame_안내.png` | 재화 칸 모서리 24px 규칙과 숫자 자리 |
+| `A21_ribbon_안내.png` | 리본의 글씨 자리와 오른쪽 끝 모양 |
 
 화풍 참고 그림으로 게임의 기존 그림도 함께 넣으면 톤이 맞습니다.
 - `dist/client/assets/boss-challenge.webp`: 보스 도전 버튼
@@ -282,6 +299,7 @@ node tools/preview.mjs --port 4173
 | A15 | 던전 → 별의 광산 → 채굴 시작 |
 | A16 | 보스 단계로 이동하는 순간 |
 | A17~A19 | 상점(버튼), 설정·우편함(팝업), 하단 메뉴 |
+| A20~A22 | 화면 맨 위 재화 칸, 상점(교환·패키지·다이아)과 우편함의 리본, 잠긴 하단 메뉴(거점·던전 등) |
 
 ## A13 · 전투 UI 그림 (스위치 `BATTLE_UI_ART`)
 
@@ -431,6 +449,52 @@ node tools/preview.mjs --port 4173
 
 **A17~A19 완료 후**: 다섯 파일(`btn-gold`, `btn-purple`, `panel-frame`, `divider`, `nav-glow`)이 모두 들어갔으면 `const UI_KIT_ART=true;` → 빌드 명령 2줄.
 
+## A20~A22 · 재화 칸 · 리본 · 잠금 배지 (스위치 `UI_EXTRA_ART`)
+
+폴더: `dist/client/assets/ui-kit/`
+
+### A20-1 `wallet-frame.webp` — 상단 재화 칸
+- **크기**: 200 × 56, 투명 배경. **9조각**이고, 게임은 **모서리 24px**을 고정하고 늘려 씁니다(화면 높이 44px).
+- **그릴 것**: 양 끝이 완전히 둥근 캡슐 모양입니다.
+  - 짙은 자주 판(위 #2A2036 → 아래 #160F20)입니다.
+  - 테두리는 1~2px 금선이고, 위쪽 가장자리에 가는 빛 반사를 넣습니다.
+  - 장식은 넣지 않거나, 왼쪽 끝 모서리(24px 안)에 아주 작은 금빛 꺾쇠 하나만 넣습니다.
+  - 가운데는 숫자 자리라 고르게 칠합니다.
+- **아이콘(골드·다이아·성운석)은 그리지 않습니다.** 게임이 기존 아이콘을 칸 왼쪽 밖으로 걸쳐 올립니다.
+- 안내도: `art/gpt-guides/A20-1_wallet-frame_안내.png`
+- **프롬프트**: `9-slice horizontal capsule frame for a currency counter, fully rounded ends, dark plum gradient fill, thin gold rim, subtle highlight along the top edge, plain uniform middle for numbers, elegant fantasy mobile RPG HUD, transparent background, no icons, no text`
+
+### A20-2 `plus-badge.webp` — 재화 칸 오른쪽 `+` 버튼
+- **크기**: 64 × 64, 투명 배경. 화면에서 22px입니다.
+- **그릴 것**: 둥근 금빛 보석 단추 가운데에 짙은 갈색 `+` 표시를 넣습니다. 위쪽은 밝게, 아래는 진하게 칠하고, 테두리는 얇은 진한 금입니다.
+- **좌우 대칭, 정중앙, 둘레 여백 4px**으로 그립니다.
+- **프롬프트**: `round glossy gold button with a dark brown plus sign in the center, bright top and deeper bottom, thin dark gold rim, perfectly symmetrical, game UI icon, transparent background, no text`
+
+### A21-1 `ribbon-red.webp`, A21-2 `ribbon-gold.webp` — 카드 리본
+- **크기**: 각 160 × 40, 투명 배경. 화면에서는 글자 길이에 맞춰 가로로 늘어납니다(높이 약 20px).
+- **쓰이는 곳**
+  - 빨강: `무료`, `보상`
+  - 금색: `한정`, `최고 가치`
+  - **글씨는 게임이 쓰므로 그리지 않습니다.**
+- **그릴 것**: 비단 리본 띠입니다.
+  - **왼쪽 끝은 곧게** 둡니다. 카드 가장자리에 붙는 쪽입니다.
+  - **오른쪽 끝은 제비꼬리(V자 홈)**로 처리합니다.
+  - 위아래에 가는 금선을 넣습니다.
+  - 가운데(가로 15%~80%, 세로 25%~75%)는 글씨 자리라 무늬 없이 고르게 칠합니다.
+  - 빨강은 #E2556A → #A9263D, 금색은 #FFE7AB → #D9A24F입니다.
+- 안내도: `art/gpt-guides/A21_ribbon_안내.png`
+- **프롬프트(빨강)**: `horizontal silk ribbon banner for a shop card label, crimson red gradient, thin gold lines along top and bottom edges, straight left end, swallowtail notch on the right end, plain uniform middle for text, fantasy mobile RPG UI, transparent background, no text`
+- **프롬프트(금색)**: 위 문장의 `crimson red`를 `warm gold`로 바꿉니다.
+
+### A22-1 `lock-badge.webp` — 잠긴 메뉴의 자물쇠 배지
+- **크기**: 64 × 64, 투명 배경. 화면에서 20px입니다. 하단 메뉴와 상단 바로가기의 잠긴 아이콘 오른쪽 위에 붙습니다.
+- **그릴 것**: 짙은 자주 원판에 금빛 테를 두르고, 가운데에 작은 금빛 자물쇠를 넣습니다. 자물쇠는 정면을 보고, 고리는 위쪽입니다.
+  - 20px로 줄여도 자물쇠로 읽혀야 하므로 잔선 없이 덩어리로 그립니다.
+- **좌우 대칭, 정중앙, 둘레 여백 4px**으로 그립니다.
+- **프롬프트**: `small round badge, dark plum disc with thin gold ring, simple golden padlock in the center facing front, bold clean silhouette readable at 20px, perfectly symmetrical, game UI icon, transparent background, no text`
+
+**A20~A22 완료 후**: 다섯 파일(`wallet-frame`, `plus-badge`, `ribbon-red`, `ribbon-gold`, `lock-badge`)이 모두 들어가고 자가 검사를 통과하면 `const UI_EXTRA_ART=true;` → 빌드 명령 2줄. 그림을 켜도 재화 칸·카드 크기는 바뀌지 않습니다.
+
 ---
 
 # 3부 · 넘길 때와 검수
@@ -449,7 +513,7 @@ node tools/preview.mjs --port 4173
 - 문제가 있으면 Claude가 위치·크기를 코드로 보정하거나, 다시 그릴 부분을 구체적으로 적어 드립니다.
 
 ## GPT가 하면 안 되는 것
-- `battle-presentation.js`의 스위치 5줄 말고 다른 코드를 고치는 것.
+- `battle-presentation.js`의 스위치 6줄 말고 다른 코드를 고치는 것.
 - 기존 그림 파일을 덮어쓰거나 지우는 것. 특히 `pick.webp`, `vein.webp`, `chips.webp`, `critical-hit.webp`.
 - 그림 안에 글자를 넣는 것.
 - 자가 검사에서 `고칠것`이 남은 카드의 스위치를 켜는 것.

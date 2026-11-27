@@ -4733,12 +4733,14 @@ syncAccountNickname=async function(){await nameSyncBeforeRankings();rankBoard.sc
      COMBAT_FX_ART  A14  assets/combat-fx/   hit spark, crit burst, slash sheets
      MINE_ART       A15  assets/star-mine/   gloved hand with pickaxe, ore node crack stages, gem
      BOSS_INTRO_ART A16  assets/battle-ui/   boss warning banner
-     UI_KIT_ART     A17-A19 assets/ui-kit/   button, popup frame, divider, bottom-menu glow (ui-kit.css) */
+     UI_KIT_ART     A17-A19 assets/ui-kit/   button, popup frame, divider, bottom-menu glow (ui-kit.css)
+     UI_EXTRA_ART   A20-A22 assets/ui-kit/   currency chip + plus badge, shop/mail ribbons, lock badge   */
 const BATTLE_UI_ART=false;
 const COMBAT_FX_ART=false;
 const MINE_ART=false;
 const BOSS_INTRO_ART=false;
 const UI_KIT_ART=false;
+const UI_EXTRA_ART=false;
 
 const battlePresentation=(()=>{
  const ART='./assets/battle-ui/',FX='./assets/combat-fx/';
@@ -4961,6 +4963,7 @@ const battlePresentation=(()=>{
  function install(){
   document.body?.classList?.toggle('bp-fx-art',COMBAT_FX_ART);
   document.body?.classList?.toggle('ui-kit-art',UI_KIT_ART);
+  document.body?.classList?.toggle('ui-extra-art',UI_EXTRA_ART);
   if(typeof paintBattle==='function'){
    const before=paintBattle;
    paintBattle=function(...args){const out=before.apply(this,args);try{paintRoute();paintHud();bossIntro()}catch(e){}return out};
