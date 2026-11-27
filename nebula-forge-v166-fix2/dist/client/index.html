@@ -4,7 +4,7 @@
 #gameBoot .boot-line{width:124px;height:3px;overflow:hidden;margin:20px auto 0;border-radius:3px;background:#655361}#gameBoot .boot-line::after{content:"";display:block;width:55%;height:100%;border-radius:inherit;background:#e9c589;animation:bootTravel 1.4s ease-in-out infinite alternate}
 @keyframes bootTravel{from{transform:translateX(0)}to{transform:translateX(82%)}}@media(prefers-reduced-motion:reduce){#gameBoot .boot-line::after{animation:none;width:100%}}
 #gameBoot button{margin-top:16px;min-height:44px;border:1px solid #baa07b;border-radius:8px;padding:0 16px;background:#3c3047;color:#fbeccc;font:inherit}
-</style><link rel="stylesheet" href="./game-bundle-7dd8aed63d5e9261.css">
+</style><link rel="stylesheet" href="./game-bundle-ef07c1ee855dd38b.css">
 <style id="visual-audit-fixes">
 /* Anchor each display sprite to the actual sole coordinates in its source frame. */
 .ui-renewal :is(.class-preview-stage,.wardrobe-stage){--display-floor:28px;height:258px;overflow:hidden;isolation:isolate}
@@ -75,7 +75,7 @@
  <small id="chatStatus" role="status" hidden></small></section></div>
 </dialog>
 <nav class="bottom-nav" id="bottomNav" aria-label="주 메뉴"></nav>
-<div class="overlay" id="overlay" onclick="if(event.target===this)closeMenu()"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="heading"><header class="dialoghead"><button onclick="closeMenu()" aria-label="이전 화면"><ui-mark data-shape=chevron-left aria-hidden=true></ui-mark></button><h2 id="heading"></h2><button class="close-button" onclick="dismissPopup()" aria-label="팝업 닫기"><ui-mark data-shape=close aria-hidden=true></ui-mark></button></header><div id="popupGuide" class="feature-guide" hidden></div><p class="server-transaction-status" id="popupTransactionStatus" role="status" hidden></p><div class="content" id="content"></div><button class="popup-close" onclick="closeMenu()" aria-label="닫기"><ui-mark data-shape=close aria-hidden=true></ui-mark></button></section></div>
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeMenu()"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="heading"><header class="dialoghead"><button onclick="closeMenu()" aria-label="이전 화면"><ui-mark data-shape=chevron-left aria-hidden=true></ui-mark></button><h2 id="heading"></h2><button class="close-button" onclick="closeFromX()" aria-label="팝업 닫기"><ui-mark data-shape=close aria-hidden=true></ui-mark></button></header><div id="popupGuide" class="feature-guide" hidden></div><p class="server-transaction-status" id="popupTransactionStatus" role="status" hidden></p><div class="content" id="content"></div><button class="popup-close" onclick="closeMenu()" aria-label="닫기"><ui-mark data-shape=close aria-hidden=true></ui-mark></button></section></div>
 <div id="classOnboarding" class="class-onboarding" role="dialog" aria-modal="true" aria-label="첫 직업 선택" hidden></div>
 <dialog id="diamondConfirm" aria-labelledby="diamondPurpose" aria-describedby="diamondCost diamondBalance" oncancel="cancelDiamondUse()" onclick="if(event.target===this)cancelDiamondUse()"><section><h2 id="diamondPurpose"></h2><strong id="diamondCost"></strong><p id="diamondBalance"></p><p class="server-transaction-status" id="diamondTransactionStatus" role="status" hidden></p><div><button type="button" class="muted-button" autofocus onclick="cancelDiamondUse()">취소</button><button type="button" class="gold-button" data-server-transaction onclick="acceptDiamondUse(event)">다이아 사용</button></div></section></dialog>
 <div id="notificationArea"><section id="featureUnlockBanner" class="feature-unlock-banner" hidden aria-label="새 기능" aria-live="polite"></section><div class="notice" id="notice" role="status" aria-atomic="true"></div></div><input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -1130,6 +1130,10 @@ function keepTrialDialog(){
 }
 function dismissPopup(){if(keepTrialDialog())return false;setTrialChoiceHeader(false);const wasOpen=$('overlay').classList.contains('show');view='';tab='';popupStack=[];$('overlay').classList.remove('show');setPopupInert(false);if(wasOpen&&activeScreen!=='home'){// Recreate the scroll layer after inert: Chromium can retain its old hit-test state after a modal repaint.
 const old=$('screenContent'),scroll=old.scrollTop,fresh=old.cloneNode(false);old.getAnimations?.().forEach(a=>a.cancel());old.replaceWith(fresh);renderScreen(false);fresh.scrollTop=scroll}}
+// A short note opened on top of another popup (a term, a rate table): X puts the reader back on the popup
+// underneath instead of closing everything. Opened by itself, X closes it as before.
+const NOTE_POPUPS=new Set(['termHelp','summonRates','petRates','royalRates','normalCostumeRates','royalSlot','normalSkin']);
+function closeFromX(){return NOTE_POPUPS.has(view)&&popupStack.length?closeMenu():dismissPopup()}
 function closeMenu(){
  if(keepTrialDialog())return false;
  while(view&&popupStack.length){

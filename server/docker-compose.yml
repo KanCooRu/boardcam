@@ -31,8 +31,8 @@ services:
         BASE_NAME: NebulaForge-Web-v166
         BASE_URL: https://github.com/KanCooRu/boardcam/releases/download/test1/NebulaForge-Web-v166.zip
         BASE_SHA256: 3968f0eb1d00d791bc6aa76569e588d72870a688eef8f1d706bf2aecded7c8d5
-        OVERLAY: nebula-forge-v166-fix1
-        DELETE: dist/client/game-bundle-83b2e25a8e91be8c.css
+        OVERLAY: nebula-forge-v166-fix2
+        DELETE: dist/client/game-bundle-83b2e25a8e91be8c.css dist/client/game-bundle-7dd8aed63d5e9261.css
     image: nebula-api:local
     restart: always
     env_file: .env
