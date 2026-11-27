@@ -201,9 +201,16 @@ function rollPet(random=Math.random()){
  for(const pet of PET_SUMMON_POOL){end+=pet.weight;if(point<end)return pet.i}
  return PET_SUMMON_POOL.at(-1).i;
 }
+// Higher grades cost more shards per level, and a duplicate of a higher grade gives more shards back.
+const SKILL_SHARD_SCALE=[1,1.5,2,3];          // 일반 · 희귀 · 영웅 · 전설
+const PET_SHARD_SCALE=[1,1.2,1.5,2,2.5,3];    // 일반 · 희귀 · 영웅 · 전설 · 신화 · 천상
+function shardScale(pet,id){
+ if(pet)return PET_SHARD_SCALE[PET_TIERS.indexOf(petTier(id))]??1;
+ return SKILL_SHARD_SCALE[SKILL_RULES[id]?.tier]??1;
+}
 function awardSummon(kind,id,state=s,random=Math.random){
  const pet=kind==='pet',levels=pet?state.pets:state.skills,newly=!levels[id];
- const shards=newly?(pet?0:5):10+Math.floor(random()*11);
+ const shards=newly?(pet?0:5):Math.round((10+Math.floor(random()*11))*shardScale(pet,id));
  if(newly)levels[id]=1;
  state[pet?'petShards':'shards']+=shards;
  return {id,newly,shards};
@@ -1393,8 +1400,8 @@ salvageLow=function(){const ids=new Set(s.gear.filter(g=>matchesBagFilters(g)&&c
 equipBest=function(){for(let p=1;p<7;p++){const best=s.gear.filter(g=>g.p===p).sort((a,b)=>gearValue(b)-gearValue(a))[0];if(best)s.equipped[p]=best.id}paint();save();notice('가장 강한 장비를 장착했습니다')};
 function showcaseGear(id){const g=s.gear.find(x=>x.id===id);if(!g||g.locked||s.equipped[g.p]===id){notice('미착용·잠금 해제 장비를 선택하세요');return}s.showcase[g.p]+=g.r+1;s.gear=s.gear.filter(x=>x.id!==id);paint();save();notice('진열장 등록 · 영구 공격력 +'+((g.r+1)*.1).toFixed(1)+'%')}
 function slotOpen(i){return i<2||i===2&&s.maxStage>=10||i===3&&s.maxStage>=30}
-function skillCost(k,level=s.skills[k]||0){return 10+Math.floor(level*1.5)}
-function petCost(i,level=s.pets[i]||0){return 10+level*2}
+function skillCost(k,level=s.skills[k]||0){return Math.round((10+Math.floor(level*1.5))*shardScale(false,k))}
+function petCost(i,level=s.pets[i]||0){return Math.round((10+level*2)*shardScale(true,i))}
 skillLevel=function(k,maximum=false){if(k<0||k>=SK.length)return;let count=0;while((s.skills[k]||0)<100&&s.shards>=skillCost(k)){s.shards-=skillCost(k);s.skills[k]=(s.skills[k]||0)+1;count++;if(!maximum)break}s.daily.upgrades=(s.daily.upgrades||0)+count;paint();save();if(!count)notice('스킬 조각 부족 또는 최대 레벨')};
 levelAllSkills=function(maximum){let count=0;for(let round=0;round<(maximum?100:1);round++){let done=0;for(const k of Object.keys(s.skills).map(Number)){if(s.skills[k]<100&&s.shards>=skillCost(k)){s.shards-=skillCost(k);s.skills[k]++;done++;count++}}if(!done)break}s.daily.upgrades=(s.daily.upgrades||0)+count;paint();save();if(!count)notice('강화 가능한 스킬이 없습니다')};
 setSlot=function(slot,k){if(!slotOpen(slot)||!s.skills[k]){notice('STAGE '+(slot===2?10:30)+'에서 슬롯이 열립니다');return}const old=s.slots.indexOf(k);if(old>=0)s.slots[old]=-1;s.slots[slot]=k;cooldowns[slot]=Math.max(cooldowns[slot],SKILL_RULES[k].cd);closeMenu();paint();save();notice('스킬 장착 완료')};
@@ -1992,7 +1999,7 @@ function petSummonPopup(){return drawResultPanel('pet',petSummonResults)}
 function petRatesPopup(){
  const groups=PET_TIERS.map(t=>summonOddsGroup({name:t.name,color:t.color,chance:t.weight/100},
   t.pets.map(i=>({name:PETS[i],icon:petArt(i),chance:petProbability(i)})))).join('');
- return '<p class="small">같은 등급 내 확률 동일 · 10회도 개별 추첨 · 중복 시 동료 조각 10~20개</p>'+groups;
+ return '<p class="small">같은 등급 내 확률 동일 · 10회도 개별 추첨 · 중복 시 동료 조각 10~20개(희귀 ×1.2 · 영웅 ×1.5 · 전설 ×2 · 신화 ×2.5 · 천상 ×3). 강화에 드는 조각도 같은 배수입니다</p>'+groups;
 }
 const exchangeShopScreen=shopScreen;
 shopScreen=function(){return screenTab==='diamonds'?diamondShop():exchangeShopScreen()};
@@ -4684,7 +4691,7 @@ function exchangeHavenItem(id){return onlineAct('townExchange',{id})}
 function raidComingPopup(){return partyRaid.lobby()}
 EXTRA_POPUPS.havenShop=['성운의 상점',havenShopPopup];
 EXTRA_POPUPS.raidComing=['레이드',raidComingPopup];
-</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-1da0702311230902.css"><script src="./game-bundle-9982f981ea041b80.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
+</script><script src="./game-bundle-b2c03337f3124134.js"></script><link rel="stylesheet" href="./game-bundle-1da0702311230902.css"><script src="./game-bundle-2dd1e15e1f340af4.js"></script><!-- ENEMY_UNITY_BUILD --><meta name="nebula-unity-build" content="./unity-battle/enable.js"><script src="./game-bundle-56d1e0794cafd907.js"></script><script src="./save-guard.js?v=143"></script><script>'use strict';
 
 const ADVENTURE_TERMS={
  '공격력':'평타와 공격 스킬의 피해를 계산할 때 사용하는 기본 수치입니다.',
